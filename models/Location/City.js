@@ -28,12 +28,12 @@ const CitySchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    LastUpdateBy: {
-      //team id
-      type: String,
-      default: "abcd1234",
-      required: true,
-    },
+    // LastUpdateBy: {
+    //   //team id
+    //   type: String,
+    //   default: "abcd1234",
+    //   required: true,
+    // },
     isActive: {
       type: Boolean,
       default: true,

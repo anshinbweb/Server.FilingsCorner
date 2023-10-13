@@ -9,24 +9,24 @@ const StateSchema = new mongoose.Schema(
     },
     StateCode: {
       type: Number,
-      required: true,
+      // required: true,
       unique: true,
     },
-    CountryName: {
-      type: String,
-      required: true,
-    },
+    // CountryName: {
+    //   type: String,
+    //   required: true,
+    // },
     CountryID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Country",
       required: true,
     },
-    LastUpdateBy: {
-      //team id
-      type: String,
-      // default: "abcd1234",
-      // required: true,
-    },
+    // LastUpdateBy: {
+    //   //team id
+    //   type: String,
+    //   // default: "abcd1234",
+    //   // required: true,
+    // },
     isActive: {
       type: Boolean,
       default: true,
