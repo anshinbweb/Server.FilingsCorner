@@ -33,7 +33,7 @@ router.post(
 
 router.get("/auth/list-top-products", catchAsync(listTopProducts));
 
-router.post("/auth/topProducts-all", catchAsync(listTProducts));
+router.post("/auth/topProducts-all", catchAsync(listTProducts));  //by params
 
 router.get("/auth/top-products/:_id", catchAsync(getTopProducts));
 
