@@ -214,4 +214,10 @@ exports.updateZiyaLocation = async (req, res) => {
       console.log(err);
       res.status(400).send("update  failed");
     }
-  };
+};
+
+exports.findZiyaLocation = async (req, res) => {
+  const find = await ZiyaLocation.find({ CountryID: req.params.country, CityID: req.params.city }).exec();
+  console.log("get ZiyaLocation", find);
+  res.json(find);
+};
