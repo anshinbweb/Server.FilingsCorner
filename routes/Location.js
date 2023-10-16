@@ -34,8 +34,8 @@ const {
 } = require("../controllers/Location");
 const catchAsync = require("../utils/catchAsync");
 
-router.get("/auth/location", catchAsync(getLocation));
-router.post("/auth/location", catchAsync(createLocation));
+// router.get("/auth/location", catchAsync(getLocation));
+// router.post("/auth/location", catchAsync(createLocation));
 
 //location setup ---> country
 router.get("/auth/location/country", catchAsync(listCountry));

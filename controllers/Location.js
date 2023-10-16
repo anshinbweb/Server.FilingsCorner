@@ -168,6 +168,25 @@ exports.listStateByParams = async (req, res) => {
       $match: { isActive: isActive },
     },
     {
+      $lookup: {
+        from: "countries",
+        localField: "CountryID",
+        foreignField: "_id",
+        as: "countryname",
+      },
+    },
+    {
+      $unwind: {
+        path: "$countryname",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $set: {
+        countryname: "$countryname.CountryName",
+      },
+    },
+    {
       $facet: {
         stage1: [
           {
