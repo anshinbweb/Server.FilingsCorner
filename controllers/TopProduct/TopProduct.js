@@ -1,4 +1,5 @@
 const TopProducts = require("../../models/TopProducts/TopProducts");
+const fs = require("fs");
 
 exports.getTopProducts = async (req, res) => {
   const find = await TopProducts.findOne({ _id: req.params._id }).exec();
@@ -8,8 +9,21 @@ exports.getTopProducts = async (req, res) => {
 
 exports.createTopProducts = async (req, res) => {
   try {
+    if (!fs.existsSync(`${__basedir}/uploads/TopProducts`)) {
+      fs.mkdirSync(`${__basedir}/uploads/TopProducts`);
+    }
+
+    let ProductImage = req.file
+      ? `uploads/TopProducts/${req.file.filename}`
+      : null;
+    let { NameOfProduct, IsActive } = req.body;
+
     console.log(req.body);
-    const add = await new TopProducts(req.body).save();
+    const add = await new TopProducts({
+      ProductImage,
+      NameOfProduct,
+      IsActive,
+    }).save();
     res.json(add);
   } catch (err) {
     console.log("log error from create Task List", err);
@@ -24,9 +38,12 @@ exports.listTopProducts = async (req, res) => {
 
 exports.listTProducts = async (req, res) => {
   try {
-    let { skip, per_page, sorton, sortdir, match } = req.body;
+    let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
     let query = [
+      {
+        $match: { IsActive: IsActive },
+      },
       {
         $facet: {
           stage1: [
@@ -112,9 +129,18 @@ exports.listTProducts = async (req, res) => {
 
 exports.updateTopProducts = async (req, res) => {
   try {
+    let ProductImage = req.file
+      ? `uploads/TopProducts/${req.file.filename}`
+      : null;
+    console.log("pp", ProductImage);
+    let fieldvalues = { ...req.body };
+    if (ProductImage != null) {
+      fieldvalues.ProductImage = ProductImage;
+    }
+
     const update = await TopProducts.findOneAndUpdate(
       { _id: req.params._id },
-      req.body,
+      fieldvalues,
       { new: true }
     );
     console.log(update);
