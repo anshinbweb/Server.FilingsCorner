@@ -13,15 +13,20 @@ exports.createTopProducts = async (req, res) => {
       fs.mkdirSync(`${__basedir}/uploads/TopProducts`);
     }
 
-    let ProductImage = req.file
-      ? `uploads/TopProducts/${req.file.filename}`
-      : null;
+    let ProductImage = req.files.ProductImage[0];
+    let ProductHoverImage = req.files.ProductHoverImage[0];
+
+    // let ProductImage = req.file
+    //   ? `uploads/TopProducts/${req.file.filename}`
+    //   : null;
+
     let { NameOfProduct, IsActive } = req.body;
 
     console.log(req.body);
     const add = await new TopProducts({
-      ProductImage,
+      ProductImage: `uploads/TopProducts/${ProductImage.filename}`,
       NameOfProduct,
+      ProductHoverImage: `uploads/TopProducts/${ProductHoverImage.filename}`,
       IsActive,
     }).save();
     res.json(add);
@@ -129,13 +134,25 @@ exports.listTProducts = async (req, res) => {
 
 exports.updateTopProducts = async (req, res) => {
   try {
-    let ProductImage = req.file
-      ? `uploads/TopProducts/${req.file.filename}`
-      : null;
-    console.log("pp", ProductImage);
+    // let profileMp = req.file ? `profile-sh/${req.file.filename}` : null;
+    let ProductImage =
+      req.files || req.body.ProductImage
+        ? req.body.ProductImage
+          ? req.body.ProductImage
+          : `uploads/TopProducts/${req.files.ProductImage[0].filename}`
+        : null;
+
+    let ProductHoverImage =
+      req.files || req.body.ProductHoverImage
+        ? req.body.ProductHoverImage
+          ? req.body.ProductHoverImage
+          : `uploads/TopProducts/${req.files.ProductHoverImage[0].filename}`
+        : null;
+
     let fieldvalues = { ...req.body };
-    if (ProductImage != null) {
+    if (ProductImage != null && ProductHoverImage != null) {
       fieldvalues.ProductImage = ProductImage;
+      fieldvalues.ProductHoverImage = ProductHoverImage;
     }
 
     const update = await TopProducts.findOneAndUpdate(

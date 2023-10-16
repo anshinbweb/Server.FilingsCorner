@@ -11,6 +11,10 @@ const TopProductsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    ProductHoverImage: {
+      type: String,
+      required: true,
+    },
     IsActive: {
       type: Boolean,
       // required: true,
