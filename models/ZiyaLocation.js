@@ -19,6 +19,12 @@ const ZiyaLocationSchema = new mongoose.Schema(
     Area: {
       type: String,
     },
+    Address: {
+      type: String,
+    },
+    StoreLogo: {
+      type: String,
+    },
     Location: {
       type: String,
     },

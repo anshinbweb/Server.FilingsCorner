@@ -1,4 +1,5 @@
 const ZiyaLocation = require("../models/ZiyaLocation");
+const fs = require("fs");
 
 exports.listZiyaLocation = async (req, res) => {
   const list = await ZiyaLocation.find().sort({ createdAt: -1 }).exec();
@@ -8,35 +9,45 @@ exports.listZiyaLocation = async (req, res) => {
 
 exports.createZiyaLocation = async (req, res) => {
   try {
-    //   const code = await ZiyaLocation.findOne({ CountryCode: req.body.CountryCode });
-    //   const country = await Country.findOne({
-    //     CountryName: req.body.CountryName,
-    //   });
-    //   if (country) {
-    //     return res
-    //       .status(200)
-    //       .json({
-    //         isOk: false,
-    //         field: 1,
-    //         message: "Country with this name already exists!",
-    //       });
-    //   } else if (code) {
-    //     return res
-    //       .status(200)
-    //       .json({
-    //         isOk: false,
-    //         field: 2,
-    //         message: "Country with this code already exists!",
-    //       });
-    //   } else {
-    // const { CountryName, CountryCode } = req.body;
-    const add = await new ZiyaLocation(req.body).save();
-    // console.log("create country", addCountry);
+    if (!fs.existsSync(`${__basedir}/uploads/StoreLogo`)) {
+      fs.mkdirSync(`${__basedir}/uploads/StoreLogo`);
+    }
+
+    let StoreLogo = req.file ? `uploads/StoreLogo/${req.file.filename}` : null;
+
+    let {
+      CityID,
+      StateID,
+      CountryID,
+      Area,
+      Address,
+      Location,
+      latitude,
+      longitude,
+      isActive,
+    } = req.body;
+
+    console.log("city", CityID);
+
+    const add = await new ZiyaLocation({
+      CityID,
+      StateID,
+      CountryID,
+      StoreLogo,
+      Area,
+      Address,
+      Location,
+      latitude,
+      longitude,
+      isActive,
+    }).save();
+    console.log("create location", add);
     res.status(200).json({ isOk: true, data: add, message: "" });
     //   }
   } catch (err) {
+    console.log("error in create", err);
     res
-      .status(200)
+      .status(400)
       .json({ isOk: false, message: "Error creating ziya location" });
   }
 };
@@ -112,15 +123,18 @@ exports.listZiyaLocationByParams = async (req, res) => {
             Area: new RegExp(match, "i"),
           },
           {
+            Address: new RegExp(match, "i"),
+          },
+
+          {
             Location: new RegExp(match, "i"),
           },
-        //   {
-        //     countryname: new RegExp(match, "i"),
-        //   },
-        //   {
-        //     statename: new RegExp(match, "i"),
-        //   },
-          
+          //   {
+          //     countryname: new RegExp(match, "i"),
+          //   },
+          //   {
+          //     statename: new RegExp(match, "i"),
+          //   },
         ],
       },
     },
@@ -201,23 +215,35 @@ exports.getZiyaLocation = async (req, res) => {
 };
 
 exports.updateZiyaLocation = async (req, res) => {
-    try {
-      // const { CountryCode, CountryName } = req.body;
-      const update = await ZiyaLocation.findOneAndUpdate(
-        { _id: req.params._id },
-        req.body,
-        { new: true }
-      );
-      console.log("edit ", update);
-      res.json(update);
-    } catch (err) {
-      console.log(err);
-      res.status(400).send("update  failed");
+  try {
+    // const { CountryCode, CountryName } = req.body;
+    let StoreLogo = req.file ? `uploads/StoreLogo/${req.file.filename}` : null;
+    console.log("pp", StoreLogo);
+    let fieldvalues = { ...req.body };
+    // fieldvalues.ProductPicture = null;
+    if (StoreLogo != null) {
+      fieldvalues.StoreLogo = StoreLogo;
     }
+    const update = await ZiyaLocation.findOneAndUpdate(
+      { _id: req.params._id },
+      // req.body,
+      fieldvalues,
+
+      { new: true }
+    );
+    console.log("edit ", update);
+    res.json(update);
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("update  failed");
+  }
 };
 
 exports.findZiyaLocation = async (req, res) => {
-  const find = await ZiyaLocation.find({ CountryID: req.params.country, CityID: req.params.city }).exec();
+  const find = await ZiyaLocation.find({
+    CountryID: req.params.country,
+    CityID: req.params.city,
+  }).exec();
   console.log("get ZiyaLocation", find);
   res.json(find);
 };
