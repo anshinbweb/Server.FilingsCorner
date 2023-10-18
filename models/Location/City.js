@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const {Schema , model , Types} = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 const CitySchema = new mongoose.Schema(
   {
     CityName: {
@@ -8,7 +8,7 @@ const CitySchema = new mongoose.Schema(
     },
     StateID: {
       type: Schema.Types.ObjectId,
-      ref:"State",
+      ref: "State",
       required: true,
     },
     // StateName: {
@@ -17,23 +17,15 @@ const CitySchema = new mongoose.Schema(
     // },
     CountryID: {
       type: Schema.Types.ObjectId,
-      ref:"Country",
+      ref: "Country",
       required: true,
     },
-    // CountryName: {
-    //   type: String,
+
+    // CityCode: {
+    //   type: Number,
     //   required: true,
     // },
-    CityCode: {
-      type: Number,
-      required: true,
-    },
-    // LastUpdateBy: {
-    //   //team id
-    //   type: String,
-    //   default: "abcd1234",
-    //   required: true,
-    // },
+
     isActive: {
       type: Boolean,
       default: true,

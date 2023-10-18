@@ -27,15 +27,15 @@ exports.listCountryByParams = async (req, res) => {
       $match: {
         $or: [
           { CountryName: regex },
-          {
-            $expr: {
-              $regexMatch: {
-                input: { $toString: "$CountryCode" },
-                regex: `^${match}`,
-                options: "i",
-              },
-            },
-          },
+          // {
+          //   $expr: {
+          //     $regexMatch: {
+          //       input: { $toString: "$CountryCode" },
+          //       regex: `^${match}`,
+          //       options: "i",
+          //     },
+          //   },
+          // },
           // { CountryCode: codeRegex }
         ],
       },
@@ -71,27 +71,27 @@ exports.listCountryByParams = async (req, res) => {
 };
 exports.createCountry = async (req, res) => {
   try {
-    const code = await Country.findOne({ CountryCode: req.body.CountryCode });
+    // const code = await Country.findOne({ CountryCode: req.body.CountryCode });
     const country = await Country.findOne({
       CountryName: req.body.CountryName,
     });
     if (country) {
-      return res
-        .status(200)
-        .json({
-          isOk: false,
-          field: 1,
-          message: "Country with this name already exists!",
-        });
-    } else if (code) {
-      return res
-        .status(200)
-        .json({
-          isOk: false,
-          field: 2,
-          message: "Country with this code already exists!",
-        });
-    } else {
+      return res.status(200).json({
+        isOk: false,
+        field: 1,
+        message: "Country with this name already exists!",
+      });
+    }
+    // else if (code) {
+    //   return res
+    //     .status(200)
+    //     .json({
+    //       isOk: false,
+    //       field: 2,
+    //       message: "Country with this code already exists!",
+    //     });
+    // }
+    else {
       const { CountryName, CountryCode } = req.body;
       const addCountry = await new Country(req.body).save();
       console.log("create country", addCountry);
@@ -230,9 +230,9 @@ exports.listStateByParams = async (req, res) => {
             {
               StateName: regex,
             },
-            {
-              StateCode: codeRegex,
-            },
+            // {
+            //   StateCode: codeRegex,
+            // },
             {
               CountryName: regex,
             },
@@ -266,26 +266,26 @@ exports.listStateByParams = async (req, res) => {
 
 exports.createState = async (req, res) => {
   try {
-    const code = await State.findOne({ StateCode: req.body.StateCode });
+    // const code = await State.findOne({ StateCode: req.body.StateCode });
     const state = await State.findOne({ StateName: req.body.StateName });
-    console.log(code, state);
+    console.log(state);
     if (state) {
-      return res
-        .status(200)
-        .json({
-          isOk: false,
-          field: 1,
-          message: "State with this name already exists!",
-        });
-    } else if (code) {
-      return res
-        .status(200)
-        .json({
-          isOk: false,
-          field: 2,
-          message: "State with this code already exists!",
-        });
-    } else {
+      return res.status(200).json({
+        isOk: false,
+        field: 1,
+        message: "State with this name already exists!",
+      });
+    }
+    // else if (code) {
+    //   return res
+    //     .status(200)
+    //     .json({
+    //       isOk: false,
+    //       field: 2,
+    //       message: "State with this code already exists!",
+    //     });
+    // }
+    else {
       console.log(req.body);
       const addState = await new State(req.body).save();
       console.log("create country", addState);
@@ -405,26 +405,26 @@ exports.listCityByParams = async (req, res) => {
       $match: {
         $or: [
           {
-            CityName: new RegExp(match, 'i')
+            CityName: new RegExp(match, "i"),
           },
           {
-            StateID: new RegExp(match, 'i')
+            StateID: new RegExp(match, "i"),
           },
           {
-            countryname: new RegExp(match, 'i')
+            countryname: new RegExp(match, "i"),
           },
           {
-            statename: new RegExp(match,'i')
+            statename: new RegExp(match, "i"),
           },
-          {
-                        $expr: {
-                          $regexMatch: {
-                            input: { $toString: "$CityCode" },
-                            regex: `^${match}`,
-                            options: "i",
-                          },
-                        },
-                      },
+          // {
+          //               $expr: {
+          //                 $regexMatch: {
+          //                   input: { $toString: "$CityCode" },
+          //                   regex: `^${match}`,
+          //                   options: "i",
+          //                 },
+          //               },
+          //             },
         ],
       },
     },
@@ -546,25 +546,25 @@ exports.getCity = async (req, res) => {
 exports.createCity = async (req, res) => {
   try {
     console.log(req.body);
-    const code = await City.findOne({ CityCode: req.body.CityCode });
+    // const code = await City.findOne({ CityCode: req.body.CityCode });
     const cityName = await City.findOne({ CityName: req.body.CityName });
     if (cityName) {
-      return res
-        .status(200)
-        .json({
-          isOk: false,
-          field: 1,
-          message: "City with this name already exists!",
-        });
-    } else if (code) {
-      return res
-        .status(200)
-        .json({
-          isOk: false,
-          field: 2,
-          message: "City with this code already exists!",
-        });
-    } else {
+      return res.status(200).json({
+        isOk: false,
+        field: 1,
+        message: "City with this name already exists!",
+      });
+    }
+    // else if (code) {
+    //   return res
+    //     .status(200)
+    //     .json({
+    //       isOk: false,
+    //       field: 2,
+    //       message: "City with this code already exists!",
+    //     });
+    // }
+    else {
       const addCity = await new City(req.body).save();
       console.log("create city", addCity);
       res.status(200).json({ isOk: true, data: addCity });
