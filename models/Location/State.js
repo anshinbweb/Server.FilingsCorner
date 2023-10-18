@@ -7,11 +7,11 @@ const StateSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    StateCode: {
-      type: Number,
-      // required: true,
-      unique: true,
-    },
+    // StateCode: {
+    //   type: Number,
+    //   // required: true,
+    //   unique: true,
+    // },
     // CountryName: {
     //   type: String,
     //   required: true,

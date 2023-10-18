@@ -5,13 +5,13 @@ const CountrySchema = new mongoose.Schema(
     CountryName: {
       type: String,
       required: true,
-      unqiue:true
+      unqiue: true,
     },
-    CountryCode: {
-      type: Number,
-      // required: true,
-      unique:true
-    },
+    // CountryCode: {
+    //   type: Number,
+    //   // required: true,
+    //   unique:true
+    // },
     isActive: {
       type: Boolean,
       default: false,
