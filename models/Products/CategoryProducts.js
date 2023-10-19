@@ -5,7 +5,7 @@ const CategoryProductsSchema = new mongoose.Schema(
     Category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
-      required: true,
+      // required: true,
     },
     ProductImage: {
       type: String,
@@ -15,8 +15,8 @@ const CategoryProductsSchema = new mongoose.Schema(
     },
     isActive: {
       type: Boolean,
-      default: true,
-      required: true,
+      // default: true,
+      // required: true,
     },
   },
   { timestamps: true }

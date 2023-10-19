@@ -1,4 +1,4 @@
-const Category = require("../Products/Category");
+const Category = require("../../models/Products/Category");
 
 exports.listCategory = async (req, res) => {
   const list = await Category.find().sort({ createdAt: -1 }).exec();
@@ -13,9 +13,7 @@ exports.createCategory = async (req, res) => {
     res.status(200).json({ isOk: true, data: add, message: "" });
     //   }
   } catch (err) {
-    res
-      .status(200)
-      .json({ isOk: false, message: "Error creating category" });
+    res.status(200).json({ isOk: false, message: "Error creating category" });
   }
 };
 
@@ -115,17 +113,16 @@ exports.getCategory = async (req, res) => {
 };
 
 exports.updateCategory = async (req, res) => {
-    try {
-      const update = await Category.findOneAndUpdate(
-        { _id: req.params._id },
-        req.body,
-        { new: true }
-      );
-      console.log("edit ", update);
-      res.json(update);
-    } catch (err) {
-      console.log(err);
-      res.status(400).send("update  failed");
-    }
+  try {
+    const update = await Category.findOneAndUpdate(
+      { _id: req.params._id },
+      req.body,
+      { new: true }
+    );
+    console.log("edit ", update);
+    res.json(update);
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("update  failed");
+  }
 };
-
