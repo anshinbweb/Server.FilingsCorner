@@ -161,5 +161,5 @@ exports.updateCategory = async (req, res) => {
       console.log(err);
       res.status(400).send("update  failed");
     }
-};
 
+};
