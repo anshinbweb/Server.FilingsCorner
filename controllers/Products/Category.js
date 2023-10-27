@@ -1,7 +1,9 @@
 const Category = require("../../models/Products/Category");
 
 exports.listCategory = async (req, res) => {
-  const list = await Category.find().sort({ createdAt: -1 }).exec();
+  const list = await Category.find()
+    // .sort({ createdAt: -1 })
+    .exec();
   // console.log("list country", list);
   res.json(list);
 };
@@ -13,30 +15,28 @@ exports.createCategory = async (req, res) => {
     //   }
 
     console.log("create", req.body);
-  
-    //   let CategoryImage = req.files.CategoryImage;
-  
-      let CategoryImage = req.file
-        ? `uploads/Category/${req.file.filename}`
-        : null;
 
-        console.log(CategoryImage)
-  
-      let {  Description, isActive } = req.body;
-  
-      const add = await new Category({
-        Category: req.body.Category,
-        // CategoryImage: `uploads/Category/${CategoryImage.filename}`,
-        CategoryImage: CategoryImage,
-        Description,
-        isActive,
-      }).save();
-      res.json(add);
+    //   let CategoryImage = req.files.CategoryImage;
+
+    let CategoryImage = req.file
+      ? `uploads/Category/${req.file.filename}`
+      : null;
+
+    console.log(CategoryImage);
+
+    let { Description, isActive } = req.body;
+
+    const add = await new Category({
+      Category: req.body.Category,
+      // CategoryImage: `uploads/Category/${CategoryImage.filename}`,
+      CategoryImage: CategoryImage,
+      Description,
+      isActive,
+    }).save();
+    res.json(add);
   } catch (err) {
     console.log(err);
-    res
-      .status(400)
-      .json({ isOk: false, message: err });
+    res.status(400).json({ isOk: false, message: err });
   }
 };
 
@@ -136,30 +136,29 @@ exports.getCategory = async (req, res) => {
 };
 
 exports.updateCategory = async (req, res) => {
-    try {
-        console.log("update",req.body);
-        let CategoryImage =
-        req.files || req.body.CategoryImage
+  try {
+    console.log("update", req.body);
+    let CategoryImage =
+      req.files || req.body.CategoryImage
+        ? req.body.CategoryImage
           ? req.body.CategoryImage
-            ? req.body.CategoryImage
-            : `uploads/Category/${req.file.filename}`
-          : null;
-  
-      let fieldvalues = { ...req.body };
-      if (CategoryImage != null ) {
-        fieldvalues.CategoryImage = CategoryImage;
-      }
-  
-      const update = await Category.findOneAndUpdate(
-        { _id: req.params._id },
-        fieldvalues,
-        { new: true }
-      );
-      console.log(update);
-      res.json(update);
-    } catch (err) {
-      console.log(err);
-      res.status(400).send("update  failed");
+          : `uploads/Category/${req.file.filename}`
+        : null;
+
+    let fieldvalues = { ...req.body };
+    if (CategoryImage != null) {
+      fieldvalues.CategoryImage = CategoryImage;
     }
 
+    const update = await Category.findOneAndUpdate(
+      { _id: req.params._id },
+      fieldvalues,
+      { new: true }
+    );
+    console.log(update);
+    res.json(update);
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("update  failed");
+  }
 };
