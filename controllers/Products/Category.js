@@ -139,7 +139,7 @@ exports.updateCategory = async (req, res) => {
   try {
     console.log("update", req.body);
     let CategoryImage =
-      req.files || req.body.CategoryImage
+      req.file || req.body.CategoryImage
         ? req.body.CategoryImage
           ? req.body.CategoryImage
           : `uploads/Category/${req.file.filename}`
