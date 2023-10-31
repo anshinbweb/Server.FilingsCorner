@@ -1,5 +1,7 @@
 const CategoryProducts = require("../../models/Products/CategoryProducts");
-const fs = require("fs");
+// const fs = require("fs");
+const sharp = require("sharp"); // Import the sharp library
+const fs = require("fs").promises; // Import the 'fs.promises' module
 
 exports.listCategoryProducts = async (req, res) => {
   const list = await CategoryProducts.find().sort({ createdAt: -1 }).exec();
@@ -9,14 +11,40 @@ exports.listCategoryProducts = async (req, res) => {
 
 exports.createCategoryProducts = async (req, res) => {
   try {
-    if (!fs.existsSync(`${__basedir}/uploads/CategoryProducts`)) {
-      fs.mkdirSync(`${__basedir}/uploads/CategoryProducts`);
-    }
+    // if (!fs.existsSync(`${__basedir}/uploads/CategoryProducts`)) {
+    //   fs.mkdirSync(`${__basedir}/uploads/CategoryProducts`);
+    // }
 
     console.log("body", req.body);
     let ProductImage = req.file
       ? `uploads/CategoryProducts/${req.file.filename}`
       : null;
+
+    if (ProductImage) {
+      // const resizedImage = `uploads/CategoryProducts/${req.file.filename}`;
+      // await sharp(ProductImage)
+      //   .resize({ width: 500, height: 500, fit: "contain" })
+      //   .toFile(resizedImage);
+      // ProductImage = resizedImage;
+      // await sharp(ProductImage)
+      //   .resize({ width: 500, height: 500, fit: "contain" })
+      //   .toFile(ProductImage); // Overwrite the original image with the resized version
+      const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${req.file.filename}`;
+
+      await sharp(ProductImage)
+        .resize({
+          width: 400,
+          height: 400,
+          fit: "contain",
+        })
+        .toFile(tempResizedImageCP);
+
+      // Remove the original image
+      await fs.unlink(ProductImage);
+
+      // Rename the temporary resized image to the original image path
+      await fs.rename(tempResizedImageCP, ProductImage);
+    }
 
     let { Category, ProductName, isActive } = req.body;
 
@@ -161,9 +189,31 @@ exports.updateCategoryProducts = async (req, res) => {
     console.log("pp", ProductImage);
     let fieldvalues = { ...req.body };
     // fieldvalues.ProductPicture = null;
+    // if (ProductImage != null) {
+    //   fieldvalues.ProductImage = ProductImage;
+    // }
+
     if (ProductImage != null) {
+      // Create a temporary file path for the resized image
+      const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${req.file.filename}`;
+
+      await sharp(ProductImage)
+        .resize({
+          width: 400,
+          height: 400,
+          fit: "contain",
+        })
+        .toFile(tempResizedImageCP);
+
+      // Remove the original image
+      await fs.unlink(ProductImage);
+
+      // Rename the temporary resized image to the original image path
+      await fs.rename(tempResizedImageCP, ProductImage);
+
       fieldvalues.ProductImage = ProductImage;
     }
+
     const update = await CategoryProducts.findOneAndUpdate(
       { _id: req.params._id },
       // req.body,
