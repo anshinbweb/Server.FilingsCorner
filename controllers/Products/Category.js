@@ -1,4 +1,6 @@
 const Category = require("../../models/Products/Category");
+const sharp = require("sharp"); // Import the sharp library
+const fs = require("fs").promises; // Import the 'fs.promises' module
 
 exports.listCategory = async (req, res) => {
   const list = await Category.find()
@@ -21,6 +23,33 @@ exports.createCategory = async (req, res) => {
     let CategoryImage = req.file
       ? `uploads/Category/${req.file.filename}`
       : null;
+
+    if (CategoryImage) {
+      // const resizedImage = `uploads/Category/${req.file.filename}`;
+      // await sharp(CategoryImage)
+      //   .resize({ width: 300, height: 200, fit: "contain" })
+      //   .toFile(resizedImage);
+      // CategoryImage = resizedImage;
+      // await sharp(CategoryImage)
+      //   .resize({ width: 300, height: 200, fit: "contain" })
+      //   .toFile(CategoryImage); // Overwrite the original image with the resized version
+
+      const tempResizedImage = `uploads/Category/temp_${req.file.filename}`;
+
+      await sharp(CategoryImage)
+        .resize({
+          width: 400,
+          height: 400,
+          fit: "contain",
+        })
+        .toFile(tempResizedImage);
+
+      // Remove the original image
+      await fs.unlink(CategoryImage);
+
+      // Rename the temporary resized image to the original image path
+      await fs.rename(tempResizedImage, CategoryImage);
+    }
 
     console.log(CategoryImage);
 
@@ -147,6 +176,23 @@ exports.updateCategory = async (req, res) => {
 
     let fieldvalues = { ...req.body };
     if (CategoryImage != null) {
+      // Create a temporary file path for the resized image
+      const tempResizedImage = `uploads/Category/temp_${req.file.filename}`;
+
+      await sharp(CategoryImage)
+        .resize({
+          width: 400,
+          height: 400,
+          fit: "contain",
+        })
+        .toFile(tempResizedImage);
+
+      // Remove the original image
+      await fs.unlink(CategoryImage);
+
+      // Rename the temporary resized image to the original image path
+      await fs.rename(tempResizedImage, CategoryImage);
+
       fieldvalues.CategoryImage = CategoryImage;
     }
 
