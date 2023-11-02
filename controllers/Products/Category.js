@@ -168,11 +168,7 @@ exports.updateCategory = async (req, res) => {
   try {
     console.log("update", req.body);
     let CategoryImage =
-      req.file || req.body.CategoryImage
-        ? req.body.CategoryImage
-          ? req.body.CategoryImage
-          : `uploads/Category/${req.file.filename}`
-        : null;
+      req.file ? `uploads/Category/${req.file.filename}` : null;
 
     let fieldvalues = { ...req.body };
     if (CategoryImage != null) {
