@@ -129,9 +129,9 @@ exports.listZiyaLocationByParams = async (req, res) => {
           {
             Location: new RegExp(match, "i"),
           },
-          //   {
-          //     countryname: new RegExp(match, "i"),
-          //   },
+          {
+            countryname: new RegExp(match, "i"),
+          },
           //   {
           //     statename: new RegExp(match, "i"),
           //   },
