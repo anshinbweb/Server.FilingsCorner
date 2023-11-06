@@ -351,7 +351,7 @@ exports.getState = async (req, res) => {
 
 ////////////////////////////////////////City//////////////////////////////////////////
 exports.listCity = async (req, res) => {
-  const list = await City.find().sort({ createdAt: -1 }).exec();
+  const list = await City.find().sort({ CityName: 1 }).exec();
   console.log("list city", list);
   res.json(list);
 };

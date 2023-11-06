@@ -111,3 +111,16 @@ exports.listCUs = async (req, res) => {
     res.status(500).send("Error in fetching data.");
   }
 };
+
+exports.removeInquiry = async (req, res) => {
+  try {
+    const del = await ContactUs.findOneAndRemove({
+      _id: req.params._id,
+    });
+    console.log(del);
+    res.json(del);
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("delete Inquiry failed");
+  }
+};

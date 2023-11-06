@@ -26,6 +26,7 @@ exports.listGKarat = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
+    console.log("IsActive in ba", IsActive);
     let query = [
       {
         $match: { IsActive: IsActive },
@@ -98,16 +99,16 @@ exports.listGKarat = async (req, res) => {
     }
 
     const list = await GoldKarat.aggregate(query);
-    // console.log(list[0].data);
+    console.log("list check", list);
     // res.json(list);
-    if (list && list.length > 0 && list[0].data && list[0].data.length > 0) {
-      console.log(list[0].data);
-      //   res.json(list[0].data);
-      res.json(list);
-    } else {
-      // Handle the case when there is no data to display
-      res.json({ message: "No data to display." });
-    }
+    // if (list && list.length > 0 && list[0].data && list[0].data.length > 0) {
+    // console.log(list[0].data);
+    //   res.json(list[0].data);
+    res.json(list);
+    // } else {
+    //   // Handle the case when there is no data to display
+    //   res.json({ message: "No data to display." });
+    // }
   } catch (error) {
     console.log("display error", error);
     // res.send("err in list", error);

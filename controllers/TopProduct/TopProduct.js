@@ -118,13 +118,13 @@ exports.listTProducts = async (req, res) => {
     const list = await TopProducts.aggregate(query);
     // console.log(list[0].data);
     // res.json(list);
-    if (list && list.length > 0 && list[0].data && list[0].data.length > 0) {
-      console.log(list[0].data);
-      res.json(list);
-    } else {
-      // Handle the case when there is no data to display
-      res.json({ message: "No data to display." });
-    }
+    // if (list && list.length > 0 && list[0].data && list[0].data.length > 0) {
+    console.log("list check", list);
+    res.json(list);
+    // } else {
+    //   // Handle the case when there is no data to display
+    //   res.json({ message: "No data to display." });
+    // }
   } catch (error) {
     console.log("display error", error);
     // res.send("err in list", error);
