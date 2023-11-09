@@ -1,9 +1,14 @@
 const GoldPrice = require("../../models/PriceTag/GoldPrice");
 
 exports.getGoldPrice = async (req, res) => {
-  const find = await GoldPrice.findOne({ _id: req.params._id }).exec();
-  console.log("get gold price", find);
-  res.json(find);
+  try {
+    const find = await GoldPrice.findOne({ _id: req.params._id }).exec();
+    console.log("get gold price", find);
+    res.json(find);
+  } catch (error) {
+    console.log("get Error creating GoldPrice", error);
+    return res.status(400).send("Failed to get dynamic content for gold.");
+  }
 };
 
 exports.createGoldPrice = async (req, res) => {
@@ -24,13 +29,25 @@ exports.createGoldPrice = async (req, res) => {
 };
 
 exports.listGoldPrice = async (req, res) => {
-  const list = await GoldPrice.find().sort({ createdAt: -1 }).exec();
-  res.json(list);
+  try {
+    const list = await GoldPrice.find().sort({ createdAt: -1 }).exec();
+    res.json(list);
+  } catch (error) {
+    console.log("list Error creating GoldPrice", err);
+    return res.status(400).send("Failed to list dynamic content for gold.");
+  }
 };
 
 exports.listLatestGoldPrice = async (req, res) => {
-  const list = await GoldPrice.findOne().sort({ createdAt: -1 }).exec();
-  res.json(list);
+  try {
+    const list = await GoldPrice.findOne().sort({ createdAt: -1 }).exec();
+    res.json(list);
+  } catch (error) {
+    console.log("listLatestGoldPrice Error creating GoldPrice", error);
+    return res
+      .status(400)
+      .send("Failed to listLatestGoldPrice dynamic content for gold.");
+  }
 };
 
 exports.listGPrice = async (req, res) => {

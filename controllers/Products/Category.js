@@ -3,11 +3,16 @@ const sharp = require("sharp"); // Import the sharp library
 const fs = require("fs").promises; // Import the 'fs.promises' module
 
 exports.listCategory = async (req, res) => {
-  const list = await Category.find()
-    // .sort({ createdAt: -1 })
-    .exec();
-  // console.log("list country", list);
-  res.json(list);
+  try {
+    const list = await Category.find()
+      // .sort({ createdAt: -1 })
+      .exec();
+    // console.log("list country", list);
+    res.json(list);
+  } catch (error) {
+    console.log("get Error creating category", error);
+    return res.status(400).send("Failed to get dynamic content for category.");
+  }
 };
 
 exports.createCategory = async (req, res) => {
@@ -70,79 +75,84 @@ exports.createCategory = async (req, res) => {
 };
 
 exports.listCategoryByParams = async (req, res) => {
-  let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
+  try {
+    let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
-  let query = [
-    {
-      $match: { isActive: IsActive },
-    },
-    {
-      $match: {
-        $or: [
-          {
-            Category: new RegExp(match, "i"),
-          },
-          {
-            Description: new RegExp(match, "i"),
-          },
-        ],
+    let query = [
+      {
+        $match: { isActive: IsActive },
       },
-    },
-    {
-      $facet: {
-        stage1: [
-          {
-            $group: {
-              _id: null,
-              count: {
-                $sum: 1,
+      {
+        $match: {
+          $or: [
+            {
+              Category: new RegExp(match, "i"),
+            },
+            {
+              Description: new RegExp(match, "i"),
+            },
+          ],
+        },
+      },
+      {
+        $facet: {
+          stage1: [
+            {
+              $group: {
+                _id: null,
+                count: {
+                  $sum: 1,
+                },
               },
             },
-          },
-        ],
-        stage2: [
-          {
-            $skip: skip,
-          },
-          {
-            $limit: per_page,
-          },
-        ],
+          ],
+          stage2: [
+            {
+              $skip: skip,
+            },
+            {
+              $limit: per_page,
+            },
+          ],
+        },
       },
-    },
-    {
-      $unwind: {
-        path: "$stage1",
-      },
-    },
-    {
-      $project: {
-        count: "$stage1.count",
-        data: "$stage2",
-      },
-    },
-  ];
-  if (sorton && sortdir) {
-    let sort = {};
-    sort[sorton] = sortdir == "desc" ? -1 : 1;
-    query = [
       {
-        $sort: sort,
+        $unwind: {
+          path: "$stage1",
+        },
       },
-    ].concat(query);
-  } else {
-    let sort = {};
-    sort["createdAt"] = -1;
-    query = [
       {
-        $sort: sort,
+        $project: {
+          count: "$stage1.count",
+          data: "$stage2",
+        },
       },
-    ].concat(query);
-  }
+    ];
+    if (sorton && sortdir) {
+      let sort = {};
+      sort[sorton] = sortdir == "desc" ? -1 : 1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    } else {
+      let sort = {};
+      sort["createdAt"] = -1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    }
 
-  const list = await Category.aggregate(query);
-  console.log("list Category by  params", list);
-  res.json(list);
+    const list = await Category.aggregate(query);
+    console.log("list Category by  params", list);
+    res.json(list);
+  } catch (error) {
+    console.log("display error in categiry list", error);
+    res.status(400).send("Error in fetching data.");
+  }
 };
 
 exports.removeCategory = async (req, res) => {
@@ -159,16 +169,22 @@ exports.removeCategory = async (req, res) => {
 };
 
 exports.getCategory = async (req, res) => {
-  const state = await Category.findOne({ _id: req.params._id }).exec();
-  console.log("get Category", state);
-  res.json(state);
+  try {
+    const state = await Category.findOne({ _id: req.params._id }).exec();
+    console.log("get Category", state);
+    res.json(state);
+  } catch (error) {
+    console.log("error in get category", error);
+    res.status(400).send("get Category failed");
+  }
 };
 
 exports.updateCategory = async (req, res) => {
   try {
     console.log("update", req.body);
-    let CategoryImage =
-      req.file ? `uploads/Category/${req.file.filename}` : null;
+    let CategoryImage = req.file
+      ? `uploads/Category/${req.file.filename}`
+      : null;
 
     let fieldvalues = { ...req.body };
     if (CategoryImage != null) {

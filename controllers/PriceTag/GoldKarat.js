@@ -1,9 +1,14 @@
 const GoldKarat = require("../../models/PriceTag/GoldKarat");
 
 exports.getGoldKarat = async (req, res) => {
-  const find = await GoldKarat.findOne({ _id: req.params._id }).exec();
-  console.log("get Task List", find);
-  res.json(find);
+  try {
+    const find = await GoldKarat.findOne({ _id: req.params._id }).exec();
+    console.log("get Task List", find);
+    res.json(find);
+  } catch (error) {
+    console.log("log error from get gold karat", error);
+    return res.status(400).send("get dynamic content failed from gold karat");
+  }
 };
 
 exports.createGoldKarat = async (req, res) => {
@@ -18,8 +23,13 @@ exports.createGoldKarat = async (req, res) => {
 };
 
 exports.listGoldKarat = async (req, res) => {
-  const list = await GoldKarat.find().sort({ createdAt: -1 }).exec();
-  res.json(list);
+  try {
+    const list = await GoldKarat.find().sort({ createdAt: -1 }).exec();
+    res.json(list);
+  } catch (error) {
+    console.log("log error from create Task List", error);
+    return res.status(400).send("list dynamic content failed from gold karat");
+  }
 };
 
 exports.listGKarat = async (req, res) => {

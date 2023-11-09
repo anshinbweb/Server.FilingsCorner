@@ -1,9 +1,16 @@
 const ContactUs = require("../../models/ContactUS/ContactUs");
 
 exports.getContactUs = async (req, res) => {
-  const find = await ContactUs.findOne({ _id: req.params._id }).exec();
-  console.log("get Task List", find);
-  res.json(find);
+  try {
+    const find = await ContactUs.findOne({ _id: req.params._id }).exec();
+    console.log("get Task List", find);
+    res.json(find);
+  } catch (error) {
+    console.log("log error from get contact us", error);
+    return res
+      .status(400)
+      .send("create dynamic content failed from contact us");
+  }
 };
 
 exports.createContactUs = async (req, res) => {
@@ -18,8 +25,15 @@ exports.createContactUs = async (req, res) => {
 };
 
 exports.listContactUs = async (req, res) => {
-  const list = await ContactUs.find().sort({ createdAt: -1 }).exec();
-  res.json(list);
+  try {
+    const list = await ContactUs.find().sort({ createdAt: -1 }).exec();
+    res.json(list);
+  } catch (error) {
+    console.log("log error from create contact us", error);
+    return res
+      .status(400)
+      .send("list dynamic content failed from list contact us");
+  }
 };
 
 exports.listCUs = async (req, res) => {
