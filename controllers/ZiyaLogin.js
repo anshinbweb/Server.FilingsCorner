@@ -12,7 +12,12 @@ exports.createZiyaLogin = async (req, res) => {
 };
 
 exports.listZiyaLogin = async (req, res) => {
-  const list = await ZiyaLogin.find().sort({ createdAt: -1 }).exec();
-  // console.log("list country", list);
-  res.json(list);
+  try {
+    const list = await ZiyaLogin.find().sort({ createdAt: -1 }).exec();
+    // console.log("list country", list);
+    res.json(list);
+  } catch (error) {
+    console.log("log error from ZiyaLogin", error);
+    return res.status(400).send("list ziya login failed");
+  }
 };

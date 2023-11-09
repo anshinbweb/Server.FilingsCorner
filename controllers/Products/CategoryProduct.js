@@ -4,9 +4,14 @@ const sharp = require("sharp"); // Import the sharp library
 const fs = require("fs").promises; // Import the 'fs.promises' module
 
 exports.listCategoryProducts = async (req, res) => {
-  const list = await CategoryProducts.find().sort({ createdAt: -1 }).exec();
-  // console.log("list country", list);
-  res.json(list);
+  try {
+    const list = await CategoryProducts.find().sort({ createdAt: -1 }).exec();
+    // console.log("list country", list);
+    res.json(list);
+  } catch (error) {
+    console.log("error in get category p", error);
+    res.status(400).send("get Category p failed");
+  }
 };
 
 exports.createCategoryProducts = async (req, res) => {
@@ -66,100 +71,105 @@ exports.createCategoryProducts = async (req, res) => {
 };
 
 exports.listCategoryProductsByParams = async (req, res) => {
-  let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
+  try {
+    let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
 
-  let query = [
-    {
-      $match: { isActive: isActive },
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "Category",
-        foreignField: "_id",
-        as: "categ",
+    let query = [
+      {
+        $match: { isActive: isActive },
       },
-    },
-    {
-      $unwind: {
-        path: "$categ",
-        preserveNullAndEmptyArrays: true,
+      {
+        $lookup: {
+          from: "categories",
+          localField: "Category",
+          foreignField: "_id",
+          as: "categ",
+        },
       },
-    },
-    {
-      $set: {
-        categ: "$categ.Category",
+      {
+        $unwind: {
+          path: "$categ",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-    },
+      {
+        $set: {
+          categ: "$categ.Category",
+        },
+      },
 
-    {
-      $match: {
-        $or: [
-          {
-            Category: new RegExp(match, "i"),
-          },
-          {
-            ProductName: new RegExp(match, "i"),
-          },
-        ],
+      {
+        $match: {
+          $or: [
+            {
+              Category: new RegExp(match, "i"),
+            },
+            {
+              ProductName: new RegExp(match, "i"),
+            },
+          ],
+        },
       },
-    },
-    {
-      $facet: {
-        stage1: [
-          {
-            $group: {
-              _id: null,
-              count: {
-                $sum: 1,
+      {
+        $facet: {
+          stage1: [
+            {
+              $group: {
+                _id: null,
+                count: {
+                  $sum: 1,
+                },
               },
             },
-          },
-        ],
-        stage2: [
-          {
-            $skip: skip,
-          },
-          {
-            $limit: per_page,
-          },
-        ],
+          ],
+          stage2: [
+            {
+              $skip: skip,
+            },
+            {
+              $limit: per_page,
+            },
+          ],
+        },
       },
-    },
-    {
-      $unwind: {
-        path: "$stage1",
-      },
-    },
-    {
-      $project: {
-        count: "$stage1.count",
-        data: "$stage2",
-      },
-    },
-  ];
-  if (sorton && sortdir) {
-    let sort = {};
-    sort[sorton] = sortdir == "desc" ? -1 : 1;
-    query = [
       {
-        $sort: sort,
+        $unwind: {
+          path: "$stage1",
+        },
       },
-    ].concat(query);
-  } else {
-    let sort = {};
-    sort["createdAt"] = -1;
-    query = [
       {
-        $sort: sort,
+        $project: {
+          count: "$stage1.count",
+          data: "$stage2",
+        },
       },
-    ].concat(query);
-  }
+    ];
+    if (sorton && sortdir) {
+      let sort = {};
+      sort[sorton] = sortdir == "desc" ? -1 : 1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    } else {
+      let sort = {};
+      sort["createdAt"] = -1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    }
 
-  const list = await CategoryProducts.aggregate(query);
-  console.log("list in pa", list);
-  console.log("list CategoryProducts by  params", list);
-  res.json(list);
+    const list = await CategoryProducts.aggregate(query);
+    console.log("list in pa", list);
+    console.log("list CategoryProducts by  params", list);
+    res.json(list);
+  } catch (error) {
+    console.log("error in list category p", error);
+    res.status(400).send("list Category p failed");
+  }
 };
 
 exports.removeCategoryProducts = async (req, res) => {
@@ -176,9 +186,16 @@ exports.removeCategoryProducts = async (req, res) => {
 };
 
 exports.getCategoryProducts = async (req, res) => {
-  const state = await CategoryProducts.findOne({ _id: req.params._id }).exec();
-  console.log("get CategoryProducts", state);
-  res.json(state);
+  try {
+    const state = await CategoryProducts.findOne({
+      _id: req.params._id,
+    }).exec();
+    console.log("get CategoryProducts", state);
+    res.json(state);
+  } catch (error) {
+    console.log("error in get category p", error);
+    res.status(400).send("get Category p failed");
+  }
 };
 
 exports.updateCategoryProducts = async (req, res) => {

@@ -5,69 +5,79 @@ const City = require("../models/Location/City");
 //////////////////////////////////////Country//////////////////////////////////////////
 
 exports.listCountry = async (req, res) => {
-  const list = await Country.find().sort({ createdAt: -1 }).exec();
-  // console.log("list country", list);
-  res.json(list);
+  try {
+    const list = await Country.find().sort({ createdAt: -1 }).exec();
+    // console.log("list country", list);
+    res.json(list);
+  } catch (error) {
+    console.log("error in list country", error);
+    res.status(400).send("list country failed");
+  }
 };
 
 exports.listCountryByParams = async (req, res) => {
-  let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
+  try {
+    let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
 
-  let query = [
-    {
-      $match: { isActive },
-    },
-  ];
+    let query = [
+      {
+        $match: { isActive },
+      },
+    ];
 
-  // Search on both CountryName and CountryCode fields
-  if (match) {
-    const regex = new RegExp(match, "i");
-    const codeRegex = !isNaN(match) ? parseInt(match) : null;
+    // Search on both CountryName and CountryCode fields
+    if (match) {
+      const regex = new RegExp(match, "i");
+      const codeRegex = !isNaN(match) ? parseInt(match) : null;
+      query.push({
+        $match: {
+          $or: [
+            { CountryName: regex },
+            // {
+            //   $expr: {
+            //     $regexMatch: {
+            //       input: { $toString: "$CountryCode" },
+            //       regex: `^${match}`,
+            //       options: "i",
+            //     },
+            //   },
+            // },
+            // { CountryCode: codeRegex }
+          ],
+        },
+      });
+    }
+
+    // Sort records based on sorton and sortdir
+    let sort = {};
+    if (sorton && sortdir) {
+      sort[sorton] = sortdir === "desc" ? -1 : 1;
+    } else {
+      sort.createdAt = -1;
+    }
+    query.push({ $sort: sort });
+
+    // Limit and skip records based on per_page and skip
     query.push({
-      $match: {
-        $or: [
-          { CountryName: regex },
-          // {
-          //   $expr: {
-          //     $regexMatch: {
-          //       input: { $toString: "$CountryCode" },
-          //       regex: `^${match}`,
-          //       options: "i",
-          //     },
-          //   },
-          // },
-          // { CountryCode: codeRegex }
-        ],
+      $facet: {
+        stage1: [{ $count: "count" }],
+        stage2: [{ $skip: skip }, { $limit: per_page }],
       },
     });
+    query.push({ $unwind: "$stage1" });
+    query.push({
+      $project: {
+        count: "$stage1.count",
+        data: "$stage2",
+      },
+    });
+
+    const list = await Country.aggregate(query);
+    res.json(list);
+  } catch (error) {
+    console.log("error in list all country", error);
+    res.status(400).send("list country failed");
   }
-
-  // Sort records based on sorton and sortdir
-  let sort = {};
-  if (sorton && sortdir) {
-    sort[sorton] = sortdir === "desc" ? -1 : 1;
-  } else {
-    sort.createdAt = -1;
-  }
-  query.push({ $sort: sort });
-
-  // Limit and skip records based on per_page and skip
-  query.push({
-    $facet: {
-      stage1: [{ $count: "count" }],
-      stage2: [{ $skip: skip }, { $limit: per_page }],
-    },
-  });
-  query.push({ $unwind: "$stage1" });
-  query.push({
-    $project: {
-      count: "$stage1.count",
-      data: "$stage2",
-    },
-  });
-
-  const list = await Country.aggregate(query);
-  res.json(list);
 };
 exports.createCountry = async (req, res) => {
   try {
@@ -148,120 +158,135 @@ exports.updateCountry = async (req, res) => {
 };
 
 exports.getCountry = async (req, res) => {
-  const country = await Country.findOne({ _id: req.params._id }).exec();
-  console.log("get country", country);
-  res.json(country);
+  try {
+    const country = await Country.findOne({ _id: req.params._id }).exec();
+    console.log("get country", country);
+    res.json(country);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("get country failed");
+  }
 };
 
 /////////////////////////////STATE////////////////////////////
 exports.listState = async (req, res) => {
-  const list = await State.find().sort({ createdAt: -1 }).exec();
-  console.log("list State", list);
-  res.json(list);
+  try {
+    const list = await State.find().sort({ createdAt: -1 }).exec();
+    console.log("list State", list);
+    res.json(list);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("get country failed");
+  }
 };
 
 exports.listStateByParams = async (req, res) => {
-  let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
+  try {
+    let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
 
-  let query = [
-    {
-      $match: { isActive: isActive },
-    },
-    {
-      $lookup: {
-        from: "countries",
-        localField: "CountryID",
-        foreignField: "_id",
-        as: "countryname",
+    let query = [
+      {
+        $match: { isActive: isActive },
       },
-    },
-    {
-      $unwind: {
-        path: "$countryname",
-        preserveNullAndEmptyArrays: true,
+      {
+        $lookup: {
+          from: "countries",
+          localField: "CountryID",
+          foreignField: "_id",
+          as: "countryname",
+        },
       },
-    },
-    {
-      $set: {
-        countryname: "$countryname.CountryName",
+      {
+        $unwind: {
+          path: "$countryname",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-    },
-    {
-      $facet: {
-        stage1: [
-          {
-            $group: {
-              _id: null,
-              count: {
-                $sum: 1,
+      {
+        $set: {
+          countryname: "$countryname.CountryName",
+        },
+      },
+      {
+        $facet: {
+          stage1: [
+            {
+              $group: {
+                _id: null,
+                count: {
+                  $sum: 1,
+                },
               },
             },
-          },
-        ],
-        stage2: [
-          {
-            $skip: skip,
-          },
-          {
-            $limit: per_page,
-          },
-        ],
-      },
-    },
-    {
-      $unwind: {
-        path: "$stage1",
-      },
-    },
-    {
-      $project: {
-        count: "$stage1.count",
-        data: "$stage2",
-      },
-    },
-  ];
-  if (match) {
-    const regex = new RegExp(match, "i");
-    const codeRegex = !isNaN(match) ? parseInt(match) : null;
-    query = [
-      {
-        $match: {
-          $or: [
+          ],
+          stage2: [
             {
-              StateName: regex,
+              $skip: skip,
             },
-            // {
-            //   StateCode: codeRegex,
-            // },
             {
-              CountryName: regex,
+              $limit: per_page,
             },
           ],
         },
       },
-    ].concat(query);
-  }
-
-  if (sorton && sortdir) {
-    let sort = {};
-    sort[sorton] = sortdir == "desc" ? -1 : 1;
-    query = [
       {
-        $sort: sort,
+        $unwind: {
+          path: "$stage1",
+        },
       },
-    ].concat(query);
-  } else {
-    let sort = {};
-    sort["createdAt"] = -1;
-    query = [
       {
-        $sort: sort,
+        $project: {
+          count: "$stage1.count",
+          data: "$stage2",
+        },
       },
-    ].concat(query);
-  }
+    ];
+    if (match) {
+      const regex = new RegExp(match, "i");
+      const codeRegex = !isNaN(match) ? parseInt(match) : null;
+      query = [
+        {
+          $match: {
+            $or: [
+              {
+                StateName: regex,
+              },
+              // {
+              //   StateCode: codeRegex,
+              // },
+              {
+                CountryName: regex,
+              },
+            ],
+          },
+        },
+      ].concat(query);
+    }
 
-  const list = await State.aggregate(query);
-  res.json(list);
+    if (sorton && sortdir) {
+      let sort = {};
+      sort[sorton] = sortdir == "desc" ? -1 : 1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    } else {
+      let sort = {};
+      sort["createdAt"] = -1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    }
+
+    const list = await State.aggregate(query);
+    res.json(list);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("get state list all failed");
+  }
 };
 
 exports.createState = async (req, res) => {
@@ -344,184 +369,199 @@ exports.updateState = async (req, res) => {
 };
 
 exports.getState = async (req, res) => {
-  const state = await State.findOne({ _id: req.params._id }).exec();
-  console.log("get state", state);
-  res.json(state);
+  try {
+    const state = await State.findOne({ _id: req.params._id }).exec();
+    console.log("get state", state);
+    res.json(state);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("get state failed");
+  }
 };
 
 ////////////////////////////////////////City//////////////////////////////////////////
 exports.listCity = async (req, res) => {
-  const list = await City.find().sort({ CityName: 1 }).exec();
-  console.log("list city", list);
-  res.json(list);
+  try {
+    const list = await City.find().sort({ CityName: 1 }).exec();
+    console.log("list city", list);
+    res.json(list);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("list city failed");
+  }
 };
 
 exports.listCityByParams = async (req, res) => {
-  let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
+  try {
+    let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
 
-  let query = [
-    {
-      $match: { isActive: isActive },
-    },
-    {
-      $lookup: {
-        from: "countries",
-        localField: "CountryID",
-        foreignField: "_id",
-        as: "countryname",
+    let query = [
+      {
+        $match: { isActive: isActive },
       },
-    },
-    {
-      $unwind: {
-        path: "$countryname",
-        preserveNullAndEmptyArrays: true,
+      {
+        $lookup: {
+          from: "countries",
+          localField: "CountryID",
+          foreignField: "_id",
+          as: "countryname",
+        },
       },
-    },
-    {
-      $set: {
-        countryname: "$countryname.CountryName",
+      {
+        $unwind: {
+          path: "$countryname",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-    },
-    {
-      $lookup: {
-        from: "states",
-        localField: "StateID",
-        foreignField: "_id",
-        as: "statename",
+      {
+        $set: {
+          countryname: "$countryname.CountryName",
+        },
       },
-    },
-    {
-      $unwind: {
-        path: "$statename",
-        preserveNullAndEmptyArrays: true,
+      {
+        $lookup: {
+          from: "states",
+          localField: "StateID",
+          foreignField: "_id",
+          as: "statename",
+        },
       },
-    },
-    {
-      $set: {
-        statename: "$statename.StateName",
+      {
+        $unwind: {
+          path: "$statename",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-    },
-    {
-      $match: {
-        $or: [
-          {
-            CityName: new RegExp(match, "i"),
-          },
-          {
-            StateID: new RegExp(match, "i"),
-          },
-          {
-            countryname: new RegExp(match, "i"),
-          },
-          {
-            statename: new RegExp(match, "i"),
-          },
-          // {
-          //               $expr: {
-          //                 $regexMatch: {
-          //                   input: { $toString: "$CityCode" },
-          //                   regex: `^${match}`,
-          //                   options: "i",
-          //                 },
-          //               },
-          //             },
-        ],
+      {
+        $set: {
+          statename: "$statename.StateName",
+        },
       },
-    },
-    {
-      $facet: {
-        stage1: [
-          {
-            $group: {
-              _id: null,
-              count: {
-                $sum: 1,
+      {
+        $match: {
+          $or: [
+            {
+              CityName: new RegExp(match, "i"),
+            },
+            {
+              StateID: new RegExp(match, "i"),
+            },
+            {
+              countryname: new RegExp(match, "i"),
+            },
+            {
+              statename: new RegExp(match, "i"),
+            },
+            // {
+            //               $expr: {
+            //                 $regexMatch: {
+            //                   input: { $toString: "$CityCode" },
+            //                   regex: `^${match}`,
+            //                   options: "i",
+            //                 },
+            //               },
+            //             },
+          ],
+        },
+      },
+      {
+        $facet: {
+          stage1: [
+            {
+              $group: {
+                _id: null,
+                count: {
+                  $sum: 1,
+                },
               },
             },
-          },
-        ],
-        stage2: [
-          {
-            $skip: skip,
-          },
-          {
-            $limit: per_page,
-          },
-        ],
+          ],
+          stage2: [
+            {
+              $skip: skip,
+            },
+            {
+              $limit: per_page,
+            },
+          ],
+        },
       },
-    },
-    {
-      $unwind: {
-        path: "$stage1",
-      },
-    },
-    {
-      $project: {
-        count: "$stage1.count",
-        data: "$stage2",
-      },
-    },
-  ];
-  // if (match) {
-  //   const regex = new RegExp(match, "i");
-  //   const codeRegex = !isNaN(match) ? parseInt(match) : null;
-  //   query = [
-  //     {
-  //       $match: {
-  //         $or: [
-  //           {
-  //             CityName: regex,
-  //           },
-  //           {
-  //             StateID: regex,
-  //           },
-  //           {
-  //             CountryID: regex,
-  //           },
-
-  //           {
-  //             countryname: regex,
-  //           },
-
-  //           // {
-  //           //   CityCode: codeRegex
-  //           // },
-  //           {
-  //             $expr: {
-  //               $regexMatch: {
-  //                 input: { $toString: "$CityCode" },
-  //                 regex: `^${match}`,
-  //                 options: "i",
-  //               },
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     },
-  //   ].concat(query);
-  // }
-
-  if (sorton && sortdir) {
-    let sort = {};
-    sort[sorton] = sortdir == "desc" ? -1 : 1;
-    query = [
       {
-        $sort: sort,
+        $unwind: {
+          path: "$stage1",
+        },
       },
-    ].concat(query);
-  } else {
-    let sort = {};
-    sort["createdAt"] = -1;
-    query = [
       {
-        $sort: sort,
+        $project: {
+          count: "$stage1.count",
+          data: "$stage2",
+        },
       },
-    ].concat(query);
+    ];
+    // if (match) {
+    //   const regex = new RegExp(match, "i");
+    //   const codeRegex = !isNaN(match) ? parseInt(match) : null;
+    //   query = [
+    //     {
+    //       $match: {
+    //         $or: [
+    //           {
+    //             CityName: regex,
+    //           },
+    //           {
+    //             StateID: regex,
+    //           },
+    //           {
+    //             CountryID: regex,
+    //           },
+
+    //           {
+    //             countryname: regex,
+    //           },
+
+    //           // {
+    //           //   CityCode: codeRegex
+    //           // },
+    //           {
+    //             $expr: {
+    //               $regexMatch: {
+    //                 input: { $toString: "$CityCode" },
+    //                 regex: `^${match}`,
+    //                 options: "i",
+    //               },
+    //             },
+    //           },
+    //         ],
+    //       },
+    //     },
+    //   ].concat(query);
+    // }
+
+    if (sorton && sortdir) {
+      let sort = {};
+      sort[sorton] = sortdir == "desc" ? -1 : 1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    } else {
+      let sort = {};
+      sort["createdAt"] = -1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    }
+
+    const list = await City.aggregate(query);
+    console.log("list city by  params", list);
+    res.json(list);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("list all city failed");
   }
-
-  const list = await City.aggregate(query);
-  console.log("list city by  params", list);
-  res.json(list);
 };
 
 exports.removeCity = async (req, res) => {
@@ -538,9 +578,14 @@ exports.removeCity = async (req, res) => {
 };
 
 exports.getCity = async (req, res) => {
-  const state = await City.findOne({ _id: req.params._id }).exec();
-  console.log("get city", state);
-  res.json(state);
+  try {
+    const state = await City.findOne({ _id: req.params._id }).exec();
+    console.log("get city", state);
+    res.json(state);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("get city failed");
+  }
 };
 
 exports.createCity = async (req, res) => {

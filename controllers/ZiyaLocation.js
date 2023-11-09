@@ -2,9 +2,14 @@ const ZiyaLocation = require("../models/ZiyaLocation");
 const fs = require("fs");
 
 exports.listZiyaLocation = async (req, res) => {
-  const list = await ZiyaLocation.find().sort({ createdAt: -1 }).exec();
-  // console.log("list country", list);
-  res.json(list);
+  try {
+    const list = await ZiyaLocation.find().sort({ createdAt: -1 }).exec();
+    // console.log("list country", list);
+    res.json(list);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("list ziya location failed");
+  }
 };
 
 exports.createZiyaLocation = async (req, res) => {
@@ -53,146 +58,151 @@ exports.createZiyaLocation = async (req, res) => {
 };
 
 exports.listZiyaLocationByParams = async (req, res) => {
-  let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
+  try {
+    let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
 
-  let query = [
-    {
-      $match: { isActive: isActive },
-    },
-    {
-      $lookup: {
-        from: "countries",
-        localField: "CountryID",
-        foreignField: "_id",
-        as: "countryname",
+    let query = [
+      {
+        $match: { isActive: isActive },
       },
-    },
-    {
-      $unwind: {
-        path: "$countryname",
-        preserveNullAndEmptyArrays: true,
+      {
+        $lookup: {
+          from: "countries",
+          localField: "CountryID",
+          foreignField: "_id",
+          as: "countryname",
+        },
       },
-    },
-    {
-      $set: {
-        countryname: "$countryname.CountryName",
+      {
+        $unwind: {
+          path: "$countryname",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-    },
-    {
-      $lookup: {
-        from: "states",
-        localField: "StateID",
-        foreignField: "_id",
-        as: "statename",
+      {
+        $set: {
+          countryname: "$countryname.CountryName",
+        },
       },
-    },
-    {
-      $unwind: {
-        path: "$statename",
-        preserveNullAndEmptyArrays: true,
+      {
+        $lookup: {
+          from: "states",
+          localField: "StateID",
+          foreignField: "_id",
+          as: "statename",
+        },
       },
-    },
-    {
-      $set: {
-        statename: "$statename.StateName",
+      {
+        $unwind: {
+          path: "$statename",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-    },
-    // {
-    //     $lookup: {
-    //       from: "cities",
-    //       localField: "CityID",
-    //       foreignField: "_id",
-    //       as: "city",
-    //     },
-    //   },
-    //   {
-    //     $unwind: {
-    //       path: "$city",
-    //       preserveNullAndEmptyArrays: true,
-    //     },
-    //   },
-    //   {
-    //     $set: {
-    //         CityName: "$city.CityName",
-    //     },
-    //   },
-    {
-      $match: {
-        $or: [
-          {
-            Area: new RegExp(match, "i"),
-          },
-          {
-            Address: new RegExp(match, "i"),
-          },
+      {
+        $set: {
+          statename: "$statename.StateName",
+        },
+      },
+      // {
+      //     $lookup: {
+      //       from: "cities",
+      //       localField: "CityID",
+      //       foreignField: "_id",
+      //       as: "city",
+      //     },
+      //   },
+      //   {
+      //     $unwind: {
+      //       path: "$city",
+      //       preserveNullAndEmptyArrays: true,
+      //     },
+      //   },
+      //   {
+      //     $set: {
+      //         CityName: "$city.CityName",
+      //     },
+      //   },
+      {
+        $match: {
+          $or: [
+            {
+              Area: new RegExp(match, "i"),
+            },
+            {
+              Address: new RegExp(match, "i"),
+            },
 
-          {
-            Location: new RegExp(match, "i"),
-          },
-          {
-            countryname: new RegExp(match, "i"),
-          },
-          //   {
-          //     statename: new RegExp(match, "i"),
-          //   },
-        ],
+            {
+              Location: new RegExp(match, "i"),
+            },
+            {
+              countryname: new RegExp(match, "i"),
+            },
+            //   {
+            //     statename: new RegExp(match, "i"),
+            //   },
+          ],
+        },
       },
-    },
-    {
-      $facet: {
-        stage1: [
-          {
-            $group: {
-              _id: null,
-              count: {
-                $sum: 1,
+      {
+        $facet: {
+          stage1: [
+            {
+              $group: {
+                _id: null,
+                count: {
+                  $sum: 1,
+                },
               },
             },
-          },
-        ],
-        stage2: [
-          {
-            $skip: skip,
-          },
-          {
-            $limit: per_page,
-          },
-        ],
+          ],
+          stage2: [
+            {
+              $skip: skip,
+            },
+            {
+              $limit: per_page,
+            },
+          ],
+        },
       },
-    },
-    {
-      $unwind: {
-        path: "$stage1",
-      },
-    },
-    {
-      $project: {
-        count: "$stage1.count",
-        data: "$stage2",
-      },
-    },
-  ];
-  if (sorton && sortdir) {
-    let sort = {};
-    sort[sorton] = sortdir == "desc" ? -1 : 1;
-    query = [
       {
-        $sort: sort,
+        $unwind: {
+          path: "$stage1",
+        },
       },
-    ].concat(query);
-  } else {
-    let sort = {};
-    sort["createdAt"] = -1;
-    query = [
       {
-        $sort: sort,
+        $project: {
+          count: "$stage1.count",
+          data: "$stage2",
+        },
       },
-    ].concat(query);
-  }
+    ];
+    if (sorton && sortdir) {
+      let sort = {};
+      sort[sorton] = sortdir == "desc" ? -1 : 1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    } else {
+      let sort = {};
+      sort["createdAt"] = -1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    }
 
-  const list = await ZiyaLocation.aggregate(query);
-  console.log("list ZiyaLocation by  params", list);
-  res.json(list);
+    const list = await ZiyaLocation.aggregate(query);
+    console.log("list ZiyaLocation by  params", list);
+    res.json(list);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("list all ziya location failed");
+  }
 };
 
 exports.removeZiyaLocation = async (req, res) => {
@@ -209,9 +219,14 @@ exports.removeZiyaLocation = async (req, res) => {
 };
 
 exports.getZiyaLocation = async (req, res) => {
-  const state = await ZiyaLocation.findOne({ _id: req.params._id }).exec();
-  console.log("get ZiyaLocation", state);
-  res.json(state);
+  try {
+    const state = await ZiyaLocation.findOne({ _id: req.params._id }).exec();
+    console.log("get ZiyaLocation", state);
+    res.json(state);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("get ZiyaLocation failed");
+  }
 };
 
 exports.updateZiyaLocation = async (req, res) => {
@@ -240,10 +255,15 @@ exports.updateZiyaLocation = async (req, res) => {
 };
 
 exports.findZiyaLocation = async (req, res) => {
-  const find = await ZiyaLocation.find({
-    CountryID: req.params.country,
-    CityID: req.params.city,
-  }).exec();
-  console.log("get ZiyaLocation", find);
-  res.json(find);
+  try {
+    const find = await ZiyaLocation.find({
+      CountryID: req.params.country,
+      CityID: req.params.city,
+    }).exec();
+    console.log("get ZiyaLocation", find);
+    res.json(find);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("find ziya failed");
+  }
 };
