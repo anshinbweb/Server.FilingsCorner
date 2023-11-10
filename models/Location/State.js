@@ -7,26 +7,11 @@ const StateSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    // StateCode: {
-    //   type: Number,
-    //   // required: true,
-    //   unique: true,
-    // },
-    // CountryName: {
-    //   type: String,
-    //   required: true,
-    // },
     CountryID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Country",
       required: true,
     },
-    // LastUpdateBy: {
-    //   //team id
-    //   type: String,
-    //   // default: "abcd1234",
-    //   // required: true,
-    // },
     isActive: {
       type: Boolean,
       default: true,

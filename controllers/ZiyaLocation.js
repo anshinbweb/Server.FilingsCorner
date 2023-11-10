@@ -103,25 +103,7 @@ exports.listZiyaLocationByParams = async (req, res) => {
           statename: "$statename.StateName",
         },
       },
-      // {
-      //     $lookup: {
-      //       from: "cities",
-      //       localField: "CityID",
-      //       foreignField: "_id",
-      //       as: "city",
-      //     },
-      //   },
-      //   {
-      //     $unwind: {
-      //       path: "$city",
-      //       preserveNullAndEmptyArrays: true,
-      //     },
-      //   },
-      //   {
-      //     $set: {
-      //         CityName: "$city.CityName",
-      //     },
-      //   },
+
       {
         $match: {
           $or: [
@@ -138,9 +120,6 @@ exports.listZiyaLocationByParams = async (req, res) => {
             {
               countryname: new RegExp(match, "i"),
             },
-            //   {
-            //     statename: new RegExp(match, "i"),
-            //   },
           ],
         },
       },
@@ -231,17 +210,14 @@ exports.getZiyaLocation = async (req, res) => {
 
 exports.updateZiyaLocation = async (req, res) => {
   try {
-    // const { CountryCode, CountryName } = req.body;
     let StoreLogo = req.file ? `uploads/StoreLogo/${req.file.filename}` : null;
     console.log("pp", StoreLogo);
     let fieldvalues = { ...req.body };
-    // fieldvalues.ProductPicture = null;
     if (StoreLogo != null) {
       fieldvalues.StoreLogo = StoreLogo;
     }
     const update = await ZiyaLocation.findOneAndUpdate(
       { _id: req.params._id },
-      // req.body,
       fieldvalues,
 
       { new: true }

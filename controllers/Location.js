@@ -31,19 +31,7 @@ exports.listCountryByParams = async (req, res) => {
       const codeRegex = !isNaN(match) ? parseInt(match) : null;
       query.push({
         $match: {
-          $or: [
-            { CountryName: regex },
-            // {
-            //   $expr: {
-            //     $regexMatch: {
-            //       input: { $toString: "$CountryCode" },
-            //       regex: `^${match}`,
-            //       options: "i",
-            //     },
-            //   },
-            // },
-            // { CountryCode: codeRegex }
-          ],
+          $or: [{ CountryName: regex }],
         },
       });
     }
@@ -81,7 +69,6 @@ exports.listCountryByParams = async (req, res) => {
 };
 exports.createCountry = async (req, res) => {
   try {
-    // const code = await Country.findOne({ CountryCode: req.body.CountryCode });
     const country = await Country.findOne({
       CountryName: req.body.CountryName,
     });
@@ -91,17 +78,7 @@ exports.createCountry = async (req, res) => {
         field: 1,
         message: "Country with this name already exists!",
       });
-    }
-    // else if (code) {
-    //   return res
-    //     .status(200)
-    //     .json({
-    //       isOk: false,
-    //       field: 2,
-    //       message: "Country with this code already exists!",
-    //     });
-    // }
-    else {
+    } else {
       const { CountryName, CountryCode } = req.body;
       const addCountry = await new Country(req.body).save();
       console.log("create country", addCountry);
@@ -113,7 +90,6 @@ exports.createCountry = async (req, res) => {
 };
 
 exports.removeCountry = async (req, res) => {
-  // const { CountryId } = req.body;
   try {
     const delCountry = await Country.findOneAndRemove({
       _id: req.params._id,
@@ -133,7 +109,6 @@ exports.removeAndUpdateCountry = async (req, res) => {
       { isActive: false },
       { new: true }
     );
-    // console.log(update);
     res.json(update);
   } catch (err) {
     console.log(err);
@@ -143,7 +118,6 @@ exports.removeAndUpdateCountry = async (req, res) => {
 
 exports.updateCountry = async (req, res) => {
   try {
-    // const { CountryCode, CountryName } = req.body;
     const update = await Country.findOneAndUpdate(
       { _id: req.params._id },
       req.body,
@@ -300,17 +274,7 @@ exports.createState = async (req, res) => {
         field: 1,
         message: "State with this name already exists!",
       });
-    }
-    // else if (code) {
-    //   return res
-    //     .status(200)
-    //     .json({
-    //       isOk: false,
-    //       field: 2,
-    //       message: "State with this code already exists!",
-    //     });
-    // }
-    else {
+    } else {
       console.log(req.body);
       const addState = await new State(req.body).save();
       console.log("create country", addState);
@@ -452,15 +416,6 @@ exports.listCityByParams = async (req, res) => {
             {
               statename: new RegExp(match, "i"),
             },
-            // {
-            //               $expr: {
-            //                 $regexMatch: {
-            //                   input: { $toString: "$CityCode" },
-            //                   regex: `^${match}`,
-            //                   options: "i",
-            //                 },
-            //               },
-            //             },
           ],
         },
       },
@@ -498,44 +453,6 @@ exports.listCityByParams = async (req, res) => {
         },
       },
     ];
-    // if (match) {
-    //   const regex = new RegExp(match, "i");
-    //   const codeRegex = !isNaN(match) ? parseInt(match) : null;
-    //   query = [
-    //     {
-    //       $match: {
-    //         $or: [
-    //           {
-    //             CityName: regex,
-    //           },
-    //           {
-    //             StateID: regex,
-    //           },
-    //           {
-    //             CountryID: regex,
-    //           },
-
-    //           {
-    //             countryname: regex,
-    //           },
-
-    //           // {
-    //           //   CityCode: codeRegex
-    //           // },
-    //           {
-    //             $expr: {
-    //               $regexMatch: {
-    //                 input: { $toString: "$CityCode" },
-    //                 regex: `^${match}`,
-    //                 options: "i",
-    //               },
-    //             },
-    //           },
-    //         ],
-    //       },
-    //     },
-    //   ].concat(query);
-    // }
 
     if (sorton && sortdir) {
       let sort = {};

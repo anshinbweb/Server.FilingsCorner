@@ -11,21 +11,12 @@ const CitySchema = new mongoose.Schema(
       ref: "State",
       required: true,
     },
-    // StateName: {
-    //   type: String,
-    //   required: true,
-    // },
+
     CountryID: {
       type: Schema.Types.ObjectId,
       ref: "Country",
       required: true,
     },
-
-    // CityCode: {
-    //   type: Number,
-    //   required: true,
-    // },
-
     isActive: {
       type: Boolean,
       default: true,

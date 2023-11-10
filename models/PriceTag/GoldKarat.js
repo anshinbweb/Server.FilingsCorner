@@ -9,7 +9,6 @@ const GoldKaratSchema = new mongoose.Schema(
     },
     IsActive: {
       type: Boolean,
-      // required: true,
     },
   },
   { timestamps: true }
