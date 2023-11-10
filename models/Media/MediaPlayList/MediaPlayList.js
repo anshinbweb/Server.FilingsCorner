@@ -6,13 +6,7 @@ const MediaPlayListSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // ad_ids_folder: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "ManageMedia",
-    //     required: true,
-    //   },
-    // ],
+
     ad_ids: [
       {
         type: mongoose.Schema.Types.ObjectId,

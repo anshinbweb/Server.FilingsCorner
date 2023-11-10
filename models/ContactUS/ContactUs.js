@@ -21,7 +21,6 @@ const ContactUsSchema = new mongoose.Schema(
     IsActive: {
       type: Boolean,
       default: true,
-      //   required: true,
     },
   },
   { timestamps: true }

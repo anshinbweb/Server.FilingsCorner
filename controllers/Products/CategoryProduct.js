@@ -6,7 +6,6 @@ const fs = require("fs").promises; // Import the 'fs.promises' module
 exports.listCategoryProducts = async (req, res) => {
   try {
     const list = await CategoryProducts.find().sort({ createdAt: -1 }).exec();
-    // console.log("list country", list);
     res.json(list);
   } catch (error) {
     console.log("error in get category p", error);
@@ -16,24 +15,12 @@ exports.listCategoryProducts = async (req, res) => {
 
 exports.createCategoryProducts = async (req, res) => {
   try {
-    // if (!fs.existsSync(`${__basedir}/uploads/CategoryProducts`)) {
-    //   fs.mkdirSync(`${__basedir}/uploads/CategoryProducts`);
-    // }
-
     console.log("body", req.body);
     let ProductImage = req.file
       ? `uploads/CategoryProducts/${req.file.filename}`
       : null;
 
     if (ProductImage) {
-      // const resizedImage = `uploads/CategoryProducts/${req.file.filename}`;
-      // await sharp(ProductImage)
-      //   .resize({ width: 500, height: 500, fit: "contain" })
-      //   .toFile(resizedImage);
-      // ProductImage = resizedImage;
-      // await sharp(ProductImage)
-      //   .resize({ width: 500, height: 500, fit: "contain" })
-      //   .toFile(ProductImage); // Overwrite the original image with the resized version
       const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${req.file.filename}`;
 
       await sharp(ProductImage)
@@ -205,10 +192,6 @@ exports.updateCategoryProducts = async (req, res) => {
       : null;
     console.log("pp", ProductImage);
     let fieldvalues = { ...req.body };
-    // fieldvalues.ProductPicture = null;
-    // if (ProductImage != null) {
-    //   fieldvalues.ProductImage = ProductImage;
-    // }
 
     if (ProductImage != null) {
       // Create a temporary file path for the resized image

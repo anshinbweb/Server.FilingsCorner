@@ -14,14 +14,7 @@ const {
 const catchAsync = require("../utils/catchAsync");
 
 const multer = require("multer");
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "uploads/TopProducts");
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, Date.now() + "_" + file.originalname);
-//   },
-// });
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     if (file.fieldname === "ProductImage") {
@@ -61,7 +54,7 @@ router.post(
 
 router.get("/auth/list-top-products", catchAsync(listTopProducts));
 
-router.post("/auth/topProducts-all", catchAsync(listTProducts));  //by params
+router.post("/auth/topProducts-all", catchAsync(listTProducts)); //by params
 
 router.get("/auth/top-products/:_id", catchAsync(getTopProducts));
 

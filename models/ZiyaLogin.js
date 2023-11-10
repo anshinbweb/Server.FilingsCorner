@@ -4,7 +4,6 @@ const ZiyaLoginSchema = new mongoose.Schema(
   {
     LoginEmail: {
       type: String,
-      //   required: true,
     },
     Password: {
       type: String,
@@ -14,8 +13,6 @@ const ZiyaLoginSchema = new mongoose.Schema(
     },
     IsActive: {
       type: Boolean,
-      //   default: true,
-      //   required: true,
     },
   },
   { timestamps: true }

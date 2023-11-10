@@ -4,10 +4,7 @@ const fs = require("fs").promises; // Import the 'fs.promises' module
 
 exports.listCategory = async (req, res) => {
   try {
-    const list = await Category.find()
-      // .sort({ createdAt: -1 })
-      .exec();
-    // console.log("list country", list);
+    const list = await Category.find().exec();
     res.json(list);
   } catch (error) {
     console.log("get Error creating category", error);
@@ -17,10 +14,6 @@ exports.listCategory = async (req, res) => {
 
 exports.createCategory = async (req, res) => {
   try {
-    // if (!fs.existsSync(`${__basedir}/uploads/Category`)) {
-    //     fs.mkdirSync(`${__basedir}/uploads/Category`);
-    //   }
-
     console.log("create", req.body);
 
     //   let CategoryImage = req.files.CategoryImage;
@@ -30,15 +23,6 @@ exports.createCategory = async (req, res) => {
       : null;
 
     if (CategoryImage) {
-      // const resizedImage = `uploads/Category/${req.file.filename}`;
-      // await sharp(CategoryImage)
-      //   .resize({ width: 300, height: 200, fit: "contain" })
-      //   .toFile(resizedImage);
-      // CategoryImage = resizedImage;
-      // await sharp(CategoryImage)
-      //   .resize({ width: 300, height: 200, fit: "contain" })
-      //   .toFile(CategoryImage); // Overwrite the original image with the resized version
-
       const tempResizedImage = `uploads/Category/temp_${req.file.filename}`;
 
       await sharp(CategoryImage)

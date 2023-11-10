@@ -7,11 +7,6 @@ const CountrySchema = new mongoose.Schema(
       required: true,
       unqiue: true,
     },
-    // CountryCode: {
-    //   type: Number,
-    //   // required: true,
-    //   unique:true
-    // },
     isActive: {
       type: Boolean,
       default: false,

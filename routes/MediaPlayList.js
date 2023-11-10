@@ -10,16 +10,6 @@ const {
   getMediaPlayList,
   listMediaPlayListByParams,
 } = require("../controllers/Media/MediaPlayList/MediaPlayList");
-// const {
-//   listPublishPlayList,
-//   createPublishPlayList,
-//   updatePublishPlayList,
-//   removePublishPlayList,
-//   getPublishPlayList,
-//   listPublishPlayListByParams,
-//   listPublishPlayListByParamsSH,
-//   pausePublishMediaPlaylist,
-// } = require("../controllers/Media/MediaPlayList/PublishPlayList");
 
 router.get("/auth/list-playlist", catchAsync(listMediaPlayList));
 router.post("/auth/create-playlist", catchAsync(createMediaPlayList));
@@ -30,29 +20,5 @@ router.post(
   "/auth/list-playlist-by-params",
   catchAsync(listMediaPlayListByParams)
 );
-
-// router.get("/auth/list-publish-playlist", catchAsync(listPublishPlayList));
-// router.post("/auth/create-publish-playlist", catchAsync(createPublishPlayList));
-// router.put(
-//   "/auth/update-publish-playlist/:_id",
-//   catchAsync(updatePublishPlayList)
-// );
-// router.delete(
-//   "/auth/remove-publish-playlist/:_id",
-//   catchAsync(removePublishPlayList)
-// );
-// router.get("/auth/get-publish-playlist/:_id", catchAsync(getPublishPlayList));
-// router.post(
-//   "/auth/list-publish-playlist-by-params",
-//   catchAsync(listPublishPlayListByParams)
-// );
-// router.post(
-//   "/auth/stakeholder/list-publish-playlist-by-params",
-//   catchAsync(listPublishPlayListByParamsSH)
-// );
-// router.put(
-//   "/auth/pause-media-playlist/:_id",
-//   catchAsync(pausePublishMediaPlaylist)
-// );
 
 module.exports = router;
