@@ -20,6 +20,7 @@ exports.createCategoryProducts = async (req, res) => {
       ? `uploads/CategoryProducts/${req.file.filename}`
       : null;
 
+    console.log("PP", ProductImage);
     if (ProductImage) {
       const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${req.file.filename}`;
 
@@ -28,6 +29,8 @@ exports.createCategoryProducts = async (req, res) => {
           width: 400,
           height: 400,
           fit: "contain",
+          background: "white", // Set background color to white
+          // background: { r: 255, g: 255, b: 255, alpha: 1 }, // Set background color to white
         })
         .toFile(tempResizedImageCP);
 
@@ -202,6 +205,7 @@ exports.updateCategoryProducts = async (req, res) => {
           width: 400,
           height: 400,
           fit: "contain",
+          background: "white", // Set background color to white
         })
         .toFile(tempResizedImageCP);
 
