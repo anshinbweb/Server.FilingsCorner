@@ -30,6 +30,7 @@ exports.createCategory = async (req, res) => {
           width: 400,
           height: 400,
           fit: "contain",
+          background: "white", // Set background color to white
         })
         .toFile(tempResizedImage);
 
@@ -180,6 +181,7 @@ exports.updateCategory = async (req, res) => {
           width: 400,
           height: 400,
           fit: "contain",
+          background: "white", // Set background color to white
         })
         .toFile(tempResizedImage);
 
