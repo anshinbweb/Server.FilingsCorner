@@ -20,6 +20,11 @@ global.__basedir = __dirname;
 const app = express();
 let databasestatus = "In-Progress";
 app.use(cors());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*'); // Adjust the '*' to your frontend's origin if possible
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 app.options("*", cors());
 app.use("/uploads", express.static("uploads"));
 app.use("/log", express.static("log"));
