@@ -10,6 +10,7 @@ const {
   getCategoryProducts,
   updateCategoryProducts,
   removeCategoryProducts,
+  FilterProductByWeight,
 } = require("../controllers/Products/CategoryProduct");
 
 const multer = require("multer");
@@ -39,6 +40,11 @@ router.post(
 );
 
 router.get("/auth/get-category-products/:_id", catchAsync(getCategoryProducts));
+
+router.get(
+  "/auth/filter-products-weight/:minWeight/:maxWeight",
+  catchAsync(FilterProductByWeight)
+);
 
 router.put(
   "/auth/update-category-products/:_id",

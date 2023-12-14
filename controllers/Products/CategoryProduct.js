@@ -41,13 +41,35 @@ exports.createCategoryProducts = async (req, res) => {
       await fs.rename(tempResizedImageCP, ProductImage);
     }
 
-    let { Category, ProductName, isActive } = req.body;
-
-    const add = await new CategoryProducts({
+    let {
       Category,
       ProductName,
+      ProductWeight,
+      ProductDescription,
+      MetalDetails,
       isActive,
-      ProductImage,
+    } = req.body;
+
+    const newMetalDetails = JSON.parse(MetalDetails);
+    const extractedObjects = [];
+
+    newMetalDetails.forEach((nestedArray) => {
+      if (nestedArray && nestedArray.length > 0) {
+        const extractedObject = nestedArray[0]; // Assuming there's only one object in each nested array
+        extractedObjects.push(extractedObject);
+      }
+    });
+    console.log("newCoordinates", newMetalDetails);
+    console.log("extractedObjects", extractedObjects);
+
+    const add = await new CategoryProducts({
+      Category: Category,
+      ProductName: ProductName,
+      ProductWeight: ProductWeight,
+      ProductDescription: ProductDescription,
+      MetalDetails: extractedObjects,
+      isActive: isActive,
+      ProductImage: ProductImage,
     }).save();
     console.log("create location", add);
     res.status(200).json({ isOk: true, data: add, message: "" });
@@ -218,6 +240,16 @@ exports.updateCategoryProducts = async (req, res) => {
       fieldvalues.ProductImage = ProductImage;
     }
 
+    const newMetalDetails = JSON.parse(fieldvalues.MetalDetails);
+    const extractedObjects = [];
+    newMetalDetails.forEach((nestedArray) => {
+      if (nestedArray && nestedArray.length > 0) {
+        const extractedObject = nestedArray[0]; // Assuming there's only one object in each nested array
+        extractedObjects.push(extractedObject);
+      }
+    });
+    fieldvalues["MetalDetails"] = extractedObjects;
+
     const update = await CategoryProducts.findOneAndUpdate(
       { _id: req.params._id },
       // req.body,
@@ -230,5 +262,22 @@ exports.updateCategoryProducts = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(400).send("update  failed");
+  }
+};
+
+exports.FilterProductByWeight = async (req, res) => {
+  // const { minWeight, maxWeight } = req.query;
+  const { minWeight, maxWeight } = req.params;
+
+  try {
+    const products = await CategoryProducts.find({
+      ProductWeight: { $gte: minWeight, $lte: maxWeight },
+    });
+
+    console.log("product list", products);
+    res.json(products);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
