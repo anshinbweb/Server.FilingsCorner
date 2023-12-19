@@ -144,8 +144,6 @@ exports.AddToWhislist = async (req, res) => {
   const { userid, productid } = req.body;
   console.log("req", req.body);
   try {
-    const check = await Prospect.findById({ _id: req.body.userid });
-    console.log("cc", check);
     const user = await Prospect.findOneAndUpdate(
       { _id: userid },
       { $addToSet: { wishlist: productid } },
@@ -156,6 +154,20 @@ exports.AddToWhislist = async (req, res) => {
     res.json(user.wishlist);
   } catch (error) {
     console.log("error in add", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.GetWhishlistUser = async (req, res) => {
+  const { userid } = req.params;
+  console.log("req", req.params);
+  try {
+    const user = await Prospect.findById({ _id: userid });
+    console.log("cc", user);
+
+    res.json(user.wishlist);
+  } catch (error) {
+    console.log("error in get", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -184,24 +196,27 @@ exports.getUserByWP = async (req, res) => {
       ContactNo: req.params.ContactNo,
     }).exec();
     console.log("find", findData);
-    const UserID = findData._id;
-    if (findData) {
+    let UserID = "";
+    if (findData !== null) {
+      UserID = findData._id;
+
+      console.log("inside", UserID);
       return res.status(200).json({
         isOk: true,
         data: UserID,
         message: "Authentication Successfull",
       });
     } else {
+      console.log("error in getting", UserID);
+
       return res.status(200).json({
         isOk: false,
-        field: 2,
+        field: 1,
         message: "No Account found with this Contact Number",
       });
     }
-
-    res.json(find);
   } catch (err) {
-    res.status(400).send(req.params.no);
+    res.status(400).send("error in get user");
   }
 };
 

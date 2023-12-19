@@ -13,20 +13,40 @@ exports.createTopProducts = async (req, res) => {
       fs.mkdirSync(`${__basedir}/uploads/TopProducts`);
     }
 
-    let ProductImage = req.files.ProductImage[0];
-    let ProductHoverImage = req.files.ProductHoverImage[0];
+    // let ProductImage = "";
+    // let ProductHoverImage = "";
+    // if (req.files) {
+    //   ProductImage = req.files.ProductImage[0];
+    //   ProductHoverImage = req.files.ProductHoverImage[0];
+    // }
 
     // let ProductImage = req.file
     //   ? `uploads/TopProducts/${req.file.filename}`
     //   : null;
 
-    let { NameOfProduct, IsActive } = req.body;
+    let { CategoryType, ProductType, IsActive } = req.body;
 
     console.log(req.body);
     const add = await new TopProducts({
-      ProductImage: `uploads/TopProducts/${ProductImage.filename}`,
-      NameOfProduct,
-      ProductHoverImage: `uploads/TopProducts/${ProductHoverImage.filename}`,
+      // ProductImage: `uploads/TopProducts/${ProductImage.filename}`,
+      // NameOfProduct,
+      // ProductHoverImage: `uploads/TopProducts/${ProductHoverImage.filename}`,
+      // IsActive,
+      ProductImage:
+        req.files || req.body.ProductImage
+          ? req.body.ProductImage
+            ? req.body.ProductImage
+            : `uploads/TopProducts/${req.files.ProductImage[0].filename}`
+          : null,
+      // NameOfProduct,
+      CategoryType,
+      ProductType,
+      ProductHoverImage:
+        req.files || req.body.ProductHoverImage
+          ? req.body.ProductHoverImage
+            ? req.body.ProductHoverImage
+            : `uploads/TopProducts/${req.files.ProductHoverImage[0].filename}`
+          : null,
       IsActive,
     }).save();
     res.json(add);
@@ -49,6 +69,46 @@ exports.listTProducts = async (req, res) => {
       {
         $match: { IsActive: IsActive },
       },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "CategoryType",
+          foreignField: "_id",
+          as: "categ",
+        },
+      },
+      {
+        $unwind: {
+          path: "$categ",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          categ: "$categ.Category",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "categoryproducts",
+          localField: "ProductType",
+          foreignField: "_id",
+          as: "products",
+        },
+      },
+      {
+        $unwind: {
+          path: "$products",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          products: "$products.ProductName",
+        },
+      },
+
       {
         $facet: {
           stage1: [

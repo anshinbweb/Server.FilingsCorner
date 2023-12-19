@@ -14,6 +14,7 @@ const {
   listProspectByParams,
   AddToWhislist,
   RemoveFromWhislist,
+  GetWhishlistUser,
 } = require("../controllers/Prospect/Prospect");
 const catchAsync = require("../utils/catchAsync");
 
@@ -22,6 +23,11 @@ router.post("/auth/prospect-list-all", catchAsync(listProspectByParams));
 router.post("/auth/add-whislist-Items", catchAsync(AddToWhislist));
 
 router.post("/auth/remove-whislist-Items", catchAsync(RemoveFromWhislist));
+
+router.get(
+  "/auth/get-whislist-Items-user/:userid",
+  catchAsync(GetWhishlistUser)
+);
 
 router.post("/auth/prospect-create", catchAsync(createProspect));
 
