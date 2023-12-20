@@ -2,9 +2,14 @@ const TopProducts = require("../../models/TopProducts/TopProducts");
 const fs = require("fs");
 
 exports.getTopProducts = async (req, res) => {
-  const find = await TopProducts.findOne({ _id: req.params._id }).exec();
-  console.log("get Task List", find);
-  res.json(find);
+  try {
+    const find = await TopProducts.findOne({ _id: req.params._id }).exec();
+    console.log("get Task List", find);
+    res.json(find);
+  } catch (error) {
+    console.log("get error", error);
+    res.status(500).send("Error in fetching data.");
+  }
 };
 
 exports.createTopProducts = async (req, res) => {
@@ -57,8 +62,13 @@ exports.createTopProducts = async (req, res) => {
 };
 
 exports.listTopProducts = async (req, res) => {
-  const list = await TopProducts.find().sort({ createdAt: -1 }).exec();
-  res.json(list);
+  try {
+    const list = await TopProducts.find().sort({ createdAt: -1 }).exec();
+    res.json(list);
+  } catch (error) {
+    console.log("list error", error);
+    res.status(500).send("Error in fetching data.");
+  }
 };
 
 exports.listTProducts = async (req, res) => {
