@@ -27,6 +27,8 @@ exports.createZiyaLocation = async (req, res) => {
       Area,
       Address,
       Location,
+      UserName,
+      Password,
       latitude,
       longitude,
       isActive,
@@ -42,6 +44,8 @@ exports.createZiyaLocation = async (req, res) => {
       Area,
       Address,
       Location,
+      UserName,
+      Password,
       latitude,
       longitude,
       isActive,
@@ -241,5 +245,43 @@ exports.findZiyaLocation = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).send("find ziya failed");
+  }
+};
+
+exports.getPartnerLoginData = async (req, res) => {
+  try {
+    const { username, password } = req.params;
+    const findData = await ZiyaLocation.findOne({
+      UserName: username,
+    }).exec();
+    console.log("find", findData);
+    let UserID = "";
+    if (findData !== null) {
+      UserID = findData._id;
+
+      console.log("inside", UserID);
+      return res.status(200).json({
+        isOk: true,
+        data: UserID,
+        message: "Authentication Successfull",
+      });
+    } else {
+      // console.log("error in getting", UserID);
+      if (!findData) {
+        return res.status(200).json({
+          isOk: false,
+          field: 2,
+          message: "Username does not match",
+        });
+      } else if (findData.Password !== password) {
+        return res.status(200).json({
+          isOk: false,
+          field: 1,
+          message: "Password does not matches",
+        });
+      }
+    }
+  } catch (err) {
+    res.status(400).send("error in get user");
   }
 };

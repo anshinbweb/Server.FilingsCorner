@@ -7,6 +7,7 @@ const {
   getZiyaLocation,
   updateZiyaLocation,
   findZiyaLocation,
+  getPartnerLoginData,
 } = require("../controllers/ZiyaLocation");
 const catchAsync = require("../utils/catchAsync");
 
@@ -40,6 +41,11 @@ router.get("/auth/location/get-ziya/:_id", catchAsync(getZiyaLocation));
 router.get(
   "/auth/find-locations/ziya/:country/:city",
   catchAsync(findZiyaLocation)
+);
+
+router.get(
+  "/auth/find-partner-user-details/:username/:password",
+  catchAsync(getPartnerLoginData)
 );
 
 router.post(

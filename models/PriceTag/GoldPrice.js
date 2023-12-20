@@ -15,6 +15,10 @@ const GoldPriceSchema = new mongoose.Schema(
     IsActive: {
       type: Boolean,
     },
+    // RADIO BUTTON
+    IsDisplay: {
+      type: Boolean,
+    },
   },
   { timestamps: true }
 );

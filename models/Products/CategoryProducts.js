@@ -10,9 +10,29 @@ const CategoryProductsSchema = new mongoose.Schema(
     ProductImage: {
       type: String,
     },
+    ProductWeight: {
+      type: Number,
+      // required: true,
+    },
     ProductName: {
       type: String,
     },
+    ProductDescription: {
+      type: String,
+    },
+    MetalDetails: [
+      {
+        MetalName: {
+          type: String,
+        },
+        MetalDescription: {
+          type: String,
+        },
+        MetalWeight: {
+          type: Number,
+        },
+      },
+    ],
     isActive: {
       type: Boolean,
     },

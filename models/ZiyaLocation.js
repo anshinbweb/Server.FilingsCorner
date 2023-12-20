@@ -25,6 +25,14 @@ const ZiyaLocationSchema = new mongoose.Schema(
     StoreLogo: {
       type: String,
     },
+    UserName: {
+      type: String,
+      required: true,
+    },
+    Password: {
+      type: String,
+      required: true,
+    },
     Location: {
       type: String,
     },
