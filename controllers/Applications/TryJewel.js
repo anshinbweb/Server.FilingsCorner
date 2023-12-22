@@ -48,9 +48,62 @@ exports.listTryJewel = async (req, res) => {
 
 exports.listTryJewelByParams = async (req, res) => {
   try {
-    let { skip, per_page, sorton, sortdir, match } = req.body;
+    let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
 
     let query = [
+      {
+        $match: { IsActive: isActive },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "cat",
+        },
+      },
+      {
+        $unwind: {
+          path: "$cat",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          cat: "$cat.Category",
+        },
+      },
+      {
+        $lookup: {
+          from: "categoryproducts",
+          localField: "productId",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $unwind: {
+          path: "$product",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          product: "$product.ProductName",
+        },
+      },
+      {
+        $match: {
+          $or: [
+            {
+              cat: { $regex: match, $options: "i" },
+            },
+            {
+              product: { $regex: match, $options: "i" },
+            },
+          ],
+        },
+      },
       {
         $facet: {
           stage1: [
@@ -85,23 +138,8 @@ exports.listTryJewelByParams = async (req, res) => {
         },
       },
     ];
-    if (match) {
-      query = [
-        {
-          $match: {
-            $or: [
-              {
-                categoryId: { $regex: match, $options: "i" },
-              },
-              {
-                scaleFactor: { $regex: match, $options: "i" },
-              },
-            ],
-          },
-        },
-      ].concat(query);
-    }
 
+  
     if (sorton && sortdir) {
       let sort = {};
       sort[sorton] = sortdir == "desc" ? -1 : 1;
