@@ -35,6 +35,6 @@ router.get("/auth/get-try-jewel/:_id", catchAsync(getTryJewel));
 
 router.put("/auth/update-try-jewel/:_id",upload.single("myFile"), catchAsync(updateTryJewel));
 
-router.delete("/auth/delete-try-jewel/:_id", catchAsync(removeTryJewel));
+router.delete("/auth/remove-try-jewel/:_id", catchAsync(removeTryJewel));
 
 module.exports = router;

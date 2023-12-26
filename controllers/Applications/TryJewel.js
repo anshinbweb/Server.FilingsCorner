@@ -193,7 +193,11 @@ exports.updateTryJewel = async (req, res) => {
       ? `uploads/TryOnProducts/${req.file.filename}`
       : null;
     let fieldvalues = { ...req.body };
-    fieldvalues.productImage = productImage;
+    // fieldvalues.productImage = productImage;
+
+    if (productImage != null ) {
+      fieldvalues.productImage = productImage;
+    }
 
     const update = await TryJewel.findOneAndUpdate(
       { _id: req.params._id },
