@@ -12,6 +12,11 @@ const CategorySchema = new mongoose.Schema(
     Description: {
       type: String,
     },
+    IsTopProducts: {
+      type: Boolean,
+      default: false,
+      // required: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

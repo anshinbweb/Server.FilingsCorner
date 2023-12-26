@@ -43,7 +43,7 @@ exports.createCategory = async (req, res) => {
 
     console.log(CategoryImage);
 
-    let { Description, isActive } = req.body;
+    let { Description, isActive, IsTopProducts } = req.body;
 
     const add = await new Category({
       Category: req.body.Category,
@@ -51,6 +51,7 @@ exports.createCategory = async (req, res) => {
       CategoryImage: CategoryImage,
       Description,
       isActive,
+      IsTopProducts,
     }).save();
     res.json(add);
   } catch (err) {

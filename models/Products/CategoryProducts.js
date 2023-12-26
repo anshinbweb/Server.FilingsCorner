@@ -36,6 +36,15 @@ const CategoryProductsSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
     },
+    IsTopProduct: {
+      type: Boolean,
+      default: false,
+      // required: true,
+    },
+    ProductHoverImage: {
+      type: String,
+      // required: true,
+    },
   },
   { timestamps: true }
 );

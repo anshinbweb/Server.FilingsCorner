@@ -1,3 +1,4 @@
+const { log } = require("console");
 const CategoryProducts = require("../../models/Products/CategoryProducts");
 // const fs = require("fs");
 const sharp = require("sharp"); // Import the sharp library
@@ -16,29 +17,56 @@ exports.listCategoryProducts = async (req, res) => {
 exports.createCategoryProducts = async (req, res) => {
   try {
     console.log("body", req.body);
-    let ProductImage = req.file
-      ? `uploads/CategoryProducts/${req.file.filename}`
-      : null;
+    console.log("files", req.files);
+    // let ProductImage = req.file
+    //   ? `uploads/CategoryProducts/${req.file.filename}`
+    //   : null;
 
-    console.log("PP", ProductImage);
+    let ProductImage = req.files.ProductImage[0];
+    // let ProductHoverImage = req.files.ProductHoverImage[0];
+    let ProductHoverImage =
+      req.body.ProductHoverImage === "" ? null : req.files.ProductHoverImage[0];
+
+    // let ProductHoverImage = req.file
+    // ? `uploads/CategoryProducts/${req.file.filename}`
+    // : null;
+
     if (ProductImage) {
-      const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${req.file.filename}`;
-
-      await sharp(ProductImage)
+      // const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${req.file.filename}`;
+      const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${ProductImage.filename}`;
+      const PATH = ProductImage.path;
+      console.log("eeee");
+      await sharp(PATH)
         .resize({
           width: 400,
           height: 400,
           fit: "contain",
-          background: "white", // Set background color to white
-          // background: { r: 255, g: 255, b: 255, alpha: 1 }, // Set background color to white
+          background: "white",
         })
         .toFile(tempResizedImageCP);
+      console.log("www");
 
-      // Remove the original image
-      await fs.unlink(ProductImage);
+      await fs.unlink(PATH);
 
       // Rename the temporary resized image to the original image path
-      await fs.rename(tempResizedImageCP, ProductImage);
+      await fs.rename(tempResizedImageCP, PATH);
+    }
+
+    if (ProductHoverImage) {
+      const tempResizedHoverImageCP = `uploads/CategoryProducts/tempCP_${ProductHoverImage.filename}`;
+      const HoverPATH = ProductHoverImage.path;
+
+      await sharp(HoverPATH)
+        .resize({
+          width: 400,
+          height: 400,
+          fit: "contain",
+          background: "white",
+        })
+        .toFile(tempResizedHoverImageCP);
+
+      await fs.unlink(HoverPATH);
+      await fs.rename(tempResizedHoverImageCP, HoverPATH);
     }
 
     let {
@@ -48,6 +76,7 @@ exports.createCategoryProducts = async (req, res) => {
       ProductDescription,
       MetalDetails,
       isActive,
+      IsTopProduct,
     } = req.body;
 
     const newMetalDetails = JSON.parse(MetalDetails);
@@ -69,7 +98,10 @@ exports.createCategoryProducts = async (req, res) => {
       ProductDescription: ProductDescription,
       MetalDetails: extractedObjects,
       isActive: isActive,
-      ProductImage: ProductImage,
+      ProductImage: ProductImage.path,
+      ProductHoverImage:
+        ProductHoverImage === null ? null : ProductHoverImage.path,
+      IsTopProduct: IsTopProduct,
     }).save();
     console.log("create location", add);
     res.status(200).json({ isOk: true, data: add, message: "" });
@@ -184,6 +216,122 @@ exports.listCategoryProductsByParams = async (req, res) => {
   }
 };
 
+exports.listAllTrendingProducts = async (req, res) => {
+  try {
+    let {
+      skip,
+      per_page,
+      sorton,
+      sortdir,
+      match,
+      // isActive,
+      checktopProd,
+    } = req.body;
+
+    console.log("req.body", req.body);
+
+    let query = [
+      {
+        $match: {
+          $or: [
+            // { isActive: isActive },
+            { IsTopProduct: checktopProd },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "Category",
+          foreignField: "_id",
+          as: "categ",
+        },
+      },
+      {
+        $unwind: {
+          path: "$categ",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          categ: "$categ.Category",
+        },
+      },
+
+      {
+        $match: {
+          $or: [
+            {
+              Category: new RegExp(match, "i"),
+            },
+            {
+              ProductName: new RegExp(match, "i"),
+            },
+          ],
+        },
+      },
+      {
+        $facet: {
+          stage1: [
+            {
+              $group: {
+                _id: null,
+                count: {
+                  $sum: 1,
+                },
+              },
+            },
+          ],
+          stage2: [
+            {
+              $skip: skip,
+            },
+            {
+              $limit: per_page,
+            },
+          ],
+        },
+      },
+      {
+        $unwind: {
+          path: "$stage1",
+        },
+      },
+      {
+        $project: {
+          count: "$stage1.count",
+          data: "$stage2",
+        },
+      },
+    ];
+    if (sorton && sortdir) {
+      let sort = {};
+      sort[sorton] = sortdir == "desc" ? -1 : 1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    } else {
+      let sort = {};
+      sort["createdAt"] = -1;
+      query = [
+        {
+          $sort: sort,
+        },
+      ].concat(query);
+    }
+
+    const listTP = await CategoryProducts.aggregate(query);
+    console.log("list in pa", listTP);
+    res.json(listTP);
+  } catch (error) {
+    console.log("error in list category p", error);
+    res.status(400).send("list Category p failed");
+  }
+};
+
 exports.removeCategoryProducts = async (req, res) => {
   try {
     const del = await CategoryProducts.findOneAndRemove({
@@ -212,15 +360,36 @@ exports.getCategoryProducts = async (req, res) => {
 
 exports.updateCategoryProducts = async (req, res) => {
   try {
-    let ProductImage = req.file
-      ? `uploads/CategoryProducts/${req.file.filename}`
-      : null;
+    // let ProductImage = req.file
+    //   ? `uploads/CategoryProducts/${req.file.filename}`
+    //   : null;
+
+    // let profileMp = req.file ? `profile-sh/${req.file.filename}` : null;
+    console.log("req", req.body);
+    log("req", req.files);
+    let ProductImage =
+      req.files || req.body.ProductImage
+        ? req.body.ProductImage
+          ? req.body.ProductImage
+          : `uploads/CategoryProducts/${req.files.ProductImage[0].filename}`
+        : null;
+
+    let ProductHoverImage =
+      req.files || req.body.ProductHoverImage
+        ? req.body.ProductHoverImage
+          ? req.body.ProductHoverImage
+          : `uploads/CategoryProducts/${req.files.ProductHoverImage[0].filename}`
+        : null;
+
     console.log("pp", ProductImage);
+    console.log("piii", ProductHoverImage);
+
     let fieldvalues = { ...req.body };
 
-    if (ProductImage != null) {
+    if (req.files && req.files.ProductImage) {
       // Create a temporary file path for the resized image
-      const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${req.file.filename}`;
+      const tempResizedImageCP = `uploads/CategoryProducts/tempCP_${req.files.ProductImage[0].filename}`;
+      // const PATH = ProductImage.path;
 
       await sharp(ProductImage)
         .resize({
@@ -238,6 +407,32 @@ exports.updateCategoryProducts = async (req, res) => {
       await fs.rename(tempResizedImageCP, ProductImage);
 
       fieldvalues.ProductImage = ProductImage;
+    }
+
+    if (req.files && req.files.ProductHoverImage) {
+      // Create a temporary file path for the resized image
+      log("ProductHoverImage", ProductHoverImage);
+      const uploadedFile = req.files.ProductHoverImage[0];
+
+      const tempResizedHoverImageCP = `uploads/CategoryProducts/tempCP_${req.files.ProductHoverImage[0].filename}`;
+      // const HoverPATH = ProductHoverImage.path;
+
+      await sharp(uploadedFile.path)
+        .resize({
+          width: 400,
+          height: 400,
+          fit: "contain",
+          background: "white", // Set background color to white
+        })
+        .toFile(tempResizedHoverImageCP);
+
+      // Remove the original image
+      await fs.unlink(uploadedFile.path);
+
+      // Rename the temporary resized image to the original image path
+      await fs.rename(tempResizedHoverImageCP, uploadedFile.path);
+
+      fieldvalues.ProductHoverImage = uploadedFile.path;
     }
 
     const newMetalDetails = JSON.parse(fieldvalues.MetalDetails);
