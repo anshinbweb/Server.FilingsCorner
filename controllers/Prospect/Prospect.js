@@ -109,13 +109,13 @@ exports.createProspect = async (req, res) => {
       return res.status(200).json({
         isOk: false,
         field: 1,
-        message: "Account with this Contact Number already exists!",
+        message: "Contact Number already exists!",
       });
     } else if (EmailId) {
       return res.status(200).json({
         isOk: false,
         field: 2,
-        message: "Account with this This EmailID already exists!",
+        message: "EmailID already exists!",
       });
     } else {
       const addProspect = await new Prospect(req.body).save();
