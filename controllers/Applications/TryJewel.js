@@ -11,6 +11,18 @@ exports.getTryJewel = async (req, res) => {
   }
 };
 
+exports.getTryJewelByProduct = async (req, res) => {
+  try {
+    console.log(req.params._id);
+    const find = await TryJewel.findOne({ productId: req.params._id, IsActive: true }).exec();
+    console.log("get try jewel by product", find);
+    res.json(find);
+  } catch (error) {
+    console.log("log error from get TryJewel", error);
+    return res.status(400).send("create dynamic content failed from TryJewel");
+  }
+};
+
 exports.createTryJewel = async (req, res) => {
   try {
     console.log(req.body);
