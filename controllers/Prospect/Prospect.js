@@ -109,13 +109,13 @@ exports.createProspect = async (req, res) => {
       return res.status(200).json({
         isOk: false,
         field: 1,
-        message: "Account with this Contact Number already exists!",
+        message: "Contact Number already exists!",
       });
     } else if (EmailId) {
       return res.status(200).json({
         isOk: false,
         field: 2,
-        message: "Account with this This EmailID already exists!",
+        message: "EmailID already exists!",
       });
     } else {
       const addProspect = await new Prospect(req.body).save();
@@ -235,9 +235,11 @@ exports.removeProspect = async (req, res) => {
 
 exports.updateProspect = async (req, res) => {
   console.log("Updating...", req.body);
+  console.log("Updating...", req.body.DateofBirth);
+
   try {
     const update = await Prospect.findOneAndUpdate(
-      { _id: req.params._id },
+      { _id: req.params.user },
       req.body,
       { new: true }
     );

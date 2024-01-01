@@ -36,6 +36,6 @@ router.get("/auth/prospect-login/:ContactNo", catchAsync(getUserByWP));
 
 router.delete("/auth/prospect-remove/:_id", catchAsync(removeProspect));
 
-router.put("/auth/prospect-update/:_id", catchAsync(updateProspect));
+router.put("/auth/prospect-update/:user", catchAsync(updateProspect));
 
 module.exports = router;
