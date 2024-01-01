@@ -235,9 +235,11 @@ exports.removeProspect = async (req, res) => {
 
 exports.updateProspect = async (req, res) => {
   console.log("Updating...", req.body);
+  console.log("Updating...", req.body.DateofBirth);
+
   try {
     const update = await Prospect.findOneAndUpdate(
-      { _id: req.params._id },
+      { _id: req.params.user },
       req.body,
       { new: true }
     );

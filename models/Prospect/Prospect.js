@@ -25,6 +25,14 @@ const ProspectSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    DateOfBirth: {
+      type: Date,
+      default: null,
+    },
+    AnniversaryDate: {
+      type: Date,
+      default: null,
+    },
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,
