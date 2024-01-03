@@ -76,6 +76,8 @@ exports.createCategoryProducts = async (req, res) => {
       ProductDescription,
       MetalDetails,
       isActive,
+      isPartner,
+      isPublic,
       IsTopProduct,
     } = req.body;
 
@@ -98,6 +100,8 @@ exports.createCategoryProducts = async (req, res) => {
       ProductDescription: ProductDescription,
       MetalDetails: extractedObjects,
       isActive: isActive,
+      isPartner: isPartner,
+      isPublic: isPublic,
       ProductImage: ProductImage.path,
       ProductHoverImage:
         ProductHoverImage === null ? null : ProductHoverImage.path,

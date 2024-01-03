@@ -36,6 +36,14 @@ const CategoryProductsSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
     },
+    isPartner: {
+      type: Boolean,
+      default: false,
+    },
+    isPublic: {
+      type: Boolean,
+      default: false,
+    },
     IsTopProduct: {
       type: Boolean,
       default: false,
