@@ -22,6 +22,14 @@ const CategorySchema = new mongoose.Schema(
       default: true,
       required: true,
     },
+    IsPartner: {
+      type: Boolean,
+      default: false,
+    },
+    IsPublic: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
