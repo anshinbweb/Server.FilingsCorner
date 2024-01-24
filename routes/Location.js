@@ -3,9 +3,12 @@ const express = require("express");
 const router = express.Router();
 
 const {
+  createLocation,
+  getLocation,
   listCountry,
   createCountry,
   removeCountry,
+  removeAndUpdateCountry,
   updateCountry,
   getCountry,
   listCountryByParams,
@@ -13,6 +16,7 @@ const {
   listState,
   listStateByParams,
   createState,
+  removeAndUpdateState,
   getState,
   updateState,
   removeState,
@@ -22,9 +26,16 @@ const {
   listCityByParams,
   createCity,
   getCity,
+  removeAndUpdateCity,
   updateCity,
+  getCountryCode,
+  getCountryName,
+  listByStatus,
 } = require("../controllers/Location");
 const catchAsync = require("../utils/catchAsync");
+
+// router.get("/auth/location", catchAsync(getLocation));
+// router.post("/auth/location", catchAsync(createLocation));
 
 //location setup ---> country
 router.get("/auth/location/country", catchAsync(listCountry));
