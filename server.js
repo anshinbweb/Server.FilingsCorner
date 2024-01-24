@@ -58,7 +58,7 @@ fs.readdirSync("./routes").map((r) =>
 
 app.get("/api", (req, res) => {
   res.json({
-    version: "v1.0-10.12.23.",
+    version: "v1.0-01.19.2024.",
     dbstatus: databasestatus,
   });
 });
@@ -67,7 +67,7 @@ app.get("/error", (req, res) => {
   let num = 20;
   num = 20 / 0;
   // new throws("new test");
-  res.test("hit the api button. v-10.12.2023.");
+  res.test("hit the api button. v-01.19.2024.");
 });
 
 app.use(async (err, req, res, next) => {
