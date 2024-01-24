@@ -58,7 +58,7 @@ fs.readdirSync("./routes").map((r) =>
 
 app.get("/api", (req, res) => {
   res.json({
-    version: "v1.0-01.19.2024.",
+    version: "v1.0-24.01.2024.",
     dbstatus: databasestatus,
   });
 });
