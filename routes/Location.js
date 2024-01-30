@@ -23,7 +23,7 @@ const {
   createCity,
   getCity,
   updateCity,
-} = require("../controllers/Location");
+} = require("../controllers/Location/Location");
 const catchAsync = require("../utils/catchAsync");
 
 //location setup ---> country

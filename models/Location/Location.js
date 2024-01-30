@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
-const ZiyaLocationSchema = new mongoose.Schema(
+const CompanyLocationSchema = new mongoose.Schema(
   {
     CityID: {
       type: String,
@@ -19,20 +19,6 @@ const ZiyaLocationSchema = new mongoose.Schema(
     Area: {
       type: String,
     },
-    Address: {
-      type: String,
-    },
-    StoreLogo: {
-      type: String,
-    },
-    UserName: {
-      type: String,
-      required: true,
-    },
-    Password: {
-      type: String,
-      required: true,
-    },
     Location: {
       type: String,
     },
@@ -42,7 +28,22 @@ const ZiyaLocationSchema = new mongoose.Schema(
     longitude: {
       type: Number,
     },
-    isActive: {
+    Address: {
+      type: String,
+    },
+    StoreLogo: {
+      type: String,
+    },
+    // UserName: {
+    //   type: String,
+    //   required: true,
+    // },
+    // Password: {
+    //   type: String,
+    //   required: true,
+    // },
+    
+    IsActive: {
       type: Boolean,
       default: true,
       required: true,
@@ -51,4 +52,4 @@ const ZiyaLocationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ZiyaLocation", ZiyaLocationSchema);
+module.exports = mongoose.model("CompanyLocation", CompanyLocationSchema);

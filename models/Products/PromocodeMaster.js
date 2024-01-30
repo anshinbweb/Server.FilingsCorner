@@ -1,5 +1,3 @@
-
-
 const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
 const PromocodeMasterSchema = new mongoose.Schema(
@@ -8,8 +6,8 @@ const PromocodeMasterSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    save: {    //(percentage)
-        type: Number
+    savePercentage: {
+      type: Number,
     },
     IsActive: {
       type: Boolean,

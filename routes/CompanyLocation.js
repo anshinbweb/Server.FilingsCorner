@@ -10,7 +10,6 @@ const {
   findLocation,
   createLocation,
   updateLocation,
-  getPartnerLoginData,
 } = require("../controllers/Location/CompanyLocation");
 
 const multerStorage = multer.diskStorage({
@@ -28,29 +27,34 @@ const upload = multer({ storage: multerStorage });
 
 const router = express.Router();
 
-router.get("/auth/locations/ziya", catchAsync(listLocation));
-router.post("/auth/location/ziya-by-params", catchAsync(listLocationByParams));
-router.delete("/auth/location/remove-ziya/:_id", catchAsync(removeLocation));
-router.get("/auth/location/get-ziya/:_id", catchAsync(getLocation));
+router.get("/auth/list/company-locations", catchAsync(listLocation));
+router.post(
+  "/auth/list-by-params/company-locations",
+  catchAsync(listLocationByParams)
+);
+router.delete(
+  "/auth/remove/company-locations/:_id",
+  catchAsync(removeLocation)
+);
+router.get("/auth/get/company-locations/:_id", catchAsync(getLocation));
 router.get(
-  "/auth/find-locations/ziya/:country/:city",
+  "/auth/find/company-locations/:country/:city",
   catchAsync(findLocation)
 );
 
-router.get(
-  "/auth/find-partner-user-details/:username/:password",
-  catchAsync(getPartnerLoginData)
-);
+// router.get(
+//   "/auth/find-partner-user-details/:username/:password",
+//   catchAsync(getPartnerLoginData)
+// );
 
 router.post(
-  "/auth/location/ziya",
+  "/auth/create/company-locations",
   upload.single("myFile"),
   catchAsync(createLocation)
 );
 router.put(
-  "/auth/location/update-ziya/:_id",
+  "/auth/update/company-locations/:_id",
   upload.single("myFile"),
-
   catchAsync(updateLocation)
 );
 

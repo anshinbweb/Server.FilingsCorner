@@ -21,28 +21,19 @@ const OrdersSchema = new mongoose.Schema(
       ref: "Users",
       required: true,
     },
-    productId: {
-      type: Schema.Types.ObjectId,
-      ref: "ProductDetails",
-      required: true,
-    },
-    subsId: {     //need to look at it
-      type: Schema.Types.ObjectId,
-      ref: "SubscriptionMaster",
-      required: true,
-    },
-    quntity: {
-      type: Number,
-    },
-    totalAmount: {
-      type: Number,
-    },
+    orderId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "OrdersDetils",
+        required: true,
+      },
+    ],
     remark: {
       type: String,
     },
-    promocode: {   //need to make promo master
+    promocode: {
       type: Schema.Types.ObjectId,
-      ref: "PromocodeMaster"
+      ref: "PromocodeMaster",
     },
     name: {
       type: String,
@@ -81,4 +72,4 @@ const OrdersSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Orders",  OrdersSchema);
+module.exports = mongoose.model("Orders", OrdersSchema);

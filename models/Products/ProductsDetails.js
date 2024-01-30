@@ -1,5 +1,6 @@
 //category
 //product name
+//image
 //price
 //description
 //isSubs (true: put that product in subscription tab)
@@ -16,6 +17,9 @@ const ProductDetailsSchema = new mongoose.Schema(
       required: true,
     },
     productName: {
+      type: String,
+    },
+    productImage: {
       type: String,
     },
     productDescription: {

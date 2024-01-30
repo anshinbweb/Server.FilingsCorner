@@ -12,16 +12,16 @@ const {
   removeFAQ,
 } = require("../controllers/PolicyAndInquiry/FAQ");
 
-router.post("/auth/create/blogs", catchAsync(createFAQ));
+router.post("/auth/create/faq", catchAsync(createFAQ));
 
-router.get("/auth/list/blogs", catchAsync(listFAQ));
+router.get("/auth/list/faq", catchAsync(listFAQ));
 
-router.post("/auth/list-by-params/blogs", catchAsync(listFAQByParams));
+router.post("/auth/list-by-params/faq", catchAsync(listFAQByParams));
 
-router.get("/auth/get/blogs/:_id", catchAsync(getFAQ));
+router.get("/auth/get/faq/:_id", catchAsync(getFAQ));
 
-router.put("/auth/update/blogs/:_id", catchAsync(updateFAQ));
+router.put("/auth/update/faq/:_id", catchAsync(updateFAQ));
 
-router.delete("/auth/remove/blogs/:_id", catchAsync(removeFAQ));
+router.delete("/auth/remove/faq/:_id", catchAsync(removeFAQ));
 
 module.exports = router;
