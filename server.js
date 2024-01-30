@@ -6,13 +6,7 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const { throws } = require("assert");
-// const autoIncrement = require("mongoose-auto-increment");
-// const XMLHttpRequest =  require('xhr2');
-// var httpRequest = new XMLHttpRequest();
-// const cookieParser = require("cookie-parser");
 require("dotenv").config();
-// const url = process.env.API_URL;
-// const cron = require("node-cron");
 const axios = require("axios");
 
 global.__basedir = __dirname;
@@ -58,16 +52,13 @@ fs.readdirSync("./routes").map((r) =>
 
 app.get("/api", (req, res) => {
   res.json({
-    version: "v1.0-10.12.23.",
+    version: "v1.0-24.01.2024.",
     dbstatus: databasestatus,
   });
 });
 
 app.get("/error", (req, res) => {
-  let num = 20;
-  num = 20 / 0;
-  // new throws("new test");
-  res.test("hit the api button. v-10.12.2023.");
+  res.test("hit the api button. v-24.01.2024.");
 });
 
 app.use(async (err, req, res, next) => {
