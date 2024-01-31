@@ -18,7 +18,6 @@ const InquirySchema = new mongoose.Schema(
     },
     Message: {
       type: String,
-      required: true,
     },
     IsActive: {
       type: Boolean,

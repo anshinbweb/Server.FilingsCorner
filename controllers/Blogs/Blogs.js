@@ -14,7 +14,8 @@ exports.createBlogs = async (req, res) => {
     const add = await new Blogs(req.body).save();
     res.json(add);
   } catch (err) {
-    return res.status(400).send(err);
+    console.log(err);
+    return res.status(500).send(err);
   }
 };
 

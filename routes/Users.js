@@ -10,6 +10,7 @@ const {
   getUsers,
   updateUsers,
   removeUsers,
+  userLogin,
 } = require("../controllers/Auth/Users");
 
 router.post("/auth/create/users", catchAsync(createUsers));
@@ -23,5 +24,8 @@ router.get("/auth/get/users/:_id", catchAsync(getUsers));
 router.put("/auth/update/users/:_id", catchAsync(updateUsers));
 
 router.delete("/auth/remove/users/:_id", catchAsync(removeUsers));
+
+router.post("/login", catchAsync(userLogin));
+
 
 module.exports = router;
