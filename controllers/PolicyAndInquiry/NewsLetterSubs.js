@@ -29,12 +29,10 @@ exports.listNewsLetter = async (req, res) => {
 
 exports.listNewsLetterByParams = async (req, res) => {
   try {
-    let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
+    let { skip, per_page, sorton, sortdir, match } = req.body;
 
     let query = [
-      {
-        $match: { IsActive: IsActive },
-      },
+     
 
       {
         $facet: {

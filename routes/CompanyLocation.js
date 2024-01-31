@@ -27,6 +27,7 @@ const upload = multer({ storage: multerStorage });
 
 const router = express.Router();
 
+
 router.get("/auth/list/company-locations", catchAsync(listLocation));
 router.post(
   "/auth/list-by-params/company-locations",
@@ -41,11 +42,6 @@ router.get(
   "/auth/find/company-locations/:country/:city",
   catchAsync(findLocation)
 );
-
-// router.get(
-//   "/auth/find-partner-user-details/:username/:password",
-//   catchAsync(getPartnerLoginData)
-// );
 
 router.post(
   "/auth/create/company-locations",

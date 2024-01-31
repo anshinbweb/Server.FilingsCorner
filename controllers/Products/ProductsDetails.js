@@ -1,4 +1,5 @@
 const ProductsDetails = require("../../models/Products/ProductsDetails");
+const fs = require("fs");
 
 exports.getProductsDetails = async (req, res) => {
   try {
@@ -10,13 +11,42 @@ exports.getProductsDetails = async (req, res) => {
 };
 
 exports.createProductsDetails = async (req, res) => {
-  try {
-    const add = await new ProductsDetails(req.body).save();
-    res.json(add);
+  
+    try {
+      if (!fs.existsSync(`${__basedir}/uploads/Products`)) {
+        fs.mkdirSync(`${__basedir}/uploads/Products`);
+      }
+  
+      let productImage = req.file ? `uploads/Products/${req.file.filename}` : null;
+  
+      let {
+        category,
+        productName,
+        productDescription,
+        price,
+        IsGiftHamper,
+        IsSubscriptionProduct,
+        IsActive,
+      } = req.body;
+  
+  
+      const add = await new ProductsDetails({
+        category,
+        productImage,
+        productName,
+        productDescription,
+        price,
+        IsGiftHamper,
+        IsSubscriptionProduct,
+        IsActive,
+      }).save();
+      res.status(200).json({ isOk: true, data: add, message: "" });
+    
   } catch (err) {
-    return res.status(400).send(err);
+    console.log(err);
+    return res.status(500).send(err);
   }
-};
+}
 
 exports.listProductsDetails = async (req, res) => {
   try {
@@ -112,12 +142,21 @@ exports.listProductsDetailsByParams = async (req, res) => {
 
 exports.updateProductsDetails = async (req, res) => {
   try {
+
+    let productImage = req.file ? `uploads/Products/${req.file.filename}` : null;
+    let fieldvalues = { ...req.body };
+    if (productImage != null) {
+      fieldvalues.productImage = productImage;
+    }
+
     const update = await ProductsDetails.findOneAndUpdate(
       { _id: req.params._id },
-      req.body,
+      fieldvalues,
+
       { new: true }
     );
     res.json(update);
+
   } catch (err) {
     res.status(400).send(err);
   }

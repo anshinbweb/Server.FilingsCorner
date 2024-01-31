@@ -14,7 +14,8 @@ exports.createUsers = async (req, res) => {
     const add = await new Users(req.body).save();
     res.json(add);
   } catch (err) {
-    return res.status(400).send(err);
+    console.log(err);
+    return res.status(500).send(err);
   }
 };
 
@@ -125,11 +126,34 @@ exports.updateUsers = async (req, res) => {
 
 exports.removeUsers = async (req, res) => {
   try {
-    const del= await Users.findOneAndRemove({
+    const del = await Users.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);
   } catch (err) {
     res.status(400).send(err);
+  }
+};
+
+exports.userLogin = async (req, res) => {
+  try {
+    const { Email, Password } = req.body;
+    const findData = await Users.findOne({
+      Email,
+      Password,
+      UserType: "admin"
+    }).exec();
+    if (findData) {
+      return res.status(200).json({
+        isOk: true,
+        data: findData,
+        message: "Authentication Successfull",
+      });
+    } else {
+      res.status(500).send("Authentication Failed!");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
   }
 };
