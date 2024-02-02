@@ -65,6 +65,20 @@ exports.listProductsDetailsByParams = async (req, res) => {
       {
         $match: { IsActive: IsActive },
       },
+      {
+        $lookup: {
+          from: "drinkcategorymasters",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
 
       {
         $facet: {

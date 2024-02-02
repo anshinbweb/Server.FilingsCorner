@@ -32,7 +32,20 @@ exports.listFAQByParams = async (req, res) => {
     let { skip, per_page, sorton, sortdir, match } = req.body;
 
     let query = [
-     
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
 
       {
         $facet: {

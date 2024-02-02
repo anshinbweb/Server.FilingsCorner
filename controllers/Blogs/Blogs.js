@@ -36,6 +36,20 @@ exports.listBlogsByParams = async (req, res) => {
       {
         $match: { IsActive: IsActive },
       },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
 
       {
         $facet: {
