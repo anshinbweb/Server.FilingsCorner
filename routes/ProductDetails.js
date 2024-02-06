@@ -11,6 +11,8 @@ const {
   getProductsDetails,
   updateProductsDetails,
   removeProductsDetails,
+  listProductByCategory,
+  getProductByID,
 } = require("../controllers/Products/ProductsDetails");
 const multer = require("multer");
 
@@ -27,10 +29,23 @@ const multerStorage = multer.diskStorage({
 
 const upload = multer({ storage: multerStorage });
 
-router.post("/auth/create/product-details",upload.single("myFile"), catchAsync(createProductsDetails));
+router.post(
+  "/auth/create/product-details",
+  upload.single("myFile"),
+  catchAsync(createProductsDetails)
+);
 
 router.get("/auth/list/product-details", catchAsync(listProductsDetails));
 
+// APPLICATION
+router.get(
+  "/auth/list/product-by-category/:categoryId",
+  catchAsync(listProductByCategory)
+);
+
+router.post("/auth/list/product-by-id/:productId", catchAsync(getProductByID));
+
+///
 router.post(
   "/auth/list-by-params/product-details",
   catchAsync(listProductsDetailsByParams)
@@ -38,8 +53,15 @@ router.post(
 
 router.get("/auth/get/product-details/:_id", catchAsync(getProductsDetails));
 
-router.put("/auth/update/product-details/:_id",upload.single("myFile"), catchAsync(updateProductsDetails));
+router.put(
+  "/auth/update/product-details/:_id",
+  upload.single("myFile"),
+  catchAsync(updateProductsDetails)
+);
 
-router.delete("/auth/remove/product-details/:_id", catchAsync(removeProductsDetails));
+router.delete(
+  "/auth/remove/product-details/:_id",
+  catchAsync(removeProductsDetails)
+);
 
 module.exports = router;

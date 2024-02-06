@@ -28,6 +28,9 @@ const ProductDetailsSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
+    weight: {
+      type: Number,
+    },
     IsActive: {
       type: Boolean,
       default: false,
