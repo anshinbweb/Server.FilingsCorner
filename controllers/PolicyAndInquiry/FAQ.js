@@ -29,11 +29,22 @@ exports.listFAQ = async (req, res) => {
 
 exports.listFAQByParams = async (req, res) => {
   try {
-    let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
+    let { skip, per_page, sorton, sortdir, match } = req.body;
 
     let query = [
       {
-        $match: { IsActive: IsActive },
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
       },
 
       {

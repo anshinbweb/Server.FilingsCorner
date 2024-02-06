@@ -28,14 +28,20 @@ const ProductDetailsSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
+    weight: {
+      type: Number,
+    },
     IsActive: {
       type: Boolean,
+      default: false,
     },
     IsSubscriptionProduct: {
       type: Boolean,
+      default: false,
     },
     IsGiftHamper: {
       type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

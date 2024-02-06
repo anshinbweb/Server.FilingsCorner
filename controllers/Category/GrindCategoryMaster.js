@@ -35,7 +35,21 @@ exports.listGrindCategoryMasterByParams = async (req, res) => {
       {
         $match: { IsActive: IsActive },
       },
-
+      {
+        $lookup: {
+          from: "drinkcategorymasters",
+          localField: "drinkCategory",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+     
       {
         $facet: {
           stage1: [
@@ -70,6 +84,7 @@ exports.listGrindCategoryMasterByParams = async (req, res) => {
         },
       },
     ];
+
     if (match) {
       query = [
         {

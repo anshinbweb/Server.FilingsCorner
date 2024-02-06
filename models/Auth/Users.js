@@ -30,6 +30,7 @@ const UsersSchema = new mongoose.Schema(
     },
     UserType: {
       type: String, //admin, user
+      default: "user"
     },
     followers: [
       {
@@ -41,6 +42,12 @@ const UsersSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Users",
+      },
+    ],
+    cart: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserCart",
       },
     ],
   },
