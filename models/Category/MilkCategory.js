@@ -1,12 +1,12 @@
-//grind type
+//milk type
+//category
 //is active
-//drinkk category master id
 
 const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
-const GrindCategoryMasterSchema = new mongoose.Schema(
+const MilkCategoryMasterSchema = new mongoose.Schema(
   {
-    grindType: {
+    milkType: {
       type: String,
       required: true,
     },
@@ -23,6 +23,6 @@ const GrindCategoryMasterSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model(
-  "GrindCategoryMaster",
-  GrindCategoryMasterSchema
+  "MilkCategoryMaster",
+  MilkCategoryMasterSchema
 );
