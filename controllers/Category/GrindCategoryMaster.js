@@ -37,8 +37,8 @@ exports.listGrindCategoryMasterByParams = async (req, res) => {
       },
       {
         $lookup: {
-          from: "drinkcategorymasters",
-          localField: "drinkCategory",
+          from: "categorymasters",
+          localField: "Category",
           foreignField: "_id",
           as: "category",
         },

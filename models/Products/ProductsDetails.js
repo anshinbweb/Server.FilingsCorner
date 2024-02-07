@@ -13,7 +13,7 @@ const ProductDetailsSchema = new mongoose.Schema(
   {
     category: {
       type: Schema.Types.ObjectId,
-      ref: "DrinkCategoryMaster",
+      ref: "CategoryMaster",
       required: true,
     },
     productName: {

@@ -28,6 +28,9 @@ const OrdersSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    totalAmount: {
+      type: Number,
+    },
     remark: {
       type: String,
     },
@@ -68,6 +71,17 @@ const OrdersSchema = new mongoose.Schema(
     IsActive: {
       type: Boolean,
     },
+    OrderStatus: {
+      type: String,
+      default: "Not Processed",
+      enum: [
+        "Not Processed",
+        "Processing",
+        "Dispatched",
+        "Cancelled",
+        "Completed",
+      ],
+    }
   },
   { timestamps: true }
 );
