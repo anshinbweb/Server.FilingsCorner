@@ -10,11 +10,17 @@ const {
   getCategoryMaster,
   updateCategoryMaster,
   removeCategoryMaster,
+  listActiveCategories,
 } = require("../controllers/Category/CategoryMaster");
 
 router.post("/auth/create/categoryMaster", catchAsync(createCategoryMaster));
 
 router.get("/auth/list/categoryMaster", catchAsync(listCategoryMaster));
+
+router.get(
+  "/auth/list-active/categoryMaster",
+  catchAsync(listActiveCategories)
+);
 
 router.post(
   "/auth/list-by-params/categoryMaster",
