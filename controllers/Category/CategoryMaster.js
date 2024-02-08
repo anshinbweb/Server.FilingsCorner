@@ -1,49 +1,33 @@
-const DrinkCategoryMaster = require("../../models/Category/DrinkCategoryMaster");
+const CategoryMaster = require("../../models/Category/CategoryMaster");
 
-exports.getDrinkCategoryMaster = async (req, res) => {
+exports.getCategoryMaster = async (req, res) => {
   try {
-    const find = await DrinkCategoryMaster.findOne({
-      _id: req.params._id,
-    }).exec();
+    const find = await CategoryMaster.findOne({ _id: req.params._id }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
-exports.createDrinkCategoryMaster = async (req, res) => {
+exports.createCategoryMaster = async (req, res) => {
   try {
-    const add = await new DrinkCategoryMaster(req.body).save();
+    const add = await new CategoryMaster(req.body).save();
     res.json(add);
   } catch (err) {
     return res.status(400).send(err);
   }
 };
 
-exports.listDrinkCategoryMaster = async (req, res) => {
+exports.listCategoryMaster = async (req, res) => {
   try {
-    const list = await DrinkCategoryMaster.find()
-      .sort({ createdAt: -1 })
-      .exec();
+    const list = await CategoryMaster.find().sort({ createdAt: -1 }).exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
   }
 };
 
-// APP
-
-exports.listActiveCategories = async (req, res) => {
-  try {
-    const list = await DrinkCategoryMaster.find()
-      .sort({ createdAt: -1 })
-      .exec();
-    res.json(list);
-  } catch (error) {
-    return res.status(400).send(error);
-  }
-};
-exports.listDrinkCategoryMasterByParams = async (req, res) => {
+exports.listCategoryMasterByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
@@ -92,7 +76,7 @@ exports.listDrinkCategoryMasterByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                DrinkCategoryMaster: { $regex: match, $options: "i" },
+                CategoryMaster: { $regex: match, $options: "i" },
               },
             ],
           },
@@ -118,7 +102,7 @@ exports.listDrinkCategoryMasterByParams = async (req, res) => {
       ].concat(query);
     }
 
-    const list = await DrinkCategoryMaster.aggregate(query);
+    const list = await CategoryMaster.aggregate(query);
 
     res.json(list);
   } catch (error) {
@@ -126,9 +110,9 @@ exports.listDrinkCategoryMasterByParams = async (req, res) => {
   }
 };
 
-exports.updateDrinkCategoryMaster = async (req, res) => {
+exports.updateCategoryMaster = async (req, res) => {
   try {
-    const update = await DrinkCategoryMaster.findOneAndUpdate(
+    const update = await CategoryMaster.findOneAndUpdate(
       { _id: req.params._id },
       req.body,
       { new: true }
@@ -139,9 +123,9 @@ exports.updateDrinkCategoryMaster = async (req, res) => {
   }
 };
 
-exports.removeDrinkCategoryMaster = async (req, res) => {
+exports.removeCategoryMaster = async (req, res) => {
   try {
-    const delTL = await DrinkCategoryMaster.findOneAndRemove({
+    const delTL = await CategoryMaster.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(delTL);

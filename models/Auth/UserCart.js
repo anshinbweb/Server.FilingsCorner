@@ -20,8 +20,23 @@ const UserCartSchema = new mongoose.Schema(
     quantity: {
       type: Number,
     },
-    totalAmount: {
+    amount: {
       type: Number,
+    },
+    sizeId: {     // if product is drink: small, medium, large  
+      type: Schema.Types.ObjectId,
+      ref: "SizeMaster",
+      required: true,
+    },
+    drinkId: {     // if product is drink: hot, iced, blend 
+      type: Schema.Types.ObjectId,
+      ref: "DrinkCategoryMaster",
+      required: true,
+    },
+    milkCategory: {     // if product is drink: whole milk, oat, soya... 
+      type: Schema.Types.ObjectId,
+      ref: "MilkCategoryMaster",
+      required: true,
     },
   },
   { timestamps: true }

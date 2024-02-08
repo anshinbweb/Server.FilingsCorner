@@ -123,7 +123,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
       },
       {
         $lookup: {
-          from: "drinkcategorymasters",
+          from: "categorymasters",
           localField: "category",
           foreignField: "_id",
           as: "category",

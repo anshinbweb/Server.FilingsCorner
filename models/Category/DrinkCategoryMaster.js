@@ -1,13 +1,19 @@
-//category name
+//milk type
+//category
 //is active
-
 
 const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
 const DrinkCategoryMasterSchema = new mongoose.Schema(
   {
-    categoryName: {
-        type: String,
+    type: {
+      type: String,
+      required: true,
+    },
+    Category: {
+      type: Schema.Types.ObjectId,
+      ref: "CategoryMaster",
+      required: true,
     },
     IsActive: {
       type: Boolean,
@@ -16,4 +22,7 @@ const DrinkCategoryMasterSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("DrinkCategoryMaster", DrinkCategoryMasterSchema);
+module.exports = mongoose.model(
+  "DrinkCategoryMaster",
+  DrinkCategoryMasterSchema
+);
