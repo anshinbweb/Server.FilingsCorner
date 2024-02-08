@@ -6,6 +6,10 @@ const BannerImagesSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    keyWord: {
+      type: String,
+      required: true,
+    },
     Description: {
       type: String,
       required: true,

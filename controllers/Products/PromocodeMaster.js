@@ -27,6 +27,23 @@ exports.listPromocodeMaster = async (req, res) => {
   }
 };
 
+exports.listActivePromocodeMaster = async (req, res) => {
+  try {
+    const list = await PromocodeMaster.find({ IsActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    if (list) {
+      res
+        .status(200)
+        .json({ isOk: true, data: list, message: "Active Promocode List" });
+    } else {
+      res.status(400).json({ isOk: false, message: "No Data Found" });
+    }
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+};
+
 exports.listPromocodeMasterByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
@@ -125,7 +142,7 @@ exports.updatePromocodeMaster = async (req, res) => {
 
 exports.removePromocodeMaster = async (req, res) => {
   try {
-    const del= await PromocodeMaster.findOneAndRemove({
+    const del = await PromocodeMaster.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);

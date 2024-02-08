@@ -125,7 +125,7 @@ exports.updateOrders = async (req, res) => {
 
 exports.removeOrders = async (req, res) => {
   try {
-    const del= await Orders.findOneAndRemove({
+    const del = await Orders.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);

@@ -15,9 +15,9 @@ const UserCartSchema = new mongoose.Schema(
     subsId: {
       type: Schema.Types.ObjectId,
       ref: "SubscriptionMaster",
-      required: true,
+      // required: true,
     },
-    quntity: {
+    quantity: {
       type: Number,
     },
     totalAmount: {

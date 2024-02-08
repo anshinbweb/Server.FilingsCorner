@@ -2,7 +2,9 @@ const DrinkCategoryMaster = require("../../models/Category/DrinkCategoryMaster")
 
 exports.getDrinkCategoryMaster = async (req, res) => {
   try {
-    const find = await DrinkCategoryMaster.findOne({ _id: req.params._id }).exec();
+    const find = await DrinkCategoryMaster.findOne({
+      _id: req.params._id,
+    }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
@@ -20,13 +22,27 @@ exports.createDrinkCategoryMaster = async (req, res) => {
 
 exports.listDrinkCategoryMaster = async (req, res) => {
   try {
-    const list = await DrinkCategoryMaster.find().sort({ createdAt: -1 }).exec();
+    const list = await DrinkCategoryMaster.find()
+      .sort({ createdAt: -1 })
+      .exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
   }
 };
 
+// APP
+
+exports.listActiveCategories = async (req, res) => {
+  try {
+    const list = await DrinkCategoryMaster.find()
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(list);
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+};
 exports.listDrinkCategoryMasterByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;

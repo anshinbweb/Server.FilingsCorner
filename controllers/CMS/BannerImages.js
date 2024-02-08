@@ -21,17 +21,18 @@ exports.createBannerImages = async (req, res) => {
       ? `uploads/BannerImg/${req.file.filename}`
       : null;
 
-    let { Title, Description, IsActive } = req.body;
+    let { Title, keyWord, Description, IsActive } = req.body;
 
     const add = await new BannerImages({
       Title,
+      keyWord,
       Description,
       bannerimage,
       IsActive,
     }).save();
     res.status(200).json({ isOk: true, data: add, message: "" });
   } catch (err) {
-    console.log(err);
+    console.log("error", err);
     res.status(500).json({ isOk: false, message: err });
   }
 };
@@ -44,60 +45,19 @@ exports.listBannerImagesByParams = async (req, res) => {
       {
         $match: { IsActive: isActive },
       },
-      {
-        $lookup: {
-          from: "countries",
-          localField: "CountryID",
-          foreignField: "_id",
-          as: "countryname",
-        },
-      },
-      {
-        $unwind: {
-          path: "$countryname",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $set: {
-          countryname: "$countryname.CountryName",
-        },
-      },
-      {
-        $lookup: {
-          from: "states",
-          localField: "StateID",
-          foreignField: "_id",
-          as: "statename",
-        },
-      },
-      {
-        $unwind: {
-          path: "$statename",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $set: {
-          statename: "$statename.StateName",
-        },
-      },
 
       {
         $match: {
           $or: [
             {
-              Area: new RegExp(match, "i"),
+              Title: new RegExp(match, "i"),
             },
             {
-              Address: new RegExp(match, "i"),
+              keyWord: new RegExp(match, "i"),
             },
 
             {
-              Location: new RegExp(match, "i"),
-            },
-            {
-              countryname: new RegExp(match, "i"),
+              Description: new RegExp(match, "i"),
             },
           ],
         },

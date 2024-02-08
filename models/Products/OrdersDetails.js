@@ -17,7 +17,7 @@ const OrdersDetailsSchema = new mongoose.Schema(
       ref: "SubscriptionMaster",
       required: true,
     },
-    quntity: {
+    quantity: {
       type: Number,
     },
     totalAmount: {

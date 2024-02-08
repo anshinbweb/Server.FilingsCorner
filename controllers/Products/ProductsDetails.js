@@ -61,11 +61,18 @@ exports.listProductsDetails = async (req, res) => {
 
 exports.listProductByCategory = async (req, res) => {
   try {
-    const list = await ProductsDetails.find({ category: req.params.categoryId })
+    const list = await ProductsDetails.find({
+      category: req.params.categoryId,
+      IsActive: true,
+    })
       .sort({ createdAt: -1 })
       .exec();
     console.log("lis", list);
-    res.json(list);
+    if (list) {
+      res.status(200).json({ isOk: true, data: list, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
   } catch (error) {
     return res.status(400).send(error);
   }
@@ -75,17 +82,32 @@ exports.getProductByID = async (req, res) => {
   try {
     const find = await ProductsDetails.findOne({
       _id: req.params.productId,
+      IsActive: true,
     }).exec();
     // res.json(find);
     console.log("find", find);
     let subData = [];
-    if (find.IsSubscriptionProduct) {
-      subData = await SubscriptionMaster.find().exec();
-      console.log("subData", subData);
+    if (find) {
+      if (find.IsSubscriptionProduct) {
+        subData = await SubscriptionMaster.find().exec();
+        console.log("subData", subData);
+        res.status(200).json({
+          isOk: true,
+          data: find,
+          subcriptionData: subData,
+          message: "",
+        });
+      } else {
+        res.status(200).json({
+          isOk: true,
+          data: find,
+          subcriptionData: "No Subscription Details",
+          message: "",
+        });
+      }
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
     }
-    res
-      .status(200)
-      .json({ isOk: true, data: find, subcriptionData: subData, message: "" });
   } catch (error) {
     return res.status(500).send(error);
   }
