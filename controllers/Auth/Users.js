@@ -137,12 +137,14 @@ exports.removeUsers = async (req, res) => {
 
 exports.userLogin = async (req, res) => {
   try {
-    const { Email, Password } = req.body;
+    const { Email, Password, UserType } = req.body;
+    console.log("UserType", UserType);
     const findData = await Users.findOne({
       Email,
       Password,
-      UserType: "admin"
+      UserType,
     }).exec();
+    console.log("find", findData);
     if (findData) {
       return res.status(200).json({
         isOk: true,
@@ -150,7 +152,11 @@ exports.userLogin = async (req, res) => {
         message: "Authentication Successfull",
       });
     } else {
-      res.status(500).send("Authentication Failed!");
+      return res.status(200).json({
+        isOk: false,
+        message: "Authentication Failed",
+      });
+      // res.status(200).send("Authentication Failed!");
     }
   } catch (err) {
     console.log(err);

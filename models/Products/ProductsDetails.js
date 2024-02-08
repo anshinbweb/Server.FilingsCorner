@@ -18,15 +18,22 @@ const ProductDetailsSchema = new mongoose.Schema(
     },
     productName: {
       type: String,
+      required: true,
     },
     productImage: {
       type: String,
+      required: true,
     },
     productDescription: {
       type: String,
     },
     price: {
       type: Number,
+      required: true,
+    },
+    weight: {
+      type: String,
+      required: true,
     },
     IsActive: {
       type: Boolean,
