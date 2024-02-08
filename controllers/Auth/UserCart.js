@@ -2,14 +2,26 @@ const UserCart = require("../../models/Auth/UserCart");
 const User = require("../../models/Auth/Users");
 exports.createUserCart = async (req, res) => {
   try {
-    const { userId, productId, subsId, quantity, totalAmount } = req.body;
+    const {
+      userId,
+      productId,
+      subsId,
+      quantity,
+      amount,
+      sizeId,
+      drinkId,
+      milkCategory,
+    } = req.body;
     console.log("req.body", req.body);
     const add = await new UserCart({
       userId,
       productId,
       subsId,
       quantity,
-      totalAmount,
+      amount,
+      sizeId,
+      drinkId,
+      milkCategory,
     }).save();
     console.log("data id", add._id);
     const usercartID = add._id;
@@ -46,10 +58,10 @@ exports.updateQuantity = async (req, res) => {
     } else {
       Qt = findData.quantity - 1;
     }
-    const amt = findData.totalAmount * Qt;
+    const amt = findData.amount * Qt;
     const updatedCart = await UserCart.findByIdAndUpdate(
       { _id: ID },
-      { quantity: Qt, totalAmount: amt },
+      { quantity: Qt, amount: amt },
       { new: true }
     );
     console.log("updatedCart", updatedCart);
@@ -57,7 +69,7 @@ exports.updateQuantity = async (req, res) => {
     res.status(200).json({
       isOk: true,
       quantity: updatedCart.quantity,
-      totalAmount: updatedCart.totalAmount,
+      amount: updatedCart.amount,
       message: "UserCart updated successfully",
     });
   } catch (err) {
