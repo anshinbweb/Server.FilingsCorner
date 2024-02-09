@@ -27,9 +27,14 @@ exports.createProductsDetails = async (req, res) => {
       productDescription,
       price,
       weight,
+      unit,
       IsGiftHamper,
       IsSubscriptionProduct,
       IsActive,
+      isSize,
+      isDrink,
+      isMilk,
+      isOutOfStock,
     } = req.body;
 
     const add = await new ProductsDetails({
@@ -39,9 +44,14 @@ exports.createProductsDetails = async (req, res) => {
       productDescription,
       price,
       weight,
+      unit,
       IsGiftHamper,
       IsSubscriptionProduct,
       IsActive,
+      isSize,
+      isDrink,
+      isMilk,
+      isOutOfStock,
     }).save();
     res.status(200).json({ isOk: true, data: add, message: "" });
   } catch (err) {

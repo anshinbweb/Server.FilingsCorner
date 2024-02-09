@@ -1,35 +1,35 @@
-const CategoryMaster = require("../../models/Category/CategoryMaster");
+const SizeMaster = require("../../models/Category/SizeMaster");
 
-exports.getCategoryMaster = async (req, res) => {
+exports.getSizeMaster = async (req, res) => {
   try {
-    const find = await CategoryMaster.findOne({ _id: req.params._id }).exec();
+    const find = await SizeMaster.findOne({ _id: req.params._id }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
-exports.createCategoryMaster = async (req, res) => {
+exports.createSizeMaster = async (req, res) => {
   try {
-    const add = await new CategoryMaster(req.body).save();
+    const add = await new SizeMaster(req.body).save();
     res.json(add);
   } catch (err) {
     return res.status(400).send(err);
   }
 };
 
-exports.listCategoryMaster = async (req, res) => {
+exports.listSizeMaster = async (req, res) => {
   try {
-    const list = await CategoryMaster.find().sort({ createdAt: -1 }).exec();
+    const list = await SizeMaster.find().sort({ createdAt: -1 }).exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
   }
 };
 
-exports.listActiveCategories = async (req, res) => {
+exports.listActiveSizeCategories = async (req, res) => {
   try {
-    const list = await CategoryMaster.find({ IsActive: true })
+    const list = await SizeMaster.find({ IsActive: true })
       .sort({ createdAt: -1 })
       .exec();
     res.json(list);
@@ -38,7 +38,7 @@ exports.listActiveCategories = async (req, res) => {
   }
 };
 
-exports.listCategoryMasterByParams = async (req, res) => {
+exports.listSizeMasterByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
@@ -87,7 +87,7 @@ exports.listCategoryMasterByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                CategoryMaster: { $regex: match, $options: "i" },
+                SizeMaster: { $regex: match, $options: "i" },
               },
             ],
           },
@@ -113,7 +113,7 @@ exports.listCategoryMasterByParams = async (req, res) => {
       ].concat(query);
     }
 
-    const list = await CategoryMaster.aggregate(query);
+    const list = await SizeMaster.aggregate(query);
 
     res.json(list);
   } catch (error) {
@@ -121,9 +121,9 @@ exports.listCategoryMasterByParams = async (req, res) => {
   }
 };
 
-exports.updateCategoryMaster = async (req, res) => {
+exports.updateSizeMaster = async (req, res) => {
   try {
-    const update = await CategoryMaster.findOneAndUpdate(
+    const update = await SizeMaster.findOneAndUpdate(
       { _id: req.params._id },
       req.body,
       { new: true }
@@ -134,9 +134,9 @@ exports.updateCategoryMaster = async (req, res) => {
   }
 };
 
-exports.removeCategoryMaster = async (req, res) => {
+exports.removeSizeMaster = async (req, res) => {
   try {
-    const delTL = await CategoryMaster.findOneAndRemove({
+    const delTL = await SizeMaster.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(delTL);

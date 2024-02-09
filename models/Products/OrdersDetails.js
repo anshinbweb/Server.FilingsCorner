@@ -15,7 +15,7 @@ const OrdersDetailsSchema = new mongoose.Schema(
     subsId: {
       type: Schema.Types.ObjectId,
       ref: "SubscriptionMaster",
-      required: true,
+      // required: true,
     },
     quantity: {
       type: Number,
@@ -23,20 +23,23 @@ const OrdersDetailsSchema = new mongoose.Schema(
     amount: {
       type: Number,
     },
-    sizeId: {     // if product is drink: small, medium, large  
+    sizeId: {
+      // if product is drink: small, medium, large
       type: Schema.Types.ObjectId,
       ref: "SizeMaster",
-      required: true,
+      // required: true,
     },
-    drinkId: {     // if product is drink: hot, iced, blend 
+    drinkId: {
+      // if product is drink: hot, iced, blend
       type: Schema.Types.ObjectId,
       ref: "DrinkCategoryMaster",
-      required: true,
+      // required: true,
     },
-    milkCategory: {     // if product is drink: whole milk, oat, soya... 
+    milkCategory: {
+      // if product is drink: whole milk, oat, soya...
       type: Schema.Types.ObjectId,
       ref: "MilkCategoryMaster",
-      required: true,
+      // required: true,
     },
   },
   { timestamps: true }

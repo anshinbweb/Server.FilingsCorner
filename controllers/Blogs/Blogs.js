@@ -1,4 +1,5 @@
 const Blogs = require("../../models/Blogs/Blogs");
+const fs = require("fs");
 
 exports.getBlogs = async (req, res) => {
   try {
@@ -11,8 +12,35 @@ exports.getBlogs = async (req, res) => {
 
 exports.createBlogs = async (req, res) => {
   try {
-    const add = await new Blogs(req.body).save();
-    res.json(add);
+    if (!fs.existsSync(`${__basedir}/uploads/blogImages`)) {
+      fs.mkdirSync(`${__basedir}/uploads/blogImages`);
+    }
+
+    console.log("req.file", req.file);
+    console.log("req.body", req.body);
+    let blogImage = req.file ? `uploads/blogImages/${req.file.filename}` : null;
+
+    let { blogTitle, blogDesc, likes, comments, userId, IsActive } = req.body;
+
+    let like;
+    let comment;
+    if (likes == undefined || likes == null || likes == "") {
+      like = [];
+    }
+    if (comments == undefined || comments == null || comments == "") {
+      comment = [];
+    }
+
+    const add = await new Blogs({
+      blogTitle: blogTitle,
+      blogImage: blogImage,
+      blogDesc: blogDesc,
+      likes: like,
+      comments: comment,
+      userId: userId,
+      IsActive: IsActive,
+    }).save();
+    res.status(200).json({ isOk: true, data: add, message: "" });
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -127,9 +155,15 @@ exports.listBlogsByParams = async (req, res) => {
 
 exports.updateBlogs = async (req, res) => {
   try {
+    let blogImage = req.file ? `uploads/blogImages/${req.file.filename}` : null;
+    let fieldvalues = { ...req.body };
+    if (blogImage != null) {
+      fieldvalues.blogImage = blogImage;
+    }
+
     const update = await Blogs.findOneAndUpdate(
       { _id: req.params._id },
-      req.body,
+      fieldvalues,
       { new: true }
     );
     res.json(update);
@@ -140,7 +174,7 @@ exports.updateBlogs = async (req, res) => {
 
 exports.removeBlogs = async (req, res) => {
   try {
-    const del= await Blogs.findOneAndRemove({
+    const del = await Blogs.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);

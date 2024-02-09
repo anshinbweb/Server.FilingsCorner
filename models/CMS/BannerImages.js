@@ -12,9 +12,9 @@ const BannerImagesSchema = new mongoose.Schema(
     },
     Description: {
       type: String,
-      required: true,
+      // required: true,
     },
-    bannerimage: {
+    bannerImage: {
       type: String,
       required: true,
     },
