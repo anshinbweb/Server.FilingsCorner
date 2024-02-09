@@ -24,12 +24,14 @@ const BlogsSchema = new mongoose.Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "Users",
+        default: [],
       },
     ],
     comments: [
       {
         type: Schema.Types.ObjectId,
         ref: "BlogComment",
+        default: [],
       },
     ],
     userId: {

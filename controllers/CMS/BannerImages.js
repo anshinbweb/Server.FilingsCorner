@@ -17,7 +17,7 @@ exports.createBannerImages = async (req, res) => {
       fs.mkdirSync(`${__basedir}/uploads/BannerImg`);
     }
 
-    let bannerimage = req.file
+    let bannerImage = req.file
       ? `uploads/BannerImg/${req.file.filename}`
       : null;
 
@@ -27,7 +27,7 @@ exports.createBannerImages = async (req, res) => {
       Title,
       keyWord,
       Description,
-      bannerimage,
+      bannerImage,
       IsActive,
     }).save();
     res.status(200).json({ isOk: true, data: add, message: "" });
@@ -39,11 +39,11 @@ exports.createBannerImages = async (req, res) => {
 
 exports.listBannerImagesByParams = async (req, res) => {
   try {
-    let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
+    let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
     let query = [
       {
-        $match: { IsActive: isActive },
+        $match: { IsActive: IsActive },
       },
 
       {
@@ -144,12 +144,12 @@ exports.getBannerImages = async (req, res) => {
 
 exports.updateBannerImages = async (req, res) => {
   try {
-    let bannerimage = req.file
+    let bannerImage = req.file
       ? `uploads/BannerImg/${req.file.filename}`
       : null;
     let fieldvalues = { ...req.body };
-    if (bannerimage != null) {
-      fieldvalues.bannerimage = bannerimage;
+    if (bannerImage != null) {
+      fieldvalues.bannerImage = bannerImage;
     }
     const update = await BannerImages.findOneAndUpdate(
       { _id: req.params._id },

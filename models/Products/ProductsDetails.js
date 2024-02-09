@@ -32,6 +32,10 @@ const ProductDetailsSchema = new mongoose.Schema(
       required: true,
     },
     weight: {
+      type: Number,
+      required: true,
+    },
+    unit: {
       type: String,
       required: true,
     },
@@ -44,6 +48,23 @@ const ProductDetailsSchema = new mongoose.Schema(
       default: false,
     },
     IsGiftHamper: {
+      type: Boolean,
+      default: false,
+    },
+
+    isSize: {
+      type: Boolean,
+      default: false,
+    },
+    isDrink: {
+      type: Boolean,
+      default: false,
+    },
+    isMilk: {
+      type: Boolean,
+      default: false,
+    },
+    isOutOfStock: {
       type: Boolean,
       default: false,
     },
