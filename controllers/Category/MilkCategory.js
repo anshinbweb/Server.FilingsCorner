@@ -46,6 +46,25 @@ exports.listMilkCategoryByParams = async (req, res) => {
       {
         $match: { IsActive: IsActive },
       },
+      {
+        $lookup: {
+          from: "categorymasters",
+          localField: "Category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          category: "$category.categoryName",
+        },
+      },
 
       {
         $facet: {
@@ -87,7 +106,7 @@ exports.listMilkCategoryByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                MilkCategory: { $regex: match, $options: "i" },
+                milkType: { $regex: match, $options: "i" },
               },
             ],
           },

@@ -46,4 +46,26 @@ router.put(
 
 router.delete("/auth/remove/blogs/:_id", catchAsync(removeBlogs));
 
+const multerStorageCK = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/BannerCKImages");
+  },
+  filename: (req, file, cb) => {
+    // const ext = file.mimetype.split("/")[1];
+    // cb(null, `${uuidv4()}-${Date.now()}.${ext}`);
+    cb(null, Date.now() + "_" + file.originalname);
+  },
+});
+const uploadCk = multer({ storage: multerStorageCK });
+
+//upload images
+router.post(
+  "/auth/cms-blog/image-upload",
+  uploadCk.single("uploadImg"),
+  async (req, res) => {
+    console.log(req.file.filename);
+    res.json({ url: req.file.filename });
+  }
+);
+
 module.exports = router;

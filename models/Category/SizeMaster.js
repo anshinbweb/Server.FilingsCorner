@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
 const SizeMasterSchema = new mongoose.Schema(
   {
-    size: {
+    sizeType: {
       type: String,
       required: true,
     },
@@ -22,7 +22,4 @@ const SizeMasterSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model(
-  "SizeMaster",
-  SizeMasterSchema
-);
+module.exports = mongoose.model("SizeMaster", SizeMasterSchema);
