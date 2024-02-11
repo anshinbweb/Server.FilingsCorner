@@ -48,6 +48,26 @@ exports.listDrinkCategoryByParams = async (req, res) => {
       },
 
       {
+        $lookup: {
+          from: "categorymasters",
+          localField: "Category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          category: "$category.categoryName",
+        },
+      },
+
+      {
         $facet: {
           stage1: [
             {
@@ -87,7 +107,7 @@ exports.listDrinkCategoryByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                DrinkCategoryMaster: { $regex: match, $options: "i" },
+                type: { $regex: match, $options: "i" },
               },
             ],
           },

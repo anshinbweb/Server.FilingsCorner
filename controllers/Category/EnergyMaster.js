@@ -46,6 +46,25 @@ exports.listEnergyMasterByParams = async (req, res) => {
       {
         $match: { IsActive: IsActive },
       },
+      {
+        $lookup: {
+          from: "categorymasters",
+          localField: "Category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          category: "$category.categoryName",
+        },
+      },
 
       {
         $facet: {
@@ -87,7 +106,7 @@ exports.listEnergyMasterByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                EnergyMaster: { $regex: match, $options: "i" },
+                energyType: { $regex: match, $options: "i" },
               },
             ],
           },
