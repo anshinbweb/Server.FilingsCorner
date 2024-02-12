@@ -13,6 +13,11 @@ const {
   removeProductsDetails,
   listProductByCategory,
   getProductByID,
+  listProductByCoffee,
+  listProductByTea,
+  listProductByDrink,
+  listProductByFlight,
+  listProductByShop,
 } = require("../controllers/Products/ProductsDetails");
 const multer = require("multer");
 
@@ -37,15 +42,6 @@ router.post(
 
 router.get("/auth/list/product-details", catchAsync(listProductsDetails));
 
-// APPLICATION
-router.get(
-  "/auth/list/product-by-category/:categoryId",
-  catchAsync(listProductByCategory)
-);
-
-router.post("/auth/list/product-by-id/:productId", catchAsync(getProductByID));
-
-///
 router.post(
   "/auth/list-by-params/product-details",
   catchAsync(listProductsDetailsByParams)
@@ -63,5 +59,21 @@ router.delete(
   "/auth/remove/product-details/:_id",
   catchAsync(removeProductsDetails)
 );
+
+router.post("/auth/get/coffee-product-details", catchAsync(listProductByCoffee));
+router.post("/auth/get/tea-product-details", catchAsync(listProductByTea));
+router.post("/auth/get/drink-product-details", catchAsync(listProductByDrink));
+router.post("/auth/get/flight-product-details", catchAsync(listProductByFlight)); // gift hamper
+router.post("/auth/get/shop-product-details", catchAsync(listProductByShop));  // accessories
+
+// APPLICATION
+router.get(
+  "/auth/list/product-by-category/:categoryId",
+  catchAsync(listProductByCategory)
+);
+
+router.post("/auth/list/product-by-id/:productId", catchAsync(getProductByID));
+
+///
 
 module.exports = router;
