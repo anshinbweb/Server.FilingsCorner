@@ -2,7 +2,7 @@ const { log } = require("console");
 const ProductsDetails = require("../../models/Products/ProductsDetails");
 const fs = require("fs");
 const SubscriptionMaster = require("../../models/Subscription/SubscriptionMaster");
-const { default: mongoose } = require("mongoose");
+const {  mongoose } = require("mongoose");
 exports.getProductsDetails = async (req, res) => {
   try {
     const find = await ProductsDetails.findOne({ _id: req.params._id }).exec();
@@ -256,7 +256,7 @@ exports.listProductByCoffee = async (req, res) => {
     const { option } = req.body;
 
     const list = await ProductsDetails.find({
-      category: mongoose.Types.ObjectId("65b8cbd1aa85ec2cb2bf9f5e"),
+      category: "65b8cbd1aa85ec2cb2bf9f5e",
       IsActive: true,
     })
       .sort({ createdAt: -1 })
@@ -295,6 +295,7 @@ exports.listProductByCoffee = async (req, res) => {
       res.status(200).json({ isOk: false, message: "No data Found" });
     }
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error);
   }
 };
@@ -302,7 +303,7 @@ exports.listProductByCoffee = async (req, res) => {
 exports.listProductByTea = async (req, res) => {
   try {
     const list = await ProductsDetails.find({
-      category: mongoose.Types.ObjectId("65b8cbd9aa85ec2cb2bf9f60"),
+      category: "65b8cbd9aa85ec2cb2bf9f60",
       IsActive: true,
     })
       .sort({ createdAt: -1 })
@@ -346,7 +347,7 @@ exports.listProductByTea = async (req, res) => {
 exports.listProductByDrink = async (req, res) => {
   try {
     const list = await ProductsDetails.find({
-      category: mongoose.Types.ObjectId("65b8e91127d8fef240f3059f"),
+      category: "65b8e91127d8fef240f3059f",
       IsActive: true,
     })
       .sort({ createdAt: -1 })
@@ -391,7 +392,7 @@ exports.listProductByShop = async (req, res) => {
   //accessories
   try {
     const list = await ProductsDetails.find({
-      category: mongoose.Types.ObjectId("65c343ea11dfa763253e353f"),
+      category: "65c343ea11dfa763253e353f",
       IsActive: true,
     })
       .sort({ createdAt: -1 })
@@ -436,7 +437,7 @@ exports.listProductByFlight = async (req, res) => {
   //gift hampers
   try {
     const list = await ProductsDetails.find({
-      category: mongoose.Types.ObjectId("65c90fd0da80f9834d4744ca"),
+      category: "65c90fd0da80f9834d4744ca",
       IsActive: true,
     })
       .sort({ createdAt: -1 })
