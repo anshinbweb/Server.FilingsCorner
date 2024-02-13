@@ -19,6 +19,7 @@ const {
   listProductByDrink,
   listProductByFlight,
   listProductByShop,
+  CategoryProductList,
 } = require("../controllers/Products/ProductsDetails");
 const multer = require("multer");
 
@@ -59,6 +60,12 @@ router.put(
 router.delete(
   "/auth/remove/product-details/:_id",
   catchAsync(removeProductsDetails)
+);
+
+// NEWWWW
+router.post(
+  "/auth/get/category-product/:option/:categoryid",
+  catchAsync(CategoryProductList)
 );
 
 router.post(
