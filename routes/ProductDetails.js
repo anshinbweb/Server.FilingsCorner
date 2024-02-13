@@ -15,6 +15,7 @@ const {
   getProductByID,
   listProductByCoffee,
   listProductByTea,
+  listProductByTeaSort,
   listProductByDrink,
   listProductByFlight,
   listProductByShop,
@@ -60,11 +61,29 @@ router.delete(
   catchAsync(removeProductsDetails)
 );
 
-router.post("/auth/get/coffee-product-details", catchAsync(listProductByCoffee));
+router.post(
+  "/auth/get/coffee-product-details/:option",
+  catchAsync(listProductByCoffee)
+);
+router.post(
+  "/auth/get/tea-product-details-sort/:option",
+  catchAsync(listProductByTeaSort)
+);
+
 router.post("/auth/get/tea-product-details", catchAsync(listProductByTea));
-router.post("/auth/get/drink-product-details", catchAsync(listProductByDrink));
-router.post("/auth/get/flight-product-details", catchAsync(listProductByFlight)); // gift hamper
-router.post("/auth/get/shop-product-details", catchAsync(listProductByShop));  // accessories
+
+router.post(
+  "/auth/get/drink-product-details/:option",
+  catchAsync(listProductByDrink)
+);
+router.post(
+  "/auth/get/flight-product-details/:option",
+  catchAsync(listProductByFlight)
+); // gift hamper
+router.post(
+  "/auth/get/shop-product-details/:option",
+  catchAsync(listProductByShop)
+); // accessories
 
 // APPLICATION
 router.get(
