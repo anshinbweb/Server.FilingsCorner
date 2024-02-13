@@ -27,18 +27,18 @@ const ProductDetailsSchema = new mongoose.Schema(
     productDescription: {
       type: String,
     },
-    price: {
-      type: Number,
-      required: true,
-    },
-    weight: {
-      type: Number,
-      required: true,
-    },
-    unit: {
-      type: String,
-      required: true,
-    },
+    // price: {
+    //   type: Number,
+    //   required: true,
+    // },
+    // weight: {
+    //   type: Number,
+    //   required: true,
+    // },
+    // unit: {
+    //   type: String,
+    //   required: true,
+    // },
     IsActive: {
       type: Boolean,
       default: false,
@@ -64,10 +64,10 @@ const ProductDetailsSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isOutOfStock: {
-      type: Boolean,
-      default: false,
-    },
+    // isOutOfStock: {
+    //   type: Boolean,
+    //   default: false,
+    // },
   },
   { timestamps: true }
 );
