@@ -2,7 +2,7 @@ const { log } = require("console");
 const ProductsDetails = require("../../models/Products/ProductsDetails");
 const fs = require("fs");
 const SubscriptionMaster = require("../../models/Subscription/SubscriptionMaster");
-const {  mongoose } = require("mongoose");
+const { mongoose } = require("mongoose");
 exports.getProductsDetails = async (req, res) => {
   try {
     const find = await ProductsDetails.findOne({ _id: req.params._id }).exec();
@@ -253,8 +253,10 @@ exports.removeProductsDetails = async (req, res) => {
 
 exports.listProductByCoffee = async (req, res) => {
   try {
-    const { option } = req.body;
+    const { option } = req.params;
 
+    // console.log("req.params", typeof parseInt(option));
+    console.log("option", option);
     const list = await ProductsDetails.find({
       category: "65b8cbd1aa85ec2cb2bf9f5e",
       IsActive: true,
@@ -265,21 +267,22 @@ exports.listProductByCoffee = async (req, res) => {
     let sortedList;
 
     switch (option) {
-      case 1: // Newest
+      case "1": // Newest
         sortedList = list;
         break;
-      case 2: // Price low to high
+      case "2": // Price low to high
         sortedList = list.sort((a, b) => a.price - b.price);
         break;
-      case 3: // Price high to low
+      case "3": // Price high to low
         sortedList = list.sort((a, b) => b.price - a.price);
+
         break;
-      case 4: // A to Z
+      case "4": // A to Z
         sortedList = list.sort((a, b) =>
           a.productName.localeCompare(b.productName)
         );
         break;
-      case 5: // Z to A
+      case "5": // Z to A
         sortedList = list.sort((a, b) =>
           b.productName.localeCompare(a.productName)
         );
@@ -300,7 +303,7 @@ exports.listProductByCoffee = async (req, res) => {
   }
 };
 
-exports.listProductByTea = async (req, res) => {
+exports.listProductByTeaSort = async (req, res) => {
   try {
     const list = await ProductsDetails.find({
       category: "65b8cbd9aa85ec2cb2bf9f60",
@@ -344,6 +347,26 @@ exports.listProductByTea = async (req, res) => {
   }
 };
 
+exports.listProductByTea = async (req, res) => {
+  try {
+    const list = await ProductsDetails.find({
+      category: "65b8cbd9aa85ec2cb2bf9f60",
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    console.log("list", list);
+
+    if (list) {
+      res.status(200).json({ isOk: true, data: list, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    return res.status(400).send("err", error);
+  }
+};
 exports.listProductByDrink = async (req, res) => {
   try {
     const list = await ProductsDetails.find({
