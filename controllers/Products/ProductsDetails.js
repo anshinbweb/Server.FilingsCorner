@@ -251,6 +251,56 @@ exports.removeProductsDetails = async (req, res) => {
   }
 };
 
+exports.CategoryProductList = async (req, res) => {
+  try {
+    const { option, categoryid } = req.params;
+
+    const list = await ProductsDetails.find({
+      category: categoryid,
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    let sortedList;
+
+    switch (option) {
+      case "1": // Newest
+        sortedList = list;
+        break;
+      case "2": // Price low to high
+        sortedList = list.sort((a, b) => a.price - b.price);
+        break;
+      case "3": // Price high to low
+        sortedList = list.sort((a, b) => b.price - a.price);
+
+        break;
+      case "4": // A to Z
+        sortedList = list.sort((a, b) =>
+          a.productName.localeCompare(b.productName)
+        );
+        break;
+      case "5": // Z to A
+        sortedList = list.sort((a, b) =>
+          b.productName.localeCompare(a.productName)
+        );
+        break;
+      default:
+        // Default sorting, perhaps by createdAt descending
+        sortedList = list;
+    }
+
+    if (sortedList) {
+      res.status(200).json({ isOk: true, data: sortedList, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send(error);
+  }
+};
+
 exports.listProductByCoffee = async (req, res) => {
   try {
     const { option } = req.params;
@@ -369,6 +419,8 @@ exports.listProductByTea = async (req, res) => {
 };
 exports.listProductByDrink = async (req, res) => {
   try {
+    const { option } = req.params;
+
     const list = await ProductsDetails.find({
       category: "65b8e91127d8fef240f3059f",
       IsActive: true,
