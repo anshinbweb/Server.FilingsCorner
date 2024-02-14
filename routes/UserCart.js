@@ -7,7 +7,7 @@ const {
   createUserCart,
   updateQuantity,
   RemoveFromCart,
-} = require("../controllers/Auth/UserCart");
+} = require("../controllers/Auth/User/UserCart");
 
 router.post("/auth/create/user-cart", catchAsync(createUserCart));
 
