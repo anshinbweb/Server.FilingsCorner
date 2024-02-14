@@ -155,10 +155,26 @@ exports.listBlogsByParams = async (req, res) => {
 
 exports.updateBlogs = async (req, res) => {
   try {
+    console.log("req.body", req.body);
     let blogImage = req.file ? `uploads/blogImages/${req.file.filename}` : null;
     let fieldvalues = { ...req.body };
     if (blogImage != null) {
       fieldvalues.blogImage = blogImage;
+    }
+
+    if (
+      fieldvalues.likes == undefined ||
+      fieldvalues.likes == null ||
+      fieldvalues.likes == ""
+    ) {
+      fieldvalues.likes = [];
+    }
+    if (
+      fieldvalues.comments == undefined ||
+      fieldvalues.comments == null ||
+      fieldvalues.comments == ""
+    ) {
+      fieldvalues.comments = [];
     }
 
     const update = await Blogs.findOneAndUpdate(
@@ -168,7 +184,8 @@ exports.updateBlogs = async (req, res) => {
     );
     res.json(update);
   } catch (err) {
-    res.status(400).send(err);
+    console.log(err);
+    return res.status(500).send("error", err);
   }
 };
 
