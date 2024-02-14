@@ -1,5 +1,5 @@
-const UserCart = require("../../models/Auth/UserCart");
-const User = require("../../models/Auth/Users");
+const UserCart = require("../../../models/Auth/User/UserCart");
+const User = require("../../../models/Auth/User/Users");
 exports.createUserCart = async (req, res) => {
   try {
     const {

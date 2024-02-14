@@ -11,7 +11,7 @@ const {
   updateUsers,
   removeUsers,
   userLogin,
-} = require("../controllers/Auth/Users");
+} = require("../controllers/Auth/User/Users");
 
 router.post("/auth/create/users", catchAsync(createUsers));
 
