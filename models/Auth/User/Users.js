@@ -48,6 +48,12 @@ const UsersSchema = new mongoose.Schema(
         ref: "UserCart",
       },
     ],
+    defaultShippingAddress: {
+      type: Number,
+    },
+    defaultBillingAddress: {
+      type: Number,
+    },
     shippingAddress: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -60,7 +66,6 @@ const UsersSchema = new mongoose.Schema(
         ref: "UserShippingAddressMaster",
       },
     ],
-
   },
   { timestamps: true }
 );
