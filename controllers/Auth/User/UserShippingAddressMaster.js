@@ -1,17 +1,19 @@
-const Users = require("../../../models/Auth/User/Users");
+const UserShippingAddress = require("../../../models/Auth/User/UserShippingAddressMaster");
 
-exports.getUsers = async (req, res) => {
+exports.getUserShippingAddress = async (req, res) => {
   try {
-    const find = await Users.findOne({ _id: req.params._id }).exec();
+    const find = await UserShippingAddress.findOne({
+      _id: req.params._id,
+    }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
-exports.createUsers = async (req, res) => {
+exports.createUserShippingAddress = async (req, res) => {
   try {
-    const add = await new Users(req.body).save();
+    const add = await new UserShippingAddress(req.body).save();
     res.json(add);
   } catch (err) {
     console.log(err);
@@ -19,16 +21,18 @@ exports.createUsers = async (req, res) => {
   }
 };
 
-exports.listUsers = async (req, res) => {
+exports.listUserShippingAddress = async (req, res) => {
   try {
-    const list = await Users.find().sort({ createdAt: -1 }).exec();
+    const list = await UserShippingAddress.find()
+      .sort({ createdAt: -1 })
+      .exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
   }
 };
 
-exports.listUsersByParams = async (req, res) => {
+exports.listUserShippingAddressByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
@@ -106,7 +110,7 @@ exports.listUsersByParams = async (req, res) => {
       ].concat(query);
     }
 
-    const list = await Users.aggregate(query);
+    const list = await UserShippingAddress.aggregate(query);
 
     res.json(list);
   } catch (error) {
@@ -114,9 +118,9 @@ exports.listUsersByParams = async (req, res) => {
   }
 };
 
-exports.updateUsers = async (req, res) => {
+exports.updateUserShippingAddress = async (req, res) => {
   try {
-    const update = await Users.findOneAndUpdate(
+    const update = await UserShippingAddress.findOneAndUpdate(
       { _id: req.params._id },
       req.body,
       { new: true }
@@ -127,40 +131,13 @@ exports.updateUsers = async (req, res) => {
   }
 };
 
-exports.removeUsers = async (req, res) => {
+exports.removeUserShippingAddress = async (req, res) => {
   try {
-    const del = await Users.findOneAndRemove({
+    const del = await UserShippingAddress.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);
   } catch (err) {
     res.status(400).send(err);
-  }
-};
-
-exports.userLogin = async (req, res) => {
-  try {
-    const { Email, Password } = req.body;
-    const findData = await Users.findOne({
-      Email,
-      Password,
-    }).exec();
-    console.log("find", findData);
-    if (findData) {
-      return res.status(200).json({
-        isOk: true,
-        data: findData,
-        message: "Authentication Successfull",
-      });
-    } else {
-      return res.status(200).json({
-        isOk: false,
-        message: "Authentication Failed",
-      });
-      // res.status(200).send("Authentication Failed!");
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(err);
   }
 };
