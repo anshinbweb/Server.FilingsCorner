@@ -13,32 +13,29 @@ const {
 } = require("../controllers/Auth/User/UserBillingAddressMaster");
 
 router.post(
-  "/auth/create/user-billing-address",
+  "/auth/create/userBillingAddress",
   catchAsync(createUserBillingAddress)
 );
 
-router.get(
-  "/auth/list/user-billing-address",
-  catchAsync(listUserBillingAddress)
-);
+router.get("/auth/list/userBillingAddress", catchAsync(listUserBillingAddress));
 
 router.post(
-  "/auth/list-by-params/user-billing-address",
+  "/auth/list-by-params/userBillingAddress",
   catchAsync(listUserBillingAddressByParams)
 );
 
 router.get(
-  "/auth/get/user-billing-address/:_id",
+  "/auth/get/userBillingAddress/:_id",
   catchAsync(getUserBillingAddress)
 );
 
 router.put(
-  "/auth/update/user-billing-address/:_id",
+  "/auth/update/userBillingAddress/:_id",
   catchAsync(updateUserBillingAddress)
 );
 
 router.delete(
-  "/auth/remove/user-billing-address/:_id",
+  "/auth/remove/userBillingAddress/:_id",
   catchAsync(removeUserBillingAddress)
 );
 
