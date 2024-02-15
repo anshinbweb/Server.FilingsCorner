@@ -23,12 +23,12 @@ const UserBillingAddressMasterSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    stateId: {
+    StateID: {
       type: Schema.Types.ObjectId,
       ref: "State",
       required: true,
     },
-    countryId: {
+    CountryID: {
       type: Schema.Types.ObjectId,
       ref: "Country",
       required: true,
