@@ -66,16 +66,21 @@ exports.listBlogsByParams = async (req, res) => {
       },
       {
         $lookup: {
-          from: "users",
+          from: "adminusers",
           localField: "userId",
           foreignField: "_id",
-          as: "user",
+          as: "adminuser",
         },
       },
       {
         $unwind: {
-          path: "$user",
+          path: "$adminuser",
           preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          adminuser: "$adminuser.firstName",
         },
       },
 
@@ -119,7 +124,7 @@ exports.listBlogsByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                Blogs: { $regex: match, $options: "i" },
+                blogTitle: { $regex: match, $options: "i" },
               },
             ],
           },

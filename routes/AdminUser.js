@@ -13,21 +13,18 @@ const {
   userLoginAdmin,
 } = require("../controllers/Auth/AdminUser");
 
-router.post("/auth/create/admin-user", catchAsync(createAdminUser));
+router.post("/auth/create/adminUser", catchAsync(createAdminUser));
 
-router.get("/auth/list/admin-user", catchAsync(listAdminUser));
+router.get("/auth/list/adminUser", catchAsync(listAdminUser));
 
-router.post(
-  "/auth/list-by-params/admin-user",
-  catchAsync(listAdminUserByParams)
-);
+router.post("/auth/listByparams/adminUser", catchAsync(listAdminUserByParams));
 
-router.get("/auth/get/admin-user/:_id", catchAsync(getAdminUser));
+router.get("/auth/get/adminUser/:_id", catchAsync(getAdminUser));
 
-router.put("/auth/update/admin-user/:_id", catchAsync(updateAdminUser));
+router.put("/auth/update/adminUser/:_id", catchAsync(updateAdminUser));
 
-router.delete("/auth/remove/admin-user/:_id", catchAsync(removeAdminUser));
+router.delete("/auth/remove/adminUser/:_id", catchAsync(removeAdminUser));
 
-router.post("/admin-login", catchAsync(userLoginAdmin));
+router.post("/adminLogin", catchAsync(userLoginAdmin));
 
 module.exports = router;

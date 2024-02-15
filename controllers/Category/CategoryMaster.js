@@ -30,7 +30,7 @@ exports.listCategoryMaster = async (req, res) => {
 exports.listActiveCategories = async (req, res) => {
   try {
     const list = await CategoryMaster.find({ IsActive: true })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .exec();
     res.json(list);
   } catch (error) {
