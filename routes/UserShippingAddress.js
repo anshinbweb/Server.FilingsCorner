@@ -10,6 +10,7 @@ const {
   getUserShippingAddress,
   updateUserShippingAddress,
   removeUserShippingAddress,
+  AddUpdateShippingAddress,
 } = require("../controllers/Auth/User/UserShippingAddressMaster");
 
 router.post(
@@ -40,6 +41,12 @@ router.put(
 router.delete(
   "/auth/remove/userShippingAddress/:_id",
   catchAsync(removeUserShippingAddress)
+);
+
+// APP
+router.post(
+  "/auth/addUpdate/userShippingAddress",
+  catchAsync(AddUpdateShippingAddress)
 );
 
 module.exports = router;

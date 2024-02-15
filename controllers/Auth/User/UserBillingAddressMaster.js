@@ -21,6 +21,28 @@ exports.createUserBillingAddress = async (req, res) => {
   }
 };
 
+//APP
+exports.AddUpdateBillingAddress = async (req, res) => {
+  try {
+    const id = req.body.id;
+    const findData = await UserBillingAddress.findOne({ _id: id }).exec();
+    if (findData) {
+      const update = await UserBillingAddress.findOneAndUpdate(
+        { _id: req.params._id },
+        req.body,
+        { new: true }
+      );
+      res.json(update);
+    } else {
+      const add = await new UserBillingAddress(req.body).save();
+      res.json(add);
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("error in data", err);
+  }
+};
+
 exports.listUserBillingAddress = async (req, res) => {
   try {
     const list = await UserBillingAddress.find().sort({ createdAt: -1 }).exec();

@@ -32,6 +32,28 @@ exports.listUserShippingAddress = async (req, res) => {
   }
 };
 
+// APP
+exports.AddUpdateShippingAddress = async (req, res) => {
+  try {
+    const id = req.body.id;
+    const findData = await UserShippingAddress.findOne({ _id: id }).exec();
+    if (findData) {
+      const update = await UserShippingAddress.findOneAndUpdate(
+        { _id: req.params._id },
+        req.body,
+        { new: true }
+      );
+      res.json(update);
+    } else {
+      const add = await new UserShippingAddress(req.body).save();
+      res.json(add);
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("error in data", err);
+  }
+};
+
 exports.listUserShippingAddressByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;

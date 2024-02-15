@@ -10,6 +10,7 @@ const {
   getUserBillingAddress,
   updateUserBillingAddress,
   removeUserBillingAddress,
+  AddUpdateBillingAddress,
 } = require("../controllers/Auth/User/UserBillingAddressMaster");
 
 router.post(
@@ -39,4 +40,9 @@ router.delete(
   catchAsync(removeUserBillingAddress)
 );
 
+// APP
+router.post(
+  "/auth/addUpdate/userBillingAddress",
+  catchAsync(AddUpdateBillingAddress)
+);
 module.exports = router;
