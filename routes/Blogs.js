@@ -48,7 +48,7 @@ router.delete("/auth/remove/blogs/:_id", catchAsync(removeBlogs));
 
 const multerStorageCK = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/BannerCKImages");
+    cb(null, "uploads/BlogCKImages");
   },
   filename: (req, file, cb) => {
     // const ext = file.mimetype.split("/")[1];
