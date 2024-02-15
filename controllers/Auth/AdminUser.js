@@ -11,8 +11,22 @@ exports.getAdminUser = async (req, res) => {
 
 exports.createAdminUser = async (req, res) => {
   try {
-    const add = await new AdminUser(req.body).save();
-    res.json(add);
+    const emailExists = await AdminUser.findOne({
+      Email: req.body.Email,
+    }).exec();
+    if (emailExists) {
+      return res.status(200).json({
+        isOk: false,
+        message: "Email already exists",
+      });
+    } else {
+      const add = await new AdminUser(req.body).save();
+      // res.json(add)
+      return res.status(200).json({
+        isOk: true,
+        data: add,
+      });
+    }
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
