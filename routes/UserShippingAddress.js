@@ -10,36 +10,43 @@ const {
   getUserShippingAddress,
   updateUserShippingAddress,
   removeUserShippingAddress,
+  AddUpdateShippingAddress,
 } = require("../controllers/Auth/User/UserShippingAddressMaster");
 
 router.post(
-  "/auth/create/user-shipping-address",
+  "/auth/create/userShippingAddress",
   catchAsync(createUserShippingAddress)
 );
 
 router.get(
-  "/auth/list/user-shipping-address",
+  "/auth/list/userShippingAddress",
   catchAsync(listUserShippingAddress)
 );
 
 router.post(
-  "/auth/list-by-params/user-shipping-address",
+  "/auth/list-by-params/userShippingAddress",
   catchAsync(listUserShippingAddressByParams)
 );
 
 router.get(
-  "/auth/get/user-shipping-address/:_id",
+  "/auth/get/userShippingAddress/:_id",
   catchAsync(getUserShippingAddress)
 );
 
 router.put(
-  "/auth/update/user-shipping-address/:_id",
+  "/auth/update/userShippingAddress/:_id",
   catchAsync(updateUserShippingAddress)
 );
 
 router.delete(
-  "/auth/remove/user-shipping-address/:_id",
+  "/auth/remove/userShippingAddress/:_id",
   catchAsync(removeUserShippingAddress)
+);
+
+// APP
+router.post(
+  "/auth/addUpdate/userShippingAddress",
+  catchAsync(AddUpdateShippingAddress)
 );
 
 module.exports = router;

@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
 const UserShippingAddressMasterSchema = new mongoose.Schema(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "Users",
+      required: true,
+    },
     firstName: {
       type: String,
     },
@@ -12,8 +17,8 @@ const UserShippingAddressMasterSchema = new mongoose.Schema(
       type: Number,
     },
     companyName: {
-        type: String,
-      },
+      type: String,
+    },
     city: {
       type: String,
       required: true,

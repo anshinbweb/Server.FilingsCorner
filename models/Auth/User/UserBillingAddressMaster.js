@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
 const UserBillingAddressMasterSchema = new mongoose.Schema(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "Users",
+      required: true,
+    },
     firstName: {
       type: String,
     },
@@ -12,18 +17,18 @@ const UserBillingAddressMasterSchema = new mongoose.Schema(
       type: Number,
     },
     companyName: {
-        type: String,
-      },
+      type: String,
+    },
     city: {
       type: String,
       required: true,
     },
-    stateId: {
+    StateID: {
       type: Schema.Types.ObjectId,
       ref: "State",
       required: true,
     },
-    countryId: {
+    CountryID: {
       type: Schema.Types.ObjectId,
       ref: "Country",
       required: true,
