@@ -56,6 +56,17 @@ exports.listBlogs = async (req, res) => {
   }
 };
 
+exports.listActiveBlogs = async (req, res) => {
+  try {
+    const listActive = await Blogs.find({ IsActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(listActive);
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+};
+
 exports.listBlogsByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
