@@ -7,15 +7,15 @@ const ProductOptionsSchema = new mongoose.Schema(
       ref: "ProductDetails",
       required: true,
     },
-    categoryId: {
+    parameterId: {
       type: Schema.Types.ObjectId,
-      ref: "CategoryMaster",
+      ref: "ParameterMaster",
       required: true,
     },
-    subCategoryId: [
+    parameterValueId: [
       {
         type: Schema.Types.ObjectId,
-        ref: "CategoryMaster",
+        ref: "ParameterValue",
         required: true,
       },
     ],
