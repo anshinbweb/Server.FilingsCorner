@@ -1,3 +1,4 @@
+const { Long } = require("mongodb");
 const CategoryMaster = require("../../models/Category/CategoryMaster");
 
 exports.getCategoryMaster = async (req, res) => {
@@ -30,8 +31,9 @@ exports.listCategoryMaster = async (req, res) => {
 exports.listActiveCategories = async (req, res) => {
   try {
     const list = await CategoryMaster.find({ IsActive: true })
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .exec();
+    console.log("list avi", list);
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
