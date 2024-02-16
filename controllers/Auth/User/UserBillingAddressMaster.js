@@ -5,6 +5,7 @@ exports.getUserBillingAddress = async (req, res) => {
     const find = await UserBillingAddress.findOne({
       _id: req.params._id,
     }).exec();
+
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);

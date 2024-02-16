@@ -33,7 +33,10 @@ const UserShippingAddressMasterSchema = new mongoose.Schema(
       ref: "Country",
       required: true,
     },
-    address: {
+    addressLine1: {
+      type: String,
+    },
+    addressLine2: {
       type: String,
     },
     zipCode: {
