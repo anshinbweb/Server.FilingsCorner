@@ -17,8 +17,17 @@ const BlogsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    blogThumnailDesc: {
+      type: String,
+
+      required: true,
+    },
     blogImage: {
       type: String,
+    },
+    views: {
+      type: Number,
+      default: 0,
     },
     likes: [
       {

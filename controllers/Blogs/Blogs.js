@@ -20,7 +20,16 @@ exports.createBlogs = async (req, res) => {
     console.log("req.body", req.body);
     let blogImage = req.file ? `uploads/blogImages/${req.file.filename}` : null;
 
-    let { blogTitle, blogDesc, likes, comments, userId, IsActive } = req.body;
+    let {
+      blogTitle,
+      blogDesc,
+      likes,
+      blogThumnailDesc,
+      views,
+      comments,
+      userId,
+      IsActive,
+    } = req.body;
 
     let like;
     let comment;
@@ -35,6 +44,8 @@ exports.createBlogs = async (req, res) => {
       blogTitle: blogTitle,
       blogImage: blogImage,
       blogDesc: blogDesc,
+      blogThumnailDesc: blogThumnailDesc,
+      views: views,
       likes: like,
       comments: comment,
       userId: userId,
