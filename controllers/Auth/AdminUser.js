@@ -12,7 +12,7 @@ exports.getAdminUser = async (req, res) => {
 exports.createAdminUser = async (req, res) => {
   try {
     const emailExists = await AdminUser.findOne({
-      Email: req.body.Email,
+      email: req.body.email,
     }).exec();
     if (emailExists) {
       return res.status(200).json({
@@ -97,10 +97,10 @@ exports.listAdminUserByParams = async (req, res) => {
                 lastName: { $regex: match, $options: "i" },
               },
               {
-                Email: { $regex: match, $options: "i" },
+                email: { $regex: match, $options: "i" },
               },
               {
-                Password: { $regex: match, $options: "i" },
+                password: { $regex: match, $options: "i" },
               },
             ],
           },
@@ -160,12 +160,12 @@ exports.removeAdminUser = async (req, res) => {
 
 exports.userLoginAdmin = async (req, res) => {
   try {
-    const { Email, Password } = req.body;
+    const { email, password } = req.body;
     const findData = await AdminUser.findOne({
-      Email,
-      Password,
+      email,
+      password,
     }).exec();
-    console.log("find", findData);
+    // console.log("find", findData);
     if (findData) {
       return res.status(200).json({
         isOk: true,

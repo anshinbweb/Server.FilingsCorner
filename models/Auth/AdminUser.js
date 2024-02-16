@@ -8,10 +8,10 @@ const AdminUsersSchema = new mongoose.Schema(
     lastName: {
       type: String,
     },
-    Email: {
+    email: {
       type: String,
     },
-    Password: {
+    password: {
       type: String,
     },
     IsActive: {

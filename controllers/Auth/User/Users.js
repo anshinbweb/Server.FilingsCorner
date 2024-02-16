@@ -154,10 +154,10 @@ exports.removeUsers = async (req, res) => {
 
 exports.userLogin = async (req, res) => {
   try {
-    const { Email, Password } = req.body;
+    const { email, password } = req.body;
     const findData = await Users.findOne({
-      Email,
-      Password,
+      email,
+      password,
     }).exec();
     console.log("find", findData);
     if (findData) {
