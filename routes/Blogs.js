@@ -6,6 +6,7 @@ const catchAsync = require("../utils/catchAsync");
 const {
   createBlogs,
   listBlogs,
+  listActiveBlogs,
   listBlogsByParams,
   getBlogs,
   updateBlogs,
@@ -32,6 +33,8 @@ router.post(
 );
 
 router.get("/auth/list/blogs", catchAsync(listBlogs));
+
+router.get("/auth/listActive/blogs", catchAsync(listActiveBlogs));
 
 router.post("/auth/list-by-params/blogs", catchAsync(listBlogsByParams));
 
