@@ -11,16 +11,46 @@ exports.getBlogs = async (req, res) => {
   }
 };
 
-exports.SerachBlog = async (req, res) => {
-  try {
-    const searchTerm = req.query.search; // Assuming you're passing the search term in the query string
+// exports.SerachBlog = async (req, res) => {
+//   try {
+//     const searchTerm = req.query.search; // Assuming you're passing the search term in the query string
 
-    const blogs = await Blogs.find({
+//     const blogs = await Blogs.find({
+//       blogTitle: { $regex: new RegExp(searchTerm, "i") },
+//       IsActive: true, // Adding IsActive condition
+//     }).sort({ createdAt: -1 });
+//     // log("blogs", blogs);
+//     res.json(blogs);
+//   } catch (error) {
+//     console.error("Error searching blogs:", error);
+//     res.status(500).json("An error occurred while searching blogs");
+//   }
+// };
+
+exports.SearchBlog = async (req, res) => {
+  try {
+    console.log("params", req.query);
+    const searchTerm = req.query.search;
+    const page = parseInt(req.query.page) || 1; // Extract page number from query parameters, default to 1 if not provided
+    const limit = 5; // Number of documents per page
+
+    const skip = (page - 1) * limit;
+
+    const query = {
       blogTitle: { $regex: new RegExp(searchTerm, "i") },
-      IsActive: true, // Adding IsActive condition
-    }).sort({ createdAt: -1 });
-    // log("blogs", blogs);
-    res.json(blogs);
+      IsActive: true,
+    };
+
+    const totalBlogs = await Blogs.countDocuments(query); // Count total documents matching the query
+
+    const totalPages = Math.ceil(totalBlogs / limit); // Calculate total pages
+
+    const blogs = await Blogs.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ blogs, totalPages, currentPage: page });
   } catch (error) {
     console.error("Error searching blogs:", error);
     res.status(500).json("An error occurred while searching blogs");
