@@ -53,6 +53,17 @@ exports.listUserBillingAddress = async (req, res) => {
   }
 };
 
+exports.listActiveBillingAddress = async (req, res) => {
+  try {
+    const list = await UserBillingAddress.find({ IsActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(list);
+  } catch (error) {
+    return res.status(400).json("error in list active billing address", error);
+  }
+};
+
 exports.listUserBillingAddressByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;

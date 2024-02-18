@@ -11,11 +11,18 @@ const {
   updateUserBillingAddress,
   removeUserBillingAddress,
   AddUpdateBillingAddress,
+  listActiveBillingAddress,
 } = require("../controllers/Auth/User/UserBillingAddressMaster");
 
 router.post(
   "/auth/create/userBillingAddress",
   catchAsync(createUserBillingAddress)
+);
+
+// APP
+router.get(
+  "/auth/listActive/userBillingAddress",
+  catchAsync(listActiveBillingAddress)
 );
 
 router.get("/auth/list/userBillingAddress", catchAsync(listUserBillingAddress));
