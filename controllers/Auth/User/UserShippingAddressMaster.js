@@ -32,6 +32,17 @@ exports.listUserShippingAddress = async (req, res) => {
   }
 };
 
+exports.listActiveShippingAddress = async (req, res) => {
+  try {
+    const list = await UserShippingAddress.find({ IsActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(list);
+  } catch (error) {
+    return res.status(400).json("error in list active shipping address", error);
+  }
+};
+
 // APP
 exports.AddUpdateShippingAddress = async (req, res) => {
   try {

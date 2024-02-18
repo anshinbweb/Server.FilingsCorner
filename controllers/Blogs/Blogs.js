@@ -1,3 +1,4 @@
+const { log } = require("console");
 const Blogs = require("../../models/Blogs/Blogs");
 const fs = require("fs");
 
@@ -10,14 +11,76 @@ exports.getBlogs = async (req, res) => {
   }
 };
 
+exports.SerachBlog = async (req, res) => {
+  try {
+    const searchTerm = req.query.search; // Assuming you're passing the search term in the query string
+
+    const blogs = await Blogs.find({
+      blogTitle: { $regex: new RegExp(searchTerm, "i") },
+      IsActive: true, // Adding IsActive condition
+    }).sort({ createdAt: -1 });
+    // log("blogs", blogs);
+    res.json(blogs);
+  } catch (error) {
+    console.error("Error searching blogs:", error);
+    res.status(500).json("An error occurred while searching blogs");
+  }
+};
+
+exports.SerachBlogDetails = async (req, res) => {
+  try {
+    const searchTermBD = req.query.search; // Assuming you're passing the search term in the query string
+
+    const blogs = await Blogs.find({
+      blogTitle: { $regex: new RegExp(searchTermBD, "i") },
+      blogDesc: { $regex: new RegExp(searchTermBD, "i") },
+      IsActive: true, // Adding IsActive condition
+    }).sort({ createdAt: -1 });
+    // log("blogs", blogs);
+    res.json(blogs);
+  } catch (error) {
+    console.error("Error searching blogs:", error);
+    res.status(500).json("An error occurred while searching blog details");
+  }
+};
+
+exports.topPopularPosts = async (req, res) => {
+  try {
+    const top5Blogs = await Blogs.aggregate([
+      {
+        $project: {
+          _id: 1,
+          blogTitle: 1,
+          blogDesc: 1,
+          blogThumnailDesc: 1,
+          blogImage: 1,
+          views: 1,
+          likesCount: { $size: "$likes" }, // Calculate the number of likes
+        },
+      },
+      {
+        $sort: { likesCount: -1 }, // Sort in descending order based on likesCount
+      },
+      {
+        $limit: 5, // Limit to 5 documents
+      },
+    ]);
+    const top5BlogIds = top5Blogs.map((blog) => blog._id);
+
+    // return top5Blogs;
+    res.json(top5BlogIds);
+  } catch (error) {
+    console.error("Error fetching top 5 popular blogs:", error);
+    throw error;
+  }
+};
+
 exports.createBlogs = async (req, res) => {
   try {
     if (!fs.existsSync(`${__basedir}/uploads/blogImages`)) {
       fs.mkdirSync(`${__basedir}/uploads/blogImages`);
     }
 
-    console.log("req.file", req.file);
-    console.log("req.body", req.body);
     let blogImage = req.file ? `uploads/blogImages/${req.file.filename}` : null;
 
     let {
@@ -67,6 +130,24 @@ exports.listBlogs = async (req, res) => {
   }
 };
 
+exports.updateViews = async (req, res) => {
+  try {
+    console.log("req.params", req.params);
+    const id = req.params.bid;
+    const viewsCounter = parseInt(req.params.views);
+
+    log("viewsCounter", viewsCounter);
+    const update = await Blogs.findOneAndUpdate(
+      { _id: id },
+      { views: viewsCounter + 1 },
+      { new: true }
+    );
+    console.log("update", update);
+    res.json(update.views);
+  } catch (error) {
+    return res.status(400).send("errror in update views", error);
+  }
+};
 exports.listActiveBlogs = async (req, res) => {
   try {
     const listActive = await Blogs.find({ IsActive: true })
@@ -182,7 +263,7 @@ exports.listBlogsByParams = async (req, res) => {
 
 exports.updateBlogs = async (req, res) => {
   try {
-    console.log("req.body", req.body);
+    // console.log("req.body", req.body);
     let blogImage = req.file ? `uploads/blogImages/${req.file.filename}` : null;
     let fieldvalues = { ...req.body };
     if (blogImage != null) {
@@ -195,6 +276,9 @@ exports.updateBlogs = async (req, res) => {
       fieldvalues.likes == ""
     ) {
       fieldvalues.likes = [];
+    } else {
+      const likesArray = JSON.parse(fieldvalues.likes);
+      fieldvalues.likes = likesArray;
     }
     if (
       fieldvalues.comments == undefined ||
@@ -202,6 +286,9 @@ exports.updateBlogs = async (req, res) => {
       fieldvalues.comments == ""
     ) {
       fieldvalues.comments = [];
+    } else {
+      const commentList = JSON.parse(fieldvalues.comments);
+      fieldvalues.comments = commentList;
     }
 
     const update = await Blogs.findOneAndUpdate(

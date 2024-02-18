@@ -10,6 +10,7 @@ const {
   getUserShippingAddress,
   updateUserShippingAddress,
   removeUserShippingAddress,
+  listActiveShippingAddress,
   AddUpdateShippingAddress,
 } = require("../controllers/Auth/User/UserShippingAddressMaster");
 
@@ -21,6 +22,11 @@ router.post(
 router.get(
   "/auth/list/userShippingAddress",
   catchAsync(listUserShippingAddress)
+);
+
+router.get(
+  "/auth/listActive/userShippingAddress",
+  catchAsync(listActiveShippingAddress)
 );
 
 router.post(
