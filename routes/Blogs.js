@@ -13,7 +13,7 @@ const {
   removeBlogs,
   updateViews,
   topPopularPosts,
-  SerachBlog,
+  SearchBlog,
   SerachBlogDetails,
 } = require("../controllers/Blogs/Blogs");
 
@@ -39,7 +39,7 @@ router.post(
 router.get("/auth/list/blogs", catchAsync(listBlogs));
 
 router.get("/auth/listActive/blogs", catchAsync(listActiveBlogs));
-router.get("/auth/serachTitle/blogs", catchAsync(SerachBlog));
+router.get("/auth/serachTitle/blogs", catchAsync(SearchBlog));
 
 router.get("/auth/serachblogDetails/blogs", catchAsync(SerachBlogDetails));
 
