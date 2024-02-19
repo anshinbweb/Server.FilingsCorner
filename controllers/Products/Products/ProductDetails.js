@@ -1,5 +1,5 @@
 const { log } = require("console");
-const ProductsDetails = require("../../models/Products/ProductsDetails");
+const ProductsDetails = require("../../../models/Products/Products/ProductDetails");
 const fs = require("fs");
 const SubscriptionMaster = require("../../models/Subscription/SubscriptionMaster");
 const { mongoose } = require("mongoose");
@@ -23,36 +23,27 @@ exports.createProductsDetails = async (req, res) => {
       : null;
 
     let {
-      category,
+      categories,
       productName,
       productDescription,
-      price,
+      basePrice,
       weight,
       unit,
-      IsGiftHamper,
-      IsSubscriptionProduct,
+      productOptionId,
+      productVariantsId,
       IsActive,
-      isSize,
-      isDrink,
-      isMilk,
-      isOutOfStock,
     } = req.body;
 
     const add = await new ProductsDetails({
-      category,
-      productImage,
+      categories,
       productName,
       productDescription,
-      price,
+      basePrice,
       weight,
       unit,
-      IsGiftHamper,
-      IsSubscriptionProduct,
+      productOptionId,
+      productVariantsId,
       IsActive,
-      isSize,
-      isDrink,
-      isMilk,
-      isOutOfStock,
     }).save();
     res.status(200).json({ isOk: true, data: add, message: "" });
   } catch (err) {
@@ -73,7 +64,8 @@ exports.listProductsDetails = async (req, res) => {
 exports.listProductByCategory = async (req, res) => {
   try {
     const list = await ProductsDetails.find({
-      category: req.params.categoryId,
+      categories: { $in: [req.params.categoryId] },
+      // categories: req.params.categoryId,
       IsActive: true,
     })
       .sort({ createdAt: -1 })
@@ -253,10 +245,10 @@ exports.removeProductsDetails = async (req, res) => {
 
 exports.CategoryProductList = async (req, res) => {
   try {
-    const { option, categoryid } = req.params;
+    const { option, categoryId } = req.params;
 
     const list = await ProductsDetails.find({
-      category: categoryid,
+      categories: { $in: [categoryId] },
       IsActive: true,
     })
       .sort({ createdAt: -1 })
@@ -301,254 +293,4 @@ exports.CategoryProductList = async (req, res) => {
   }
 };
 
-exports.listProductByCoffee = async (req, res) => {
-  try {
-    const { option } = req.params;
 
-    // console.log("req.params", typeof parseInt(option));
-    console.log("option", option);
-    const list = await ProductsDetails.find({
-      category: "65b8cbd1aa85ec2cb2bf9f5e",
-      IsActive: true,
-    })
-      .sort({ createdAt: -1 })
-      .exec();
-
-    let sortedList;
-
-    switch (option) {
-      case "1": // Newest
-        sortedList = list;
-        break;
-      case "2": // Price low to high
-        sortedList = list.sort((a, b) => a.price - b.price);
-        break;
-      case "3": // Price high to low
-        sortedList = list.sort((a, b) => b.price - a.price);
-
-        break;
-      case "4": // A to Z
-        sortedList = list.sort((a, b) =>
-          a.productName.localeCompare(b.productName)
-        );
-        break;
-      case "5": // Z to A
-        sortedList = list.sort((a, b) =>
-          b.productName.localeCompare(a.productName)
-        );
-        break;
-      default:
-        // Default sorting, perhaps by createdAt descending
-        sortedList = list;
-    }
-
-    if (sortedList) {
-      res.status(200).json({ isOk: true, data: sortedList, message: "" });
-    } else {
-      res.status(200).json({ isOk: false, message: "No data Found" });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(400).send(error);
-  }
-};
-
-exports.listProductByTeaSort = async (req, res) => {
-  try {
-    const list = await ProductsDetails.find({
-      category: "65b8cbd9aa85ec2cb2bf9f60",
-      IsActive: true,
-    })
-      .sort({ createdAt: -1 })
-      .exec();
-
-    switch (option) {
-      case 1: // Newest
-        sortedList = list;
-        break;
-      case 2: // Price low to high
-        sortedList = list.sort((a, b) => a.price - b.price);
-        break;
-      case 3: // Price high to low
-        sortedList = list.sort((a, b) => b.price - a.price);
-        break;
-      case 4: // A to Z
-        sortedList = list.sort((a, b) =>
-          a.productName.localeCompare(b.productName)
-        );
-        break;
-      case 5: // Z to A
-        sortedList = list.sort((a, b) =>
-          b.productName.localeCompare(a.productName)
-        );
-        break;
-      default:
-        // Default sorting, perhaps by createdAt descending
-        sortedList = list;
-    }
-
-    if (sortedList) {
-      res.status(200).json({ isOk: true, data: sortedList, message: "" });
-    } else {
-      res.status(200).json({ isOk: false, message: "No data Found" });
-    }
-  } catch (error) {
-    return res.status(400).send(error);
-  }
-};
-
-exports.listProductByTea = async (req, res) => {
-  try {
-    const list = await ProductsDetails.find({
-      category: "65b8cbd9aa85ec2cb2bf9f60",
-      IsActive: true,
-    })
-      .sort({ createdAt: -1 })
-      .exec();
-
-    console.log("list", list);
-
-    if (list) {
-      res.status(200).json({ isOk: true, data: list, message: "" });
-    } else {
-      res.status(200).json({ isOk: false, message: "No data Found" });
-    }
-  } catch (error) {
-    return res.status(400).send("err", error);
-  }
-};
-exports.listProductByDrink = async (req, res) => {
-  try {
-    const { option } = req.params;
-
-    const list = await ProductsDetails.find({
-      category: "65b8e91127d8fef240f3059f",
-      IsActive: true,
-    })
-      .sort({ createdAt: -1 })
-      .exec();
-
-    switch (option) {
-      case 1: // Newest
-        sortedList = list;
-        break;
-      case 2: // Price low to high
-        sortedList = list.sort((a, b) => a.price - b.price);
-        break;
-      case 3: // Price high to low
-        sortedList = list.sort((a, b) => b.price - a.price);
-        break;
-      case 4: // A to Z
-        sortedList = list.sort((a, b) =>
-          a.productName.localeCompare(b.productName)
-        );
-        break;
-      case 5: // Z to A
-        sortedList = list.sort((a, b) =>
-          b.productName.localeCompare(a.productName)
-        );
-        break;
-      default:
-        // Default sorting, perhaps by createdAt descending
-        sortedList = list;
-    }
-
-    if (sortedList) {
-      res.status(200).json({ isOk: true, data: sortedList, message: "" });
-    } else {
-      res.status(200).json({ isOk: false, message: "No data Found" });
-    }
-  } catch (error) {
-    return res.status(400).send(error);
-  }
-};
-
-exports.listProductByShop = async (req, res) => {
-  //accessories
-  try {
-    const list = await ProductsDetails.find({
-      category: "65c343ea11dfa763253e353f",
-      IsActive: true,
-    })
-      .sort({ createdAt: -1 })
-      .exec();
-
-    switch (option) {
-      case 1: // Newest
-        sortedList = list;
-        break;
-      case 2: // Price low to high
-        sortedList = list.sort((a, b) => a.price - b.price);
-        break;
-      case 3: // Price high to low
-        sortedList = list.sort((a, b) => b.price - a.price);
-        break;
-      case 4: // A to Z
-        sortedList = list.sort((a, b) =>
-          a.productName.localeCompare(b.productName)
-        );
-        break;
-      case 5: // Z to A
-        sortedList = list.sort((a, b) =>
-          b.productName.localeCompare(a.productName)
-        );
-        break;
-      default:
-        // Default sorting, perhaps by createdAt descending
-        sortedList = list;
-    }
-
-    if (sortedList) {
-      res.status(200).json({ isOk: true, data: sortedList, message: "" });
-    } else {
-      res.status(200).json({ isOk: false, message: "No data Found" });
-    }
-  } catch (error) {
-    return res.status(400).send(error);
-  }
-};
-
-exports.listProductByFlight = async (req, res) => {
-  //gift hampers
-  try {
-    const list = await ProductsDetails.find({
-      category: "65c90fd0da80f9834d4744ca",
-      IsActive: true,
-    })
-      .sort({ createdAt: -1 })
-      .exec();
-
-    switch (option) {
-      case 1: // Newest
-        sortedList = list;
-        break;
-      case 2: // Price low to high
-        sortedList = list.sort((a, b) => a.price - b.price);
-        break;
-      case 3: // Price high to low
-        sortedList = list.sort((a, b) => b.price - a.price);
-        break;
-      case 4: // A to Z
-        sortedList = list.sort((a, b) =>
-          a.productName.localeCompare(b.productName)
-        );
-        break;
-      case 5: // Z to A
-        sortedList = list.sort((a, b) =>
-          b.productName.localeCompare(a.productName)
-        );
-        break;
-      default:
-        // Default sorting, perhaps by createdAt descending
-        sortedList = list;
-    }
-
-    if (sortedList) {
-      res.status(200).json({ isOk: true, data: sortedList, message: "" });
-    } else {
-      res.status(200).json({ isOk: false, message: "No data Found" });
-    }
-  } catch (error) {
-    return res.status(400).send(error);
-  }
-};
