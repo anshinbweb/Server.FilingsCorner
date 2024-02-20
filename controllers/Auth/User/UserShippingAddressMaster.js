@@ -1,4 +1,5 @@
 const UserShippingAddress = require("../../../models/Auth/User/UserShippingAddressMaster");
+const User = require("../../../models/Auth/User/Users");
 
 exports.getUserShippingAddress = async (req, res) => {
   try {
@@ -14,6 +15,12 @@ exports.getUserShippingAddress = async (req, res) => {
 exports.createUserShippingAddress = async (req, res) => {
   try {
     const add = await new UserShippingAddress(req.body).save();
+    const shippingID = add._id;
+    const user = await User.findOneAndUpdate(
+      { _id: req.body.userId },
+      { $addToSet: { shippingAddress: shippingID } },
+      { new: true }
+    );
     res.json(add);
   } catch (err) {
     console.log(err);
@@ -166,11 +173,25 @@ exports.updateUserShippingAddress = async (req, res) => {
 
 exports.removeUserShippingAddress = async (req, res) => {
   try {
-    const del = await UserShippingAddress.findOneAndRemove({
+    const ShippingAdd = await UserShippingAddress.findOne({
       _id: req.params._id,
     });
-    res.json(del);
-  } catch (err) {
-    res.status(400).send(err);
+
+    if (ShippingAdd) {
+      const updatedUserSA = await User.findOneAndUpdate(
+        { _id: ShippingAdd.userId },
+        { $pull: { shippingAddress: req.params._id } },
+        { new: true }
+      );
+      const deletedsA = await UserShippingAddress.findOneAndRemove({
+        _id: req.params._id,
+      });
+      console.log("delted", deletedsA);
+      res.json(deletedsA);
+    } else {
+      console.log("Billing address not found");
+    }
+  } catch (error) {
+    res.status(500).json("error in remove", error);
   }
 };
