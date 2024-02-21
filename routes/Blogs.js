@@ -6,10 +6,15 @@ const catchAsync = require("../utils/catchAsync");
 const {
   createBlogs,
   listBlogs,
+  listActiveBlogs,
   listBlogsByParams,
   getBlogs,
   updateBlogs,
   removeBlogs,
+  updateViews,
+  topPopularPosts,
+  SearchBlog,
+  SerachBlogDetails,
 } = require("../controllers/Blogs/Blogs");
 
 const multer = require("multer");
@@ -32,6 +37,15 @@ router.post(
 );
 
 router.get("/auth/list/blogs", catchAsync(listBlogs));
+
+router.get("/auth/listActive/blogs", catchAsync(listActiveBlogs));
+router.get("/auth/serachTitle/blogs", catchAsync(SearchBlog));
+
+router.get("/auth/serachblogDetails/blogs", catchAsync(SerachBlogDetails));
+
+router.post("/auth/topPopularPosts/blogs", catchAsync(topPopularPosts));
+
+router.put("/auth/updateViews/blogs/:bid/:views", catchAsync(updateViews));
 
 router.post("/auth/list-by-params/blogs", catchAsync(listBlogsByParams));
 

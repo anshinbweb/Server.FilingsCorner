@@ -1,5 +1,5 @@
 const BlogsComment = require("../../models/Blogs/BlogComment");
-
+const Blog = require("../../models/Blogs/Blogs");
 exports.getBlogsComment = async (req, res) => {
   try {
     const find = await BlogsComment.findOne({ _id: req.params._id }).exec();
@@ -11,10 +11,25 @@ exports.getBlogsComment = async (req, res) => {
 
 exports.createBlogsComment = async (req, res) => {
   try {
+    console.log("req.body", req.body);
     const add = await new BlogsComment(req.body).save();
-    res.json(add);
+    console.log("add", add);
+    const BlogID = add.blogId;
+    const id = add._id;
+    const blogAdded = await Blog.findOneAndUpdate(
+      { _id: BlogID },
+      { $addToSet: { comments: id } },
+      { new: true }
+    );
+    console.log("user add", blogAdded);
+
+    // res.json(add);
+    res.status(200).json({
+      isOk: true,
+      message: "blog comment created successfully",
+    });
   } catch (err) {
-    return res.status(400).send(err);
+    return res.status(400).json("error in data", err);
   }
 };
 
@@ -125,7 +140,7 @@ exports.updateBlogsComment = async (req, res) => {
 
 exports.removeBlogsComment = async (req, res) => {
   try {
-    const del= await BlogsComment.findOneAndRemove({
+    const del = await BlogsComment.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);

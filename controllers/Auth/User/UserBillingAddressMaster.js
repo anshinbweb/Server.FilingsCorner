@@ -1,5 +1,5 @@
 const UserBillingAddress = require("../../../models/Auth/User/UserBillingAddressMaster");
-
+const User = require("../../../models/Auth/User/Users");
 exports.getUserBillingAddress = async (req, res) => {
   try {
     const find = await UserBillingAddress.findOne({
@@ -8,17 +8,24 @@ exports.getUserBillingAddress = async (req, res) => {
 
     res.json(find);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).json("error in get", error);
   }
 };
 
 exports.createUserBillingAddress = async (req, res) => {
   try {
     const add = await new UserBillingAddress(req.body).save();
+    const billingID = add._id;
+    const user = await User.findOneAndUpdate(
+      { _id: req.body.userId },
+      { $addToSet: { billingAddress: billingID } },
+      { new: true }
+    );
+
     res.json(add);
   } catch (err) {
     console.log(err);
-    return res.status(500).send(err);
+    res.status(500).json("error in create", err);
   }
 };
 
@@ -49,7 +56,18 @@ exports.listUserBillingAddress = async (req, res) => {
     const list = await UserBillingAddress.find().sort({ createdAt: -1 }).exec();
     res.json(list);
   } catch (error) {
-    return res.status(400).send(error);
+    res.status(500).json("error in list user", error);
+  }
+};
+
+exports.listActiveBillingAddress = async (req, res) => {
+  try {
+    const list = await UserBillingAddress.find({ IsActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(list);
+  } catch (error) {
+    return res.status(400).json("error in list active billing address", error);
   }
 };
 
@@ -135,7 +153,7 @@ exports.listUserBillingAddressByParams = async (req, res) => {
 
     res.json(list);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json("error in list", error);
   }
 };
 
@@ -148,17 +166,32 @@ exports.updateUserBillingAddress = async (req, res) => {
     );
     res.json(update);
   } catch (err) {
-    res.status(400).send(err);
+    res.status(500).json("error in update", err);
   }
 };
 
 exports.removeUserBillingAddress = async (req, res) => {
   try {
-    const del = await UserBillingAddress.findOneAndRemove({
+    // Remove billing address
+    const BillingAdd = await UserBillingAddress.findOne({
       _id: req.params._id,
     });
-    res.json(del);
-  } catch (err) {
-    res.status(400).send(err);
+
+    if (BillingAdd) {
+      const updatedUserBA = await User.findOneAndUpdate(
+        { _id: BillingAdd.userId },
+        { $pull: { billingAddress: req.params._id } },
+        { new: true }
+      );
+      const deletedBA = await UserBillingAddress.findOneAndRemove({
+        _id: req.params._id,
+      });
+      console.log("delted", deletedBA);
+      res.json(deletedBA);
+    } else {
+      console.log("Billing address not found");
+    }
+  } catch (error) {
+    res.status(500).json("error in remove", error);
   }
 };

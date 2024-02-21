@@ -158,29 +158,64 @@ exports.removeAdminUser = async (req, res) => {
   }
 };
 
+// exports.userLoginAdmin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const findData = await AdminUser.findOne({
+//       email,
+//       password,
+//     }).exec();
+//     // console.log("find", findData);
+//     if (findData) {
+//       return res.status(200).json({
+//         isOk: true,
+//         data: findData,
+//         message: "Authentication Successfull",
+//       });
+//     } else {
+//       return res.status(200).json({
+//         isOk: false,
+//         message: "Authentication Failed",
+//       });
+//       // res.status(200).send("Authentication Failed!");
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send(err);
+//   }
+// };
+
 exports.userLoginAdmin = async (req, res) => {
+  const { email, password } = req.body;
+  console.log("email", req.body);
   try {
-    const { email, password } = req.body;
-    const findData = await AdminUser.findOne({
-      email,
-      password,
-    }).exec();
-    // console.log("find", findData);
-    if (findData) {
-      return res.status(200).json({
-        isOk: true,
-        data: findData,
-        message: "Authentication Successfull",
-      });
+    const usermp = await AdminUser.findOne({ email: email }).exec();
+    if (usermp) {
+      if (usermp.password !== password) {
+        console.log("Password didn't match");
+        return res.status(200).json({
+          isOk: false,
+          filed: 1,
+          message: "Authentication Failed",
+        });
+      } else {
+        res.status(200).json({
+          isOk: true,
+          message: "Authentication Successfull",
+          data: usermp,
+        });
+      }
     } else {
-      return res.status(200).json({
+      res.status(200).json({
         isOk: false,
-        message: "Authentication Failed",
+        message: "Admin User not Found",
       });
-      // res.status(200).send("Authentication Failed!");
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).send(err);
+    console.error(err);
+    res.status(200).json({
+      isOk: false,
+      message: "An error occurred while logging in adminpanel",
+    });
   }
 };

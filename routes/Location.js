@@ -9,6 +9,7 @@ const {
   updateCountry,
   getCountry,
   listCountryByParams,
+  listActiveCountry,
 
   listState,
   listStateByParams,
@@ -16,6 +17,7 @@ const {
   getState,
   updateState,
   removeState,
+  listActiveState,
 
   listCity,
   removeCity,
@@ -28,6 +30,8 @@ const catchAsync = require("../utils/catchAsync");
 
 //location setup ---> country
 router.get("/auth/location/country", catchAsync(listCountry));
+router.get("/auth/activeLocation/country", catchAsync(listActiveCountry));
+
 router.post("/auth/location/countries", catchAsync(listCountryByParams));
 router.post("/auth/location/country", catchAsync(createCountry));
 router.delete("/auth/location/country/:_id", catchAsync(removeCountry));
@@ -36,6 +40,8 @@ router.get("/auth/location/country/:_id", catchAsync(getCountry));
 
 //location setup ---> state
 router.get("/auth/location/state", catchAsync(listState));
+router.get("/auth/activeLocation/state", catchAsync(listActiveState));
+
 router.post("/auth/location/states", catchAsync(listStateByParams));
 router.delete("/auth/location/state/:_id", catchAsync(removeState));
 router.post("/auth/location/state", catchAsync(createState));

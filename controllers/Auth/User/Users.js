@@ -152,29 +152,62 @@ exports.removeUsers = async (req, res) => {
   }
 };
 
+// exports.userLogin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const findData = await Users.findOne({
+//       email,
+//       password,
+//     }).exec();
+//     console.log("find", findData);
+//     if (findData) {
+//       return res.status(200).json({
+//         isOk: true,
+//         data: findData,
+//         message: "Authentication Successfull",
+//       });
+//     } else {
+//       return res.status(200).json({
+//         isOk: false,
+//         message: "Authentication Failed",
+//       });
+//       // res.status(200).send("Authentication Failed!");
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send(err);
+//   }
+// };
+
 exports.userLogin = async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
-    const findData = await Users.findOne({
-      email,
-      password,
-    }).exec();
-    console.log("find", findData);
-    if (findData) {
-      return res.status(200).json({
-        isOk: true,
-        data: findData,
-        message: "Authentication Successfull",
-      });
+    const usermp = await Users.findOne({ email: email }).exec();
+    if (usermp) {
+      if (usermp.password !== password) {
+        console.log("Password didn't match");
+        return res.status(200).json({
+          isOk: false,
+          filed: 1,
+          message: "Authentication Failed",
+        });
+      } else {
+        res.status(200).json({
+          isOk: true,
+          message: "Authentication Successfull",
+          data: usermp,
+        });
+      }
     } else {
-      return res.status(200).json({
+      res.status(200).json({
         isOk: false,
-        message: "Authentication Failed",
+        message: "user Not found",
       });
-      // res.status(200).send("Authentication Failed!");
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).send(err);
+    console.error(err);
+    res
+      .status(200)
+      .json({ isOk: false, message: "An error occurred while logging in" });
   }
 };

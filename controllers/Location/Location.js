@@ -15,6 +15,19 @@ exports.listCountry = async (req, res) => {
   }
 };
 
+exports.listActiveCountry = async (req, res) => {
+  try {
+    const list = await Country.find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    // console.log("list country", list);
+    res.json(list);
+  } catch (error) {
+    console.log("error in list Active country", error);
+    res.status(500).json("list Active country failed");
+  }
+};
+
 exports.listCountryByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
@@ -151,6 +164,19 @@ exports.listState = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).send("get country failed");
+  }
+};
+
+exports.listActiveState = async (req, res) => {
+  try {
+    const list = await State.find({ isActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    console.log("list active State", list);
+    res.json(list);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("get state active failed");
   }
 };
 
