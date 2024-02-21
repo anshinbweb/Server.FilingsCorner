@@ -24,6 +24,10 @@ const ProductVariantsSchema = new mongoose.Schema(
         type: Boolean,
         default: false,
       },
+      isSubscription: {
+        type: Boolean,
+        default: false,
+      },
     IsActive: {
       type: Boolean,
       default: false,
