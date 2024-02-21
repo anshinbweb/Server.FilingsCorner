@@ -41,16 +41,16 @@ const ProductDetailsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    productOptionId: {
+    productOptionId: [{
       type: Schema.Types.ObjectId,
       ref: "ProductOptions",
       required: true,
-    },
-    productVariantsId: {
+    }],
+    productVariantsId: [{
       type: Schema.Types.ObjectId,
       ref: "ProductVariants",
       required: true,
-    },
+    }],
     IsActive: {
       type: Boolean,
       default: false,
