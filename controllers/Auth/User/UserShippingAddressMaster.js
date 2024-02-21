@@ -3,9 +3,11 @@ const User = require("../../../models/Auth/User/Users");
 
 exports.getUserShippingAddress = async (req, res) => {
   try {
-    const find = await UserShippingAddress.findOne({
-      _id: req.params._id,
+    const ids = req.params.ids; // Assuming req.params.ids is an array of IDs
+    const find = await UserShippingAddress.find({
+      _id: { $in: ids },
     }).exec();
+    console.log("find", find);
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
