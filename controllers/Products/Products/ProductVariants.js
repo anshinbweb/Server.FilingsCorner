@@ -1,4 +1,3 @@
-const { Long } = require("mongodb");
 const ProductVariants = require("../../../models/Products/Products/ProductVariants");
 
 exports.getProductVariants = async (req, res) => {

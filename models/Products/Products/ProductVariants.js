@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
-const ProductOptionsSchema = new mongoose.Schema(
+const ProductVariantsSchema = new mongoose.Schema(
   {
     productId: {
       type: Schema.Types.ObjectId,
@@ -32,7 +32,7 @@ const ProductOptionsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ProductOptions", ProductOptionsSchema);
+module.exports = mongoose.model("ProductVariants", ProductVariantsSchema);
 
 
 //PnC: small/a/hot, small/a/cold,small/a/iced, medium/b/hot, medium/b/cold, large/c/hot, large/d/hot,....

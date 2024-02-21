@@ -1,4 +1,3 @@
-const { log } = require("console");
 const ProductsDetails = require("../../../models/Products/Products/ProductDetails");
 const fs = require("fs");
 const SubscriptionMaster = require("../../models/Subscription/SubscriptionMaster");

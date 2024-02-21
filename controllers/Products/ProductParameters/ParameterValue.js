@@ -1,4 +1,3 @@
-const { Long } = require("mongodb");
 const ParameterValue = require("../../../models/Products/ProductParameters/ParameterValue");
 
 exports.getParameterValue = async (req, res) => {
