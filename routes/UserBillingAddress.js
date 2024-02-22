@@ -12,6 +12,7 @@ const {
   removeUserBillingAddress,
   AddUpdateBillingAddress,
   listActiveBillingAddress,
+  getAllBillingAddressofUser,
 } = require("../controllers/Auth/User/UserBillingAddressMaster");
 
 router.post(
@@ -35,6 +36,11 @@ router.post(
 router.get(
   "/auth/get/userBillingAddress/:_id",
   catchAsync(getUserBillingAddress)
+);
+
+router.get(
+  "/auth/get/allBillingAddress/:userId",
+  catchAsync(getAllBillingAddressofUser)
 );
 
 router.put(

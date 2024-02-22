@@ -2,30 +2,17 @@ const userNotifcation = require("../../models/Notifications/notification");
 const mongoose = require("mongoose");
 exports.createuserNotifcation = async (req, res) => {
   try {
-    const {
-      UserId,
-      Type,
-      Description,
-      //   URL,
-      // IsRead
-    } = req.body;
-    console.log(
-      UserId,
-      Type,
-      Description,
-      // URL,
-      IsRead
-    );
+    const { UserId, Type, Description, isActive } = req.body;
+    console.log(UserId, Type, Description, isActive);
     const addNotification = await new userNotifcation({
       UserId,
       Type,
       Description,
-      //   URL,
-      //   IsRead,
+      isActive,
     }).save();
     res.json(addNotification);
   } catch (err) {
-    return res.status(400).json("error in create user notification", err);
+    return res.status(500).json("error in create user notification", err);
   }
 };
 
@@ -65,11 +52,15 @@ exports.listuserNotification = async (req, res) => {
   }
 };
 
-exports.getuserNotification = async (req, res) => {
-  const notification = await userNotifcation
-    .find({ _id: req.params._id })
-    .exec();
-  res.json(notification);
+exports.getNotification = async (req, res) => {
+  try {
+    const notification = await userNotifcation.findOne({ _id: req.params._id });
+    console.log("notification", notification);
+    res.json(notification);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("get user notification failed", err);
+  }
 };
 
 exports.getuserAllNotification = async (req, res) => {
@@ -111,13 +102,41 @@ exports.getuserAllNotification = async (req, res) => {
 //   }
 // };
 exports.listuserNotifcationByparams = async (req, res) => {
-  let { skip, per_page, sorton, sortdir, match, userId, isActive } = req.body;
+  let {
+    skip,
+    per_page,
+    sorton,
+    sortdir,
+    match,
+    // userId,
+    isActive,
+  } = req.body;
 
   let query = [
     {
       $match: {
-        UserId: mongoose.Types.ObjectId(userId),
+        // UserId: mongoose.Types.ObjectId(userId),
         isActive: isActive,
+      },
+    },
+
+    {
+      $lookup: {
+        from: "users",
+        localField: "UserId",
+        foreignField: "_id",
+        as: "UserData",
+      },
+    },
+    {
+      $unwind: {
+        path: "$UserData",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $set: {
+        UserData: "$UserData.firstName",
       },
     },
 
