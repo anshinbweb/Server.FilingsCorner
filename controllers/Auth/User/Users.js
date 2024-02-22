@@ -211,3 +211,49 @@ exports.userLogin = async (req, res) => {
       .json({ isOk: false, message: "An error occurred while logging in" });
   }
 };
+
+exports.ChangePasswordUser = async (req, res) => {
+  try {
+    const { userId, password, newPassword, ConfirmPassword } = req.body;
+    console.log("req.body", req.body);
+    const user = await Users.findById({ _id: userId }).exec();
+    if (user) {
+      if (user.password === password) {
+        if (ConfirmPassword !== newPassword) {
+          return res.status(200).json({
+            isOk: false,
+            field: 1,
+            message: "Confirm password does not matches",
+          });
+        } else {
+          const user = await Users.findOne({ _id: userId }).exec();
+          user.password = newPassword;
+          user.save();
+          console.log("Password updated successfully", user);
+          return res.status(200).json({
+            isOk: true,
+            message: "Password updated successfully",
+            data: user,
+          });
+        }
+      } else {
+        return res.status(200).json({
+          isOk: false,
+          field: 2,
+
+          message: "password is Incorrect",
+        });
+      }
+    } else {
+      return res.status(200).json({
+        field: 3,
+
+        isOk: false,
+        message: "user not found",
+      });
+    }
+  } catch (error) {
+    console.log("log error from user login", error);
+    return res.status(500).json("change password user login failed");
+  }
+};

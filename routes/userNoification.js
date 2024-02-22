@@ -7,7 +7,7 @@ const {
   listuserNotifcationByparams,
   updateUserNotification,
   removeUserNotification,
-  getuserNotification,
+  getNotification,
 } = require("../controllers/userNotifications/userNotification");
 
 const router = express.Router();
@@ -23,7 +23,7 @@ router.delete(
 );
 
 router.post("/auth/listUserNotification", catchAsync(listuserNotification));
-router.get(
+router.post(
   "/auth/listNotificationParams",
   catchAsync(listuserNotifcationByparams)
 );
@@ -32,5 +32,5 @@ router.get(
   catchAsync(getuserAllNotification)
 );
 
-router.get("/auth/getUserNotification/:_id", catchAsync(getuserNotification));
+router.get("/auth/getNotification/:_id", catchAsync(getNotification));
 module.exports = router;

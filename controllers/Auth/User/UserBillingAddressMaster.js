@@ -1,5 +1,8 @@
 const UserBillingAddress = require("../../../models/Auth/User/UserBillingAddressMaster");
 const User = require("../../../models/Auth/User/Users");
+
+const mongoose = require("mongoose");
+
 exports.getUserBillingAddress = async (req, res) => {
   try {
     const find = await UserBillingAddress.findOne({
@@ -9,6 +12,77 @@ exports.getUserBillingAddress = async (req, res) => {
     res.json(find);
   } catch (error) {
     return res.status(500).json("error in get", error);
+  }
+};
+
+exports.getAllBillingAddressofUser = async (req, res) => {
+  try {
+    const id = req.params.userId;
+    const find = await UserBillingAddress.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(id), // Assuming you're using Mongoose and need to convert id to ObjectId
+          IsActive: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "countries", // Assuming the name of the country table is "Countries"
+          localField: "countryId",
+          foreignField: "_id",
+          as: "country",
+        },
+      },
+      {
+        $unwind: {
+          path: "$country",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $lookup: {
+          from: "states", // Assuming the name of the country table is "Countries"
+          localField: "stateId",
+          foreignField: "_id",
+          as: "state",
+        },
+      },
+      {
+        $unwind: {
+          path: "$state",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          firstName: 1,
+          lastName: 1,
+          contactNo: 1,
+          companyName: 1,
+          city: 1,
+          State: "$state.StateName", // Replace stateId with state name
+          Country: "$country.CountryName", // Replace countryId with country name
+          addressLine1: 1,
+          addressLine2: 1,
+          zipCode: 1,
+          isBillingSame: 1,
+          IsActive: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      },
+    ]).exec();
+    console.log("find", find);
+    res.status(200).json(find); // Updated res.json() to res.status().json()
+  } catch (error) {
+    console.log("error in get", error);
+    return res
+      .status(500)
+      .json("error in get billing address of all user", error);
   }
 };
 
