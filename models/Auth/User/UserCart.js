@@ -17,30 +17,35 @@ const UserCartSchema = new mongoose.Schema(
       ref: "SubscriptionMaster",
       // required: true,
     },
+    productVariantsId: {
+      type: Schema.Types.ObjectId,
+      ref: "ProductVariants",
+      // required: true,
+    },
     quantity: {
       type: Number,
     },
-    amount: {
+    totalAmount: {
       type: Number,
     },
-    sizeId: {
-      // if product is drink: small, medium, large
-      type: Schema.Types.ObjectId,
-      ref: "SizeMaster",
-      // required: true,
-    },
-    drinkId: {
-      // if product is drink: hot, iced, blend
-      type: Schema.Types.ObjectId,
-      ref: "DrinkCategoryMaster",
-      // required: true,
-    },
-    milkCategory: {
-      // if product is drink: whole milk, oat, soya...
-      type: Schema.Types.ObjectId,
-      ref: "MilkCategoryMaster",
-      // required: true,
-    },
+    // sizeId: {
+    //   // if product is drink: small, medium, large
+    //   type: Schema.Types.ObjectId,
+    //   ref: "SizeMaster",
+    //   // required: true,
+    // },
+    // drinkId: {
+    //   // if product is drink: hot, iced, blend
+    //   type: Schema.Types.ObjectId,
+    //   ref: "DrinkCategoryMaster",
+    //   // required: true,
+    // },
+    // milkCategory: {
+    //   // if product is drink: whole milk, oat, soya...
+    //   type: Schema.Types.ObjectId,
+    //   ref: "MilkCategoryMaster",
+    //   // required: true,
+    // },
   },
   { timestamps: true }
 );
