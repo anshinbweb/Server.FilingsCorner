@@ -11,6 +11,10 @@ const SubscriptionMasterSchema = new mongoose.Schema(
     savePercentage: {
       type: Number,
     },
+    days: {
+      // Need to change the API
+      type: Number,
+    },
     IsActive: {
       type: Boolean,
     },

@@ -1,27 +1,43 @@
 const UserCart = require("../../../models/Auth/User/UserCart");
 const User = require("../../../models/Auth/User/Users");
+const ProductDetails = require("../../../models/Products/Products/ProductDetails");
+const ProductVariants = require("../../../models/Products/Products/ProductVariants");
+
 exports.createUserCart = async (req, res) => {
   try {
-    const {
-      userId,
-      productId,
-      subsId,
-      quantity,
-      amount,
-      sizeId,
-      drinkId,
-      milkCategory,
-    } = req.body;
+    const { userId, productId, subsId, productVariantsId, quantity } = req.body;
     console.log("req.body", req.body);
+
+    // CHECK STOCK
+    let amount = 0;
+    if (productVariantsId == null) {
+      amount = await ProductDetails.findOne({ _id: productId });
+      if (amount.isOutOfStock) {
+        return res.status(200).json({
+          isOk: false,
+          message: "Product is out of stock",
+        });
+      }
+      amount = amount.basePrice * quantity;
+      console.log("amount", amount);
+    } else {
+      amount = await ProductVariants.findOne({ _id: productVariantsId });
+      if (amount.isOutOfStock) {
+        return res.status(200).json({
+          isOk: false,
+          message: "Product is out of stock",
+        });
+      }
+      amount = amount.priceVariant * quantity;
+      console.log("amount", amount);
+    }
+
     const add = await new UserCart({
       userId,
       productId,
       subsId,
+      productVariantsId,
       quantity,
-      amount,
-      sizeId,
-      drinkId,
-      milkCategory,
     }).save();
     console.log("data id", add._id);
     const usercartID = add._id;
@@ -35,6 +51,7 @@ exports.createUserCart = async (req, res) => {
     res.status(200).json({
       isOk: true,
       message: "UserCart created successfully",
+      amount: amount,
     });
   } catch (err) {
     console.log(err);
@@ -58,10 +75,10 @@ exports.updateQuantity = async (req, res) => {
     } else {
       Qt = findData.quantity - 1;
     }
-    const amt = findData.amount * Qt;
+    // const amt = findData.amount * Qt;
     const updatedCart = await UserCart.findByIdAndUpdate(
       { _id: ID },
-      { quantity: Qt, amount: amt },
+      { quantity: Qt },
       { new: true }
     );
     console.log("updatedCart", updatedCart);
@@ -80,11 +97,12 @@ exports.updateQuantity = async (req, res) => {
 
 exports.RemoveFromCart = async (req, res) => {
   try {
-    const { userId, productId } = req.params;
+    const { userId, productId, productVariantsId } = req.params;
     console.log("req.params", req.params);
-    const findData = await UserCart.findOne({
+    const findData = await UserCart.findOneAndRemove({
       userId: userId,
       productId: productId,
+      productVariantsId: productVariantsId,
     });
     console.log("findData", findData);
     const ID = findData._id;
