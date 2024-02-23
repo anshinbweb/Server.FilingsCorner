@@ -4,11 +4,11 @@ const ParameterValueSchema = new mongoose.Schema(
   {
     parameterId: {
       type: Schema.Types.ObjectId,
-      ref: "ParameterMaster",
+      ref: "ParameterMaster", //milk
       required: true,
     },
     parameterValue: {
-      type: String,
+      type: String, //oat milk
     },
     IsActive: {
       type: Boolean,
