@@ -47,7 +47,25 @@ exports.listParameterValueByParams = async (req, res) => {
       {
         $match: { IsActive: IsActive },
       },
-
+      {
+        $lookup: {
+          from: "parametermasters",
+          localField: "parameterId",
+          foreignField: "_id",
+          as: "parameters",
+        },
+      },
+      {
+        $unwind: {
+          path: "$parameters",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          parameters: "$parameters.parameterName",
+        },
+      },
       {
         $facet: {
           stage1: [
