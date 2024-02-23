@@ -9,7 +9,7 @@
 
 const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
-const ProductDetailsSchema = new mongoose.Schema(
+const ProductDetailsNewSchema = new mongoose.Schema(
   {
     categories: [
       {
@@ -73,4 +73,4 @@ const ProductDetailsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ProductDetails", ProductDetailsSchema);
+module.exports = mongoose.model("ProductDetailsNew", ProductDetailsNewSchema);
