@@ -25,9 +25,9 @@ const UserCartSchema = new mongoose.Schema(
     quantity: {
       type: Number,
     },
-    totalAmount: {
-      type: Number,
-    },
+    // totalAmount: {
+    //   type: Number,
+    // },
     // sizeId: {
     //   // if product is drink: small, medium, large
     //   type: Schema.Types.ObjectId,

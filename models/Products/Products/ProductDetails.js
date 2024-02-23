@@ -41,16 +41,30 @@ const ProductDetailsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    productOptionId: [{
-      type: Schema.Types.ObjectId,
-      ref: "ProductOptions",
-      required: true,
-    }],
-    productVariantsId: [{
-      type: Schema.Types.ObjectId,
-      ref: "ProductVariants",
-      required: true,
-    }],
+    productOptionId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ProductOptions",
+        required: true,
+      },
+    ],
+    productVariantsId: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ProductVariants",
+        required: true,
+      },
+    ],
+    isOutOfStock: {
+      // Need to change the API
+      type: Boolean,
+      default: false,
+    },
+    isSubscription: {
+      // Need to change the API
+      type: Boolean,
+      default: false,
+    },
     IsActive: {
       type: Boolean,
       default: false,

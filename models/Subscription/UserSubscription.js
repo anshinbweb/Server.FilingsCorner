@@ -25,6 +25,20 @@ const UserSubscriptionSchema = new mongoose.Schema(
       ref: "SubscriptionMaster",
       required: true,
     },
+    productVariantsId: {
+      // Need to change the API
+      type: Schema.Types.ObjectId,
+      ref: "ProductVariants",
+      // required: true,
+    },
+    quantity: {
+      // Need to change the API
+      type: Number,
+    },
+    nextOrderDate: {
+      // Need to change the API
+      type: Date,
+    },
     IsActive: {
       type: Boolean,
     },
