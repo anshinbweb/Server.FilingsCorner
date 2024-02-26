@@ -133,3 +133,17 @@ exports.removeProductVariants = async (req, res) => {
     res.status(400).send(err);
   }
 };
+
+exports.getProductVariantsInfo = async (req, res) => {
+  try {
+    const productId = req.body.productId;
+    const productVariant = req.body.productVariants;
+    const find = await ProductVariants.findOne({
+      productId: productId,
+      productVariants: { $all: productVariant },
+    }).exec();
+    res.json(find);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};

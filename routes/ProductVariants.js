@@ -10,6 +10,7 @@ const {
   updateProductVariants,
   listProductVariants,
   listProductVariantsByParams,
+  getProductVariantsInfo,
 } = require("../controllers/Products/Products/ProductVariants");
 
 router.post("/auth/create/productVariants", catchAsync(createProductVariants));
@@ -32,5 +33,7 @@ router.delete(
   "/auth/remove/productVariants/:_id",
   catchAsync(removeProductVariants)
 );
+
+router.get("/auth/get/productVariantsInfo", catchAsync(getProductVariantsInfo));
 
 module.exports = router;
