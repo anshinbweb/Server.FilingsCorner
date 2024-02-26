@@ -1,7 +1,9 @@
 const ProductsDetails = require("../../../models/Products/Products/ProductDetails");
 const fs = require("fs");
-const SubscriptionMaster = require("../../models/Subscription/SubscriptionMaster");
+const SubscriptionMaster = require("../../../models/Subscription/SubscriptionMaster");
 const { mongoose } = require("mongoose");
+const ProductOptions = require("../../../models/Products/Products/ProductOptions");
+
 exports.getProductsDetails = async (req, res) => {
   try {
     const find = await ProductsDetails.findOne({ _id: req.params._id }).exec();
@@ -79,7 +81,7 @@ exports.listProductByCategory = async (req, res) => {
   }
 };
 
-exports.getProductByID = async (req, res) => {
+exports.getProductByID_ = async (req, res) => {
   try {
     const find = await ProductsDetails.findOne({
       _id: req.params.productId,
@@ -104,6 +106,61 @@ exports.getProductByID = async (req, res) => {
           message: "",
         });
       }
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
+
+exports.getProductByID = async (req, res) => {
+  try {
+    let query = [
+      {
+        $match: { _id: req.params.productId, IsActive: true },
+      },
+      {
+        $lookup: {
+          from: "categorymasters",
+          localField: "categories",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      // {
+      //   $unwind: {
+      //     path: "$category",
+      //     preserveNullAndEmptyArrays: true,
+      //   },
+      // },
+
+      {
+        $project: {
+          category: {
+            $map: {
+              input: "$category",
+              as: "cat",
+              in: "$$cat.categoryName",
+
+              // in: {
+              //   _id: "$$cat._id",
+              //   categoryName: "$$cat.categoryName",
+              // },
+            },
+          },
+        },
+      },
+    ];
+
+    // const find = await ProductsDetails.findOne({
+    //   _id: req.params.productId,
+    //   IsActive: true,
+    // }).exec();
+    const find = await ProductsDetails.aggregate(query).exec();
+
+    if (find.length > 0) {
+      res.status(200).json({ isOk: true, data: find[0], message: "" });
     } else {
       res.status(200).json({ isOk: false, message: "No data Found" });
     }
@@ -247,7 +304,7 @@ exports.CategoryProductList = async (req, res) => {
     const { option, categoryId } = req.params;
 
     const list = await ProductsDetails.find({
-      categories: { $in: [categoryId] },
+      categories: { $in: [new mongoose.Types.ObjectId(categoryId)] },
       IsActive: true,
     })
       .sort({ createdAt: -1 })
@@ -292,4 +349,122 @@ exports.CategoryProductList = async (req, res) => {
   }
 };
 
+exports.getProductsOptions = async (req, res) => {
+  try {
+    const product = await ProductsDetails.findOne({
+      _id: req.params.productId,
+    }).exec();
 
+    const query = [
+      {
+        $match: {
+          _id: { $in: product.productOptionId },
+        },
+      },
+      {
+        $lookup: {
+          // $in: ProductOptions.parameterId,
+          from: "parametermasters",
+          localField: "parameterId",
+          foreignField: "_id",
+          as: "parameter1",
+        },
+      },
+      { $unwind: { path: "$parameter1", preserveNullAndEmptyArrays: true } },
+
+      {
+        $lookup: {
+          from: "parametervalues",
+          localField: "parameterValueId",
+          foreignField: "_id",
+          as: "parameter",
+        },
+      },
+      // { $unwind: { path: "$parameter", preserveNullAndEmptyArrays: true } },
+
+      {
+        $project: {
+          parameterName: "$parameter1.parameterName",
+          // parameterValue: "$parameterValue.parameterValue",
+          parameterValueId: 1,
+          parameterValueNames: {
+            $map: {
+              input: "$parameter",
+              as: "parameter2",
+              in: "$$parameter2.parameterValue",
+            },
+          },
+        },
+      },
+    ];
+
+    const options = await ProductOptions.aggregate(query).exec();
+    // console.log(options);
+
+    let newOptions = [];
+    options.forEach((element) => {
+      let newOption = {
+        id: element._id,
+        name: element.parameterName,
+        // make a object of parameterValueId and parameterValueNames
+        parameterValues: element.parameterValueNames.map((value, index) => {
+          return {
+            id: element.parameterValueId[index],
+            name: value,
+          };
+        }),
+      };
+      newOptions.push(newOption);
+    });
+
+    res.json(newOptions);
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send(error);
+  }
+};
+
+exports.getProductsOptionsParameters = async (req, res) => {
+  try {
+    const { productId, optionId } = req.params;
+
+    const query = [
+      {
+        $match: {
+          productId: new mongoose.Types.ObjectId(productId),
+          parameterId: new mongoose.Types.ObjectId(optionId),
+        },
+      },
+      {
+        $lookup: {
+          from: "parametervalues",
+          localField: "parameterValueId",
+          foreignField: "_id",
+          as: "parameter",
+        },
+      },
+
+      {
+        $project: {
+          // parameterValue: 1,
+          parameterValueId: 1,
+          parameterNames: {
+            $map: {
+              input: "$parameter",
+              as: "parameter",
+              in: "$$parameter.parameterValue",
+            },
+          },
+        },
+      },
+      { $unwind: { path: "$parameter", preserveNullAndEmptyArrays: true } },
+    ];
+
+    const options = await ProductOptions.aggregate(query).exec();
+
+    res.json(options);
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send(error);
+  }
+};
