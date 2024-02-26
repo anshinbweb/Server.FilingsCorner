@@ -300,12 +300,82 @@ exports.removeProductsDetails = async (req, res) => {
 
 exports.CategoryProductList = async (req, res) => {
   try {
-    const { option, categoryId } = req.params;
+    // const { option, categoryId } = req.params;
+    const option = req.body.option;
+    let categories = req.body.categories;
+    let variants = req.body.variants;
 
-    const list = await ProductsDetails.find({
-      categories: { $in: [new mongoose.Types.ObjectId(categoryId)] },
-      IsActive: true,
-    })
+    categories = categories.map((id) => new mongoose.Types.ObjectId(id));
+    variants = variants.map((id) => new mongoose.Types.ObjectId(id));
+
+    let query = [
+      {
+        $match: {
+          IsActive: true,
+          categories: { $in: categories },
+        },
+      },
+      {
+        $lookup: {
+          from: "productoptions",
+          localField: "productOptionId",
+          foreignField: "_id",
+          as: "options",
+        },
+      },
+      {
+        $set: {
+          parameters: {
+            // make a array of all parameterValueId as a single array
+            $map: {
+              input: "$options",
+              as: "option",
+              in: "$$option.parameterValueId",
+              // in: {
+              //   $reduce: {
+              //     input: "$$option.parameterValueId",
+              //     initialValue: "",
+              //     in: {
+              //       $concat: ["$$value", { $toString: "$$this" }],
+              //     },
+              //   },
+              // },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          parameters: { $all: variants }, // Match all the variants provided
+        },
+      },
+      {
+        $project: {
+          productName: 1,
+          productDescription: 1,
+          productImage: 1,
+          basePrice: 1,
+          weight: 1,
+          unit: 1,
+          isOutOfStock: 1,
+          isSubscription: 1,
+          // parameters: 1,
+          // options: {
+          //   $map: {
+          //     input: "$options",
+          //     as: "option",
+          //     in: {
+          //       _id: "$$option._id",
+          //       parameterId: "$$option.parameterId",
+          //       parameterValueId: "$$option.parameterValueId",
+          //     },
+          //   },
+          // },
+        },
+      },
+    ];
+
+    const list = await ProductsDetails.aggregate(query)
       .sort({ createdAt: -1 })
       .exec();
 
