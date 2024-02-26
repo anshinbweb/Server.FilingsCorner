@@ -118,7 +118,10 @@ exports.getProductByID = async (req, res) => {
   try {
     let query = [
       {
-        $match: { _id: req.params.productId, IsActive: true },
+        $match: {
+          _id: new mongoose.Types.ObjectId(req.params.productId),
+          IsActive: true,
+        },
       },
       {
         $lookup: {
@@ -128,35 +131,31 @@ exports.getProductByID = async (req, res) => {
           as: "category",
         },
       },
-      // {
-      //   $unwind: {
-      //     path: "$category",
-      //     preserveNullAndEmptyArrays: true,
-      //   },
-      // },
-
       {
         $project: {
+          productName: 1,
+          productDescription: 1,
+          productImage: 1,
+          basePrice: 1,
+          weight: 1,
+          unit: 1,
+          isOutOfStock: 1,
+          isSubscription: 1,
+
           category: {
             $map: {
               input: "$category",
               as: "cat",
-              in: "$$cat.categoryName",
-
-              // in: {
-              //   _id: "$$cat._id",
-              //   categoryName: "$$cat.categoryName",
-              // },
+              in: {
+                _id: "$$cat._id",
+                categoryName: "$$cat.categoryName",
+              },
             },
           },
         },
       },
     ];
 
-    // const find = await ProductsDetails.findOne({
-    //   _id: req.params.productId,
-    //   IsActive: true,
-    // }).exec();
     const find = await ProductsDetails.aggregate(query).exec();
 
     if (find.length > 0) {
