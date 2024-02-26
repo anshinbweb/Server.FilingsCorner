@@ -1,4 +1,5 @@
 const Users = require("../../../models/Auth/User/Users");
+const fs = require("fs");
 
 exports.getUsers = async (req, res) => {
   try {
@@ -11,6 +12,57 @@ exports.getUsers = async (req, res) => {
 
 exports.createUsers = async (req, res) => {
   try {
+    if (!fs.existsSync(`${__basedir}/uploads/userImages`)) {
+      fs.mkdirSync(`${__basedir}/uploads/userImages`);
+    }
+
+    let userImage = req.file ? `uploads/userImages/${req.file.filename}` : null;
+    let {
+      firstName,
+      lastName,
+      contactNo,
+      email,
+      password,
+      IsActive,
+      IsPublic,
+      followers,
+      following,
+      cart,
+      defaultShippingAddress,
+      defaultBillingAddress,
+      shippingAddress,
+      billingAddress,
+    } = req.body;
+
+    let Cart;
+    let sa;
+    let Followers;
+    let Following;
+    let ba;
+    if (
+      shippingAddress == undefined ||
+      shippingAddress == null ||
+      shippingAddress == ""
+    ) {
+      sa = [];
+    }
+    if (
+      billingAddress == undefined ||
+      billingAddress == null ||
+      billingAddress == ""
+    ) {
+      ba = [];
+    }
+    if (followers == undefined || followers == null || followers == "") {
+      Followers = [];
+    }
+    if (cart == undefined || cart == null || cart == "") {
+      Cart = [];
+    }
+    if (following == undefined || following == null || following == "") {
+      Following = [];
+    }
+
     const emailExists = await Users.findOne({
       email: req.body.email,
     }).exec();
@@ -20,7 +72,25 @@ exports.createUsers = async (req, res) => {
         message: "Email already exists",
       });
     } else {
-      const add = await new Users(req.body).save();
+      // const add = await new Users(req.body).save();
+      const add = await new Users({
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        contactNo: contactNo,
+        IsActive: IsActive,
+        IsPublic: IsPublic,
+        followers: Followers,
+        following: Following,
+        cart: Cart,
+        defaultShippingAddress: defaultShippingAddress,
+        defaultBillingAddress: defaultBillingAddress,
+        shippingAddress: sa,
+        billingAddress: ba,
+        userImage: userImage,
+      }).save();
+
       // res.json(add)
       return res.status(200).json({
         isOk: true,
@@ -130,9 +200,16 @@ exports.listUsersByParams = async (req, res) => {
 
 exports.updateUsers = async (req, res) => {
   try {
+    let userImage = req.file ? `uploads/userImages/${req.file.filename}` : null;
+    let fieldvalues = { ...req.body };
+    if (userImage != null) {
+      fieldvalues.userImage = userImage;
+    }
+
     const update = await Users.findOneAndUpdate(
       { _id: req.params._id },
-      req.body,
+      // req.body,
+      fieldvalues,
       { new: true }
     );
     res.json(update);
