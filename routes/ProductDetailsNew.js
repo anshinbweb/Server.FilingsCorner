@@ -66,7 +66,7 @@ router.delete(
 
 // NEWWWW
 router.post(
-  "/auth/get/product/category-product/:option/:categoryId",
+  "/auth/get/product/category-product",
   catchAsync(CategoryProductList)
 );
 

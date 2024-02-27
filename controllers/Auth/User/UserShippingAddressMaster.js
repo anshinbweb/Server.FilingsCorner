@@ -1,6 +1,7 @@
 const UserShippingAddress = require("../../../models/Auth/User/UserShippingAddressMaster");
 const User = require("../../../models/Auth/User/Users");
 const mongoose = require("mongoose");
+const UserBillingAddress = require("../../../models/Auth/User/UserBillingAddressMaster");
 
 exports.getUserShippingAddress = async (req, res) => {
   try {
@@ -130,6 +131,17 @@ exports.createUserShippingAddress = async (req, res) => {
       { $addToSet: { shippingAddress: shippingID } },
       { new: true }
     );
+
+    if (req.body.isBillingSame) {
+      const add = await new UserBillingAddress(req.body).save();
+      const billingID = add._id;
+      const user = await User.findOneAndUpdate(
+        { _id: req.body.userId },
+        { $addToSet: { billingAddress: billingID } },
+        { new: true }
+      );
+    }
+
     res.json(add);
   } catch (err) {
     console.log(err);
