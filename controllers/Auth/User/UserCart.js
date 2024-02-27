@@ -79,100 +79,100 @@ exports.getUserCartByUserId = async (req, res) => {
 
     const userCart = await UserCart.find({ userId: userId }).exec();
 
-    // let list = [];
-    // for (let i = 0; i < userCart.length; i++) {
-    //   let amount = 0;
-    //   let discount = 0;
-    //   if (userCart[i].subsId != null) {
-    //     const subs = await SubscriptionMaster.findOne({
-    //       _id: userCart[i].subsId,
-    //     }).exec();
-    //     discount = subs.savePercentage;
-    //   }
+    let list = [];
+    for (let i = 0; i < userCart.length; i++) {
+      let amount = 0;
+      let discount = 0;
+      if (userCart[i].subsId != null) {
+        const subs = await SubscriptionMaster.findOne({
+          _id: userCart[i].subsId,
+        }).exec();
+        discount = subs.savePercentage;
+      }
 
-    //   if (userCart[i].productVariantsId == null) {
-    //     amount = await ProductDetails.findOne({ _id: userCart[i].productId });
-    //     amount = amount.basePrice * userCart[i].quantity;
-    //   } else {
-    //     amount = await ProductVariants.findOne({
-    //       _id: userCart[i].productVariantsId,
-    //     });
-    //     amount = amount.priceVariant * userCart[i].quantity;
-    //   }
-    //   amount = amount - (amount * discount) / 100;
-    //   let cartItem = userCart[i].toObject();
-    //   cartItem["amount"] = amount;
-    //   list.push(cartItem);
+      if (userCart[i].productVariantsId == null) {
+        amount = await ProductDetails.findOne({ _id: userCart[i].productId });
+        amount = amount.basePrice * userCart[i].quantity;
+      } else {
+        amount = await ProductVariants.findOne({
+          _id: userCart[i].productVariantsId,
+        });
+        amount = amount.priceVariant * userCart[i].quantity;
+      }
+      amount = amount - (amount * discount) / 100;
+      let cartItem = userCart[i].toObject();
+      cartItem["amount"] = amount;
+      list.push(cartItem);
 
-    //   // list.push(userCart[i]);
-    //   list[i]["amount"] = amount;
-    // }
+      // list.push(userCart[i]);
+      list[i]["amount"] = amount;
+    }
 
-    let query = [
-      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
-      {
-        $lookup: {
-          from: "subscriptionmasters",
-          localField: "subsId",
-          foreignField: "_id",
-          as: "subscriptionData",
-        },
-      },
-      {
-        $lookup: {
-          from: "productdetailsnews",
-          localField: "productId",
-          foreignField: "_id",
-          as: "productDetailsData",
-        },
-      },
-      {
-        $lookup: {
-          from: "productvariants",
-          localField: "productVariantsId",
-          foreignField: "_id",
-          as: "productVariantsData",
-        },
-      },
-      { $unwind: { path: "$subscriptionData" } },
-      { $unwind: { path: "$productDetailsData" } },
-      { $unwind: { path: "$productVariantsData" } },
-      {
-        $project: {
-          // ... retain any other fields from your original 'UserCart' documents
+    // let query = [
+    //   { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+    //   {
+    //     $lookup: {
+    //       from: "subscriptionmasters",
+    //       localField: "subsId",
+    //       foreignField: "_id",
+    //       as: "subscriptionData",
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "productdetailsnews",
+    //       localField: "productId",
+    //       foreignField: "_id",
+    //       as: "productDetailsData",
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "productvariants",
+    //       localField: "productVariantsId",
+    //       foreignField: "_id",
+    //       as: "productVariantsData",
+    //     },
+    //   },
+    //   { $unwind: { path: "$subscriptionData" } },
+    //   { $unwind: { path: "$productDetailsData" } },
+    //   { $unwind: { path: "$productVariantsData" } },
+    //   {
+    //     $project: {
+    //       // ... retain any other fields from your original 'UserCart' documents
 
-          amount: {
-            // $subtract: [
-            //   {
-            $cond: [
-              { $ne: ["$productVariantsId", null] },
-              {
-                $multiply: ["$productVariantsData.priceVariant", "$quantity"],
-              },
-              { $multiply: ["$productDetailsData.basePrice", "$quantity"] },
-            ],
-          },
-          // {
-          //   $multiply: [
-          //     // Same price calculation as above ...
-          //     "$subscriptionData.savePercentage",
-          //     0.01, // Divide the percentage by 100
-          //   ],
-          // },
-          // ],
-        },
-        // productData: {
-        //   // Merging product information
-        //   $cond: [
-        //     { $ne: ["$productVariantsId", null] },
-        //     "$productVariantsData",
-        //     "$productDetailsData",
-        //   ],
-        // },
-      },
-    ];
+    //       amount: {
+    //         // $subtract: [
+    //         //   {
+    //         $cond: [
+    //           { $ne: ["$productVariantsId", null] },
+    //           {
+    //             $multiply: ["$productVariantsData.priceVariant", "$quantity"],
+    //           },
+    //           { $multiply: ["$productDetailsData.basePrice", "$quantity"] },
+    //         ],
+    //       },
+    //       // {
+    //       //   $multiply: [
+    //       //     // Same price calculation as above ...
+    //       //     "$subscriptionData.savePercentage",
+    //       //     0.01, // Divide the percentage by 100
+    //       //   ],
+    //       // },
+    //       // ],
+    //     },
+    //     // productData: {
+    //     //   // Merging product information
+    //     //   $cond: [
+    //     //     { $ne: ["$productVariantsId", null] },
+    //     //     "$productVariantsData",
+    //     //     "$productDetailsData",
+    //     //   ],
+    //     // },
+    //   },
+    // ];
 
-    const list = await UserCart.aggregate(query).exec();
+    // const list = await UserCart.aggregate(query).exec();
 
     res.status(200).json(list);
   } catch (error) {
