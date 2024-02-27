@@ -1,6 +1,7 @@
 const ProductOptions = require("../../../models/Products/Products/ProductOptions");
 const ProductVariants = require("../../../models/Products/Products/ProductVariants");
 const ProductDetails = require("../../../models/Products/Products/ProductDetails");
+const mongoose = require("mongoose");
 
 exports.getProductOptions = async (req, res) => {
   try {
@@ -241,5 +242,109 @@ exports.createProductOptionsForvariants = async (req, res) => {
     res.json({ isOk: true, message: "Variants Created" });
   } catch (err) {
     return res.status(400);
+  }
+};
+
+exports.removeProductOptionsForvariants = async (req, res) => {
+  try {
+    const productId = req.body.productId;
+    const optionId = req.body.optionId;
+    let valuesId = req.body.valuesId;
+
+    valuesId = valuesId.map((id) => {
+      return new mongoose.Types.ObjectId(id);
+    });
+
+    const variantIds = await ProductDetails.findOne({
+      _id: productId,
+    }).exec();
+    let variants = variantIds.productVariantsId;
+
+    const deleteVariants = await ProductVariants.deleteMany({
+      _id: { $in: variants },
+    }).exec();
+
+    const updateOption = await ProductOptions.updateOne(
+      { parameterId: optionId, productId: productId },
+      { $set: { parameterValueId: valuesId } },
+      { new: true }
+    ).exec();
+
+    console.log("updateOption", updateOption);
+
+    const updateProductDetails = await ProductDetails.updateOne(
+      {
+        _id: productId,
+      },
+      { $set: { productVariantsId: [] } },
+      { new: true }
+    ).exec();
+
+    const ProductOption = await ProductOptions.find({
+      productId: productId,
+    }).exec();
+
+    console.log("ProductOption", ProductOption);
+
+    // call createProductOptionsForvariants recursively to create new variants with some changes on code
+    for (let i = 0; i < ProductOption.length; i++) {
+      const oldVariants = await ProductVariants.find({
+        productId: productId,
+      }).exec();
+
+      let variantsIds = [];
+      const productDetail = await ProductDetails.findOne({
+        _id: productId,
+      }).exec();
+      variantsIds = productDetail.productVariantsId;
+
+      if (oldVariants.length == 0) {
+        console.log("oldVariants True");
+        for (let ii = 0; ii < ProductOption[i].parameterValueId.length; ii++) {
+          const addVariants = await new ProductVariants({
+            productId: productId,
+            productVariants: ProductOption[i].parameterValueId[ii],
+            IsActive: true,
+          }).save();
+          variantsIds.push(addVariants._id);
+        }
+      } else {
+        const updateVariants = await ProductVariants.updateMany(
+          { productId: productId },
+          { $push: { productVariants: ProductOption[i].parameterValueId[0] } }
+        ).exec();
+
+        for (let ii = 0; ii < oldVariants.length; ii++) {
+          let data = oldVariants[ii].productVariants;
+          for (let j = 1; j < ProductOption[i].parameterValueId.length; j++) {
+            data.push(ProductOption[i].parameterValueId[j]);
+            const addVariants = await new ProductVariants({
+              productId: productId,
+              productVariants: data,
+              IsActive: true,
+            }).save();
+            variantsIds.push(addVariants._id);
+            data.pop(ProductOption[i].parameterValueId[j]);
+          }
+        }
+        console.log("added");
+      }
+
+      console.log("variantsIds", variantsIds);
+      console.log("productOptionId", ProductOption[i]._id);
+      const updateVariantsIds = await ProductDetails.findOneAndUpdate(
+        { _id: productId },
+        {
+          $set: { productVariantsId: variantsIds },
+          // $push: { productOptionId: ProductOption[i]._id },
+        },
+        { new: true }
+      ).exec();
+    }
+
+    res.json({ isOk: true, message: "Variants Deleted" });
+  } catch (err) {
+    console.log("err", err);
+    return res.status(500).send(err);
   }
 };

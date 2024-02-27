@@ -361,20 +361,10 @@ exports.CategoryProductList = async (req, res) => {
         {
           $set: {
             parameters: {
-              // make a array of all parameterValueId as a single array
               $map: {
                 input: "$options",
                 as: "option",
                 in: "$$option.parameterValueId",
-                // in: {
-                //   $reduce: {
-                //     input: "$$option.parameterValueId",
-                //     initialValue: "",
-                //     in: {
-                //       $concat: ["$$value", { $toString: "$$this" }],
-                //     },
-                //   },
-                // },
               },
             },
           },
