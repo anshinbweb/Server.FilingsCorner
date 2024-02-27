@@ -9,7 +9,8 @@ const {
   listProductOptions,
   updateProductOptions,
   removeProductOptions,
-  getProductOptions
+  getProductOptions,
+  createProductOptionsForvariants,
 } = require("../controllers/Products/Products/ProductOptions");
 
 router.post("/auth/create/productOptions", catchAsync(createProductOptions));
@@ -31,6 +32,11 @@ router.put(
 router.delete(
   "/auth/remove/productOptions/:_id",
   catchAsync(removeProductOptions)
+);
+
+router.post(
+  "/auth/create/productOptionsForvariants",
+  catchAsync(createProductOptionsForvariants)
 );
 
 module.exports = router;
