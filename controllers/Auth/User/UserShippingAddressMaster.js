@@ -5,16 +5,50 @@ const UserBillingAddress = require("../../../models/Auth/User/UserBillingAddress
 
 exports.getUserShippingAddress = async (req, res) => {
   try {
-    const ids = req.body.ids; // Assuming req.params.ids is an array of IDs
-    const find = await UserShippingAddress.find({
-      _id: { $in: ids },
+    const id = req.params._id; // Assuming req.params.ids is an array of IDs
+    const find = await UserShippingAddress.findOne({
+      _id: id,
     }).exec();
     console.log("find", find);
     res.json(find);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).json("eror in get user data", error);
   }
 };
+
+exports.updateDefaultAddress = async (req, res) => {
+  try {
+    const { userId, addressId } = req.params;
+    const find = await User.findOne({ _id: userId }).exec();
+    if (find) {
+      const sa = find.shippingAddress;
+      const index = sa.indexOf(addressId);
+      console.log("Index of addressId:", index);
+
+      find.defaultShippingAddress = index;
+      find.save();
+      res.json(find);
+    } else {
+      res.status(200).json("user not found");
+    }
+  } catch (error) {
+    return res.status(500).json("error in default address", error);
+  }
+};
+
+exports.UpdateDefaultShippingAddress = async (req, res) => {
+  try {
+    const id = req.params._id; // Assuming req.params.ids is an array of IDs
+    const find = await UserShippingAddress.findOne({
+      _id: id,
+    }).exec();
+    console.log("find", find);
+    res.json(find);
+  } catch (error) {
+    return res.status(500).json("eror in get user data", error);
+  }
+};
+
 // GET SHIPPING ADDRESS BY USER ID
 exports.getAllShippingAddressofUser = async (req, res) => {
   try {

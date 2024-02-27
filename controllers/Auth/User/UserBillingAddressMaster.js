@@ -16,6 +16,26 @@ exports.getUserBillingAddress = async (req, res) => {
   }
 };
 
+exports.updateDefaultBillingAddress = async (req, res) => {
+  try {
+    const { userId, addressId } = req.params;
+    const find = await User.findOne({ _id: userId }).exec();
+    if (find) {
+      const sa = find.shippingAddress;
+      const index = sa.indexOf(addressId);
+      console.log("Index of addressId:", index);
+
+      find.defaultBillingAddress = index;
+      find.save();
+      res.json(find);
+    } else {
+      res.status(200).json("user not found");
+    }
+  } catch (error) {
+    return res.status(500).json("error in default billing address", error);
+  }
+};
+
 exports.getAllBillingAddressofUser = async (req, res) => {
   try {
     const id = req.params.userId;
