@@ -1,5 +1,6 @@
 const ProductOptions = require("../../../models/Products/Products/ProductOptions");
 const ProductVariants = require("../../../models/Products/Products/ProductVariants");
+const ProductDetails = require("../../../models/Products/Products/ProductDetails");
 
 exports.getProductOptions = async (req, res) => {
   try {
@@ -169,6 +170,12 @@ exports.createProductOptionsForvariants = async (req, res) => {
 
     console.log("oldVariants ", oldVariants);
 
+    let variantsIds = [];
+    const productDetail = await ProductDetails.findOne({
+      _id: productId,
+    }).exec();
+    variantsIds = productDetail.productVariantsId;
+
     if (oldVariants.length == 0) {
       console.log("oldVariants True");
       for (let i = 0; i < parameterValueId.length; i++) {
@@ -177,6 +184,7 @@ exports.createProductOptionsForvariants = async (req, res) => {
           productVariants: parameterValueId[i],
           IsActive: true,
         }).save();
+        variantsIds.push(addVariants._id);
       }
     } else {
       // const variants = [];
@@ -211,6 +219,7 @@ exports.createProductOptionsForvariants = async (req, res) => {
             productVariants: data,
             IsActive: true,
           }).save();
+          variantsIds.push(addVariants._id);
           data.pop(parameterValueId[j]);
         }
       }
@@ -218,6 +227,17 @@ exports.createProductOptionsForvariants = async (req, res) => {
 
       // const addVariants = await ProductVariants.insertMany(variants);
     }
+
+    console.log("variantsIds", variantsIds);
+    console.log("productOptionId", add._id);
+    const updateVariantsIds = await ProductDetails.findOneAndUpdate(
+      { _id: productId },
+      {
+        $set: { productVariantsId: variantsIds },
+        $push: { productOptionId: add._id },
+      },
+      { new: true }
+    ).exec();
     res.json({ isOk: true, message: "Variants Created" });
   } catch (err) {
     return res.status(400);
