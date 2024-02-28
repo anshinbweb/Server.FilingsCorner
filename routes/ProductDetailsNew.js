@@ -13,7 +13,7 @@ const {
   listProductsDetailsByParams,
   updateProductsDetails,
   removeProductsDetails,
-  CategoryProductList,
+  CategoryProductListData,
   getProductsOptions,
   getProductsOptionsParameters,
 } = require("../controllers/Products/Products/ProductDetails");
@@ -66,8 +66,8 @@ router.delete(
 
 // NEWWWW
 router.post(
-  "/auth/get/product/category-product",
-  catchAsync(CategoryProductList)
+  "/auth/get/product/category-product-list",
+  catchAsync(CategoryProductListData)
 );
 
 // APPLICATION

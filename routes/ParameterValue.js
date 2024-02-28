@@ -10,11 +10,17 @@ const {
   getParameterValue,
   updateParameterValue,
   removeParameterValue,
+  listActiveParameterValue,
 } = require("../controllers/Products/ProductParameters/ParameterValue");
 
 router.post("/auth/create/parameterValue", catchAsync(createParameterValue));
 
 router.get("/auth/list/parameterValue", catchAsync(listParameterValue));
+
+router.get(
+  "/auth/listActive/parameterValue",
+  catchAsync(listActiveParameterValue)
+);
 
 router.post(
   "/auth/list-by-params/parameterValue",

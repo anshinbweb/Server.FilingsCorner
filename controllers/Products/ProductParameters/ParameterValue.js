@@ -27,7 +27,7 @@ exports.listParameterValue = async (req, res) => {
   }
 };
 
-exports.listActiveCategories = async (req, res) => {
+exports.listActiveParameterValue = async (req, res) => {
   try {
     const list = await ParameterValue.find({ IsActive: true })
       .sort({ createdAt: -1 })
