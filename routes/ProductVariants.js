@@ -11,6 +11,11 @@ const {
   listProductVariants,
   listProductVariantsByParams,
   getProductVariantsInfo,
+  listProductVariantsByProductId,
+  updateProductVariantSubs,
+  updateProductVariantStock,
+  updateProductVariantActive,
+  updateProductVariantPrice,
 } = require("../controllers/Products/Products/ProductVariants");
 
 router.post("/auth/create/productVariants", catchAsync(createProductVariants));
@@ -35,5 +40,30 @@ router.delete(
 );
 
 router.get("/auth/get/productVariantsInfo", catchAsync(getProductVariantsInfo));
+
+router.get(
+  "/auth/get/productVariantsByProductId/:_id",
+  catchAsync(listProductVariantsByProductId)
+);
+
+router.put(
+  "/auth/update/productVariantPrice/:_id",
+  catchAsync(updateProductVariantPrice)
+);
+
+router.put(
+  "/auth/update/productVariantSubs/:_id",
+  catchAsync(updateProductVariantSubs)
+);
+
+router.put(
+  "/auth/update/productVariantStock/:_id",
+  catchAsync(updateProductVariantStock)
+);
+
+router.put(
+  "/auth/update/productVariantActive/:_id",
+  catchAsync(updateProductVariantActive)
+);
 
 module.exports = router;

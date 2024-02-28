@@ -188,24 +188,6 @@ exports.createProductOptionsForvariants = async (req, res) => {
         variantsIds.push(addVariants._id);
       }
     } else {
-      // const variants = [];
-      // let temp = {};
-      // if (parameterValueId.length > 1) {
-      //   for (let i = 1; i < parameterValueId.length; i++) {
-      //     for (let j = 0; j < find.length; j++) {
-      //       // temp = {
-      //       //   productId: productId,
-      //       //   productVariants: find[j].push(parameterValueId[i]),
-      //       // };
-      //       // variants.push(temp);
-      //       const addVariants = await new ProductVariants({
-      //         productId: productId,
-      //         productVariants: find[j]['productVariants'].push(parameterValueId[i]),
-      //       }).save();
-      //     }
-      //   }
-      // }
-
       const updateVariants = await ProductVariants.updateMany(
         { productId: productId },
         { $push: { productVariants: parameterValueId[0] } }
@@ -241,9 +223,23 @@ exports.createProductOptionsForvariants = async (req, res) => {
     ).exec();
     res.json({ isOk: true, message: "Variants Created" });
   } catch (err) {
+    console.log(err);
     return res.status(400);
   }
 };
+
+
+exports.listProductOptionsByProductId = async (req, res) => {
+  try {
+    const find = await ProductOptions.find({
+      productId: req.params._id,
+    })
+      .populate("parameterId")
+      .populate("parameterValueId")
+      .exec();
+    res.json(find);
+  } catch (err) {
+    res.status(400).send(err);
 
 exports.removeProductOptionsForvariants = async (req, res) => {
   try {
@@ -346,5 +342,6 @@ exports.removeProductOptionsForvariants = async (req, res) => {
   } catch (err) {
     console.log("err", err);
     return res.status(500).send(err);
+
   }
 };

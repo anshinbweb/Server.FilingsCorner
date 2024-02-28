@@ -147,3 +147,70 @@ exports.getProductVariantsInfo = async (req, res) => {
     res.status(400).send(err);
   }
 };
+
+exports.listProductVariantsByProductId = async (req, res) => {
+  try {
+    const find = await ProductVariants.find({
+      productId: req.params._id,
+    }).populate('productVariants').exec();
+    res.json(find);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+exports.updateProductVariantPrice = async (req, res) => {
+  try {
+    const { value } = req.body;
+    const update = await ProductVariants.findOneAndUpdate(
+      { _id: req.params._id },
+      { priceVariant:  value },
+      { new: true }
+    );
+    res.json(update);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+exports.updateProductVariantSubs = async (req, res) => {
+  try {
+    const { value } = req.body;
+    const update = await ProductVariants.findOneAndUpdate(
+      { _id: req.params._id },
+      { isSubscription:  value },
+      { new: true }
+    );
+    res.json(update);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+exports.updateProductVariantStock = async (req, res) => {
+  try {
+    const { value } = req.body;
+    const update = await ProductVariants.findOneAndUpdate(
+      { _id: req.params._id },
+      { isOutOfStock:  value },
+      { new: true }
+    );
+    res.json(update);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+exports.updateProductVariantActive = async (req, res) => {
+  try {
+    const { value } = req.body;
+    const update = await ProductVariants.findOneAndUpdate(
+      { _id: req.params._id },
+      { IsActive:  value },
+      { new: true }
+    );
+    res.json(update);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
