@@ -240,6 +240,8 @@ exports.listProductOptionsByProductId = async (req, res) => {
     res.json(find);
   } catch (err) {
     res.status(400).send(err);
+  }
+}
 
 exports.removeProductOptionsForvariants = async (req, res) => {
   try {
