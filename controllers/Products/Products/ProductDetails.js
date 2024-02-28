@@ -302,14 +302,131 @@ exports.removeProductsDetails = async (req, res) => {
   }
 };
 
-exports.CategoryProductList = async (req, res) => {
+exports.CategoryProductListData = async (req, res) => {
   try {
-    const { option, categoryId } = req.params;
+    // const { option, categoryId } = req.params;
+    const option = req.body.option;
+    let categories = req.body.categories;
+    let variants = req.body.variants;
 
-    const list = await ProductsDetails.find({
-      categories: { $in: [new mongoose.Types.ObjectId(categoryId)] },
-      IsActive: true,
-    })
+    if (typeof categories === "string") {
+      categories = [categories];
+    }
+
+    categories = categories.map((id) => new mongoose.Types.ObjectId(id));
+    variants = variants.map((id) => new mongoose.Types.ObjectId(id));
+
+    let query = [];
+    if (variants.length === 0) {
+      query = [
+        {
+          $match: {
+            IsActive: true,
+            categories: { $in: categories },
+          },
+        },
+        {
+          $lookup: {
+            from: "productoptions",
+            localField: "productOptionId",
+            foreignField: "_id",
+            as: "options",
+          },
+        },
+        {
+          $project: {
+            productName: 1,
+            productDescription: 1,
+            productImage: 1,
+            basePrice: 1,
+            weight: 1,
+            unit: 1,
+            isOutOfStock: 1,
+            isSubscription: 1,
+          },
+        },
+      ];
+    } else {
+      query = [
+        {
+          $match: {
+            IsActive: true,
+            categories: { $in: categories },
+          },
+        },
+        {
+          $lookup: {
+            from: "productoptions",
+            localField: "productOptionId",
+            foreignField: "_id",
+            as: "options",
+          },
+        },
+        {
+          $set: {
+            parameters: {
+              $map: {
+                input: "$options",
+                as: "option",
+                in: "$$option.parameterValueId",
+              },
+            },
+          },
+        },
+        {
+          $unwind: "$parameters",
+        },
+        {
+          $unwind: "$parameters",
+        },
+        {
+          $group: {
+            _id: "$_id",
+            productName: { $first: "$productName" },
+            productDescription: { $first: "$productDescription" },
+            productImage: { $first: "$productImage" },
+            basePrice: { $first: "$basePrice" },
+            weight: { $first: "$weight" },
+            unit: { $first: "$unit" },
+            isOutOfStock: { $first: "$isOutOfStock" },
+            isSubscription: { $first: "$isSubscription" },
+            variantIds: { $push: "$parameters" },
+          },
+        },
+        {
+          $match: {
+            variantIds: { $all: variants }, // Match all the variants provided
+          },
+        },
+        {
+          $project: {
+            productName: 1,
+            productDescription: 1,
+            productImage: 1,
+            basePrice: 1,
+            weight: 1,
+            unit: 1,
+            isOutOfStock: 1,
+            isSubscription: 1,
+            parameters: 1,
+            variantIds: 1,
+            // options: {
+            //   $map: {
+            //     input: "$options",
+            //     as: "option",
+            //     in: {
+            //       _id: "$$option._id",
+            //       parameterId: "$$option.parameterId",
+            //       parameterValueId: "$$option.parameterValueId",
+            //     },
+            //   },
+            // },
+          },
+        },
+      ];
+    }
+
+    const list = await ProductsDetails.aggregate(query)
       .sort({ createdAt: -1 })
       .exec();
 

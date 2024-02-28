@@ -10,11 +10,14 @@ const {
   getParameterMaster,
   updateParameterMaster,
   removeParameterMaster,
+  listActiveParameter,
 } = require("../controllers/Products/ProductParameters/ParameterMaster");
 
 router.post("/auth/create/parameterMaster", catchAsync(createParameterMaster));
 
 router.get("/auth/list/parameterMaster", catchAsync(listParameterMaster));
+
+router.get("/auth/listActive/parameterMaster", catchAsync(listActiveParameter));
 
 router.post(
   "/auth/list-by-params/parameterMaster",
