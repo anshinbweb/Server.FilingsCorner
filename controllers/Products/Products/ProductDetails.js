@@ -32,6 +32,8 @@ exports.createProductsDetails = async (req, res) => {
       unit,
       productOptionId,
       productVariantsId,
+      isOutOfStock,
+      isSubscription,
       IsActive,
     } = req.body;
 
@@ -44,6 +46,8 @@ exports.createProductsDetails = async (req, res) => {
       unit,
       productOptionId,
       productVariantsId,
+      isOutOfStock,
+      isSubscription,
       IsActive,
     }).save();
     res.status(200).json({ isOk: true, data: add, message: "" });
