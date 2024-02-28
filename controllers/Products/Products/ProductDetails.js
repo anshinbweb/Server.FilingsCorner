@@ -298,7 +298,7 @@ exports.removeProductsDetails = async (req, res) => {
   }
 };
 
-exports.CategoryProductList = async (req, res) => {
+exports.CategoryProductListData = async (req, res) => {
   try {
     // const { option, categoryId } = req.params;
     const option = req.body.option;
