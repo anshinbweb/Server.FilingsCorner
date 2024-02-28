@@ -77,7 +77,55 @@ exports.getUserCartByUserId = async (req, res) => {
     const { userId } = req.params;
     console.log("req.params", req.params);
 
-    const userCart = await UserCart.find({ userId: userId }).exec();
+    // aggregate query to get productname from productId and subsname from subsId
+    let query = [
+      {
+        $match: { userId: new mongoose.Types.ObjectId(userId) },
+      },
+      {
+        $lookup: {
+          from: "productdetailsnews",
+          localField: "productId",
+          foreignField: "_id",
+          as: "productDetailsData",
+        },
+      },
+      {
+        $lookup: {
+          from: "subscriptionmasters",
+          localField: "subsId",
+          foreignField: "_id",
+          as: "subscriptionData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$productDetailsData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: "$subscriptionData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          productId: 1,
+          subsId: 1,
+          productVariantsId: 1,
+          quantity: 1,
+          productName: "$productDetailsData.productName",
+          subsName: "$subscriptionData.title",
+        },
+      },
+    ];
+
+    // const userCart = await UserCart.find({ userId: userId }).exec();
+    const userCart = await UserCart.aggregate(query).exec();
 
     let list = [];
     for (let i = 0; i < userCart.length; i++) {
@@ -100,7 +148,7 @@ exports.getUserCartByUserId = async (req, res) => {
         amount = amount.priceVariant * userCart[i].quantity;
       }
       amount = amount - (amount * discount) / 100;
-      let cartItem = userCart[i].toObject();
+      let cartItem = userCart[i];
       cartItem["amount"] = amount;
       list.push(cartItem);
 
@@ -215,18 +263,18 @@ exports.updateQuantity = async (req, res) => {
 
     if (updatedCart.productVariantsId == null) {
       amount = await ProductDetails.findOne({ _id: updatedCart.productId });
-      amount = amount.basePrice * updatedCart.quantity;
+      amount = amount.basePrice * count;
     } else {
       amount = await ProductVariants.findOne({
         _id: updatedCart.productVariantsId,
       });
-      amount = amount.priceVariant * updatedCart.quantity;
+      amount = amount.priceVariant * count;
     }
     amount = amount - (amount * discount) / 100;
 
     res.status(200).json({
       isOk: true,
-      quantity: updatedCart.quantity,
+      quantity: count,
       amount: amount,
       message: "UserCart updated successfully",
     });
