@@ -1,3 +1,4 @@
+const { Long } = require("mongodb");
 const Orders = require("../../models/Products/Orders");
 
 exports.getOrders = async (req, res) => {
@@ -11,6 +12,7 @@ exports.getOrders = async (req, res) => {
 
 exports.createOrders = async (req, res) => {
   try {
+    console.log("req.body", req.body);
     const add = await new Orders(req.body).save();
     res.json(add);
   } catch (err) {
@@ -29,13 +31,89 @@ exports.listOrders = async (req, res) => {
 
 exports.listOrdersByParams = async (req, res) => {
   try {
-    let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
+    let { skip, per_page, sorton, sortdir, match } = req.body;
 
     let query = [
+      // {
+      //   $match: { IsActive: IsActive },
+      // },
       {
-        $match: { IsActive: IsActive },
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "username",
+        },
+      },
+      {
+        $unwind: {
+          path: "$username",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          username: "$username.firstName",
+        },
       },
 
+      {
+        $lookup: {
+          from: "countries",
+          localField: "country",
+          foreignField: "_id",
+          as: "countryname",
+        },
+      },
+      {
+        $unwind: {
+          path: "$countryname",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          countryname: "$countryname.CountryName",
+        },
+      },
+      {
+        $lookup: {
+          from: "states",
+          localField: "state",
+          foreignField: "_id",
+          as: "statename",
+        },
+      },
+      {
+        $unwind: {
+          path: "$statename",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          statename: "$statename.StateName",
+        },
+      },
+      {
+        $lookup: {
+          from: "cities",
+          localField: "city",
+          foreignField: "_id",
+          as: "cityname",
+        },
+      },
+      {
+        $unwind: {
+          path: "$cityname",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          cityname: "$cityname.CityName",
+        },
+      },
       {
         $facet: {
           stage1: [
@@ -76,7 +154,19 @@ exports.listOrdersByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                Orders: { $regex: match, $options: "i" },
+                name: { $regex: match, $options: "i" },
+              },
+              {
+                countryname: { $regex: match, $options: "i" },
+              },
+              {
+                statename: { $regex: match, $options: "i" },
+              },
+              {
+                cityname: { $regex: match, $options: "i" },
+              },
+              {
+                username: { $regex: match, $options: "i" },
               },
             ],
           },
@@ -106,7 +196,7 @@ exports.listOrdersByParams = async (req, res) => {
 
     res.json(list);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send("error in list", error);
   }
 };
 
@@ -125,7 +215,7 @@ exports.updateOrders = async (req, res) => {
 
 exports.removeOrders = async (req, res) => {
   try {
-    const del= await Orders.findOneAndRemove({
+    const del = await Orders.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);

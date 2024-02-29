@@ -17,19 +17,30 @@ const BlogsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    blogThumnailDesc: {
+      type: String,
+
+      required: true,
+    },
     blogImage: {
       type: String,
+    },
+    views: {
+      type: Number,
+      default: 0,
     },
     likes: [
       {
         type: Schema.Types.ObjectId,
         ref: "Users",
+        default: [],
       },
     ],
     comments: [
       {
         type: Schema.Types.ObjectId,
         ref: "BlogComment",
+        default: [],
       },
     ],
     userId: {

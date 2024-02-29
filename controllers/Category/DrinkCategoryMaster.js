@@ -1,39 +1,70 @@
-const DrinkCategoryMaster = require("../../models/Category/DrinkCategoryMaster");
+const DrinkCategory = require("../../models/Category/DrinkCategoryMaster");
 
-exports.getDrinkCategoryMaster = async (req, res) => {
+exports.getDrinkCategory = async (req, res) => {
   try {
-    const find = await DrinkCategoryMaster.findOne({ _id: req.params._id }).exec();
+    const find = await DrinkCategory.findOne({ _id: req.params._id }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
-exports.createDrinkCategoryMaster = async (req, res) => {
+exports.createDrinkCategory = async (req, res) => {
   try {
-    const add = await new DrinkCategoryMaster(req.body).save();
+    const add = await new DrinkCategory(req.body).save();
     res.json(add);
   } catch (err) {
     return res.status(400).send(err);
   }
 };
 
-exports.listDrinkCategoryMaster = async (req, res) => {
+exports.listDrinkCategory = async (req, res) => {
   try {
-    const list = await DrinkCategoryMaster.find().sort({ createdAt: -1 }).exec();
+    const list = await DrinkCategory.find().sort({ createdAt: -1 }).exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
   }
 };
 
-exports.listDrinkCategoryMasterByParams = async (req, res) => {
+exports.listActiveDrinkCategories = async (req, res) => {
+  try {
+    const list = await DrinkCategory.find({ IsActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(list);
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+};
+
+exports.listDrinkCategoryByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
     let query = [
       {
         $match: { IsActive: IsActive },
+      },
+
+      {
+        $lookup: {
+          from: "categorymasters",
+          localField: "Category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          category: "$category.categoryName",
+        },
       },
 
       {
@@ -76,7 +107,7 @@ exports.listDrinkCategoryMasterByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                DrinkCategoryMaster: { $regex: match, $options: "i" },
+                type: { $regex: match, $options: "i" },
               },
             ],
           },
@@ -102,7 +133,7 @@ exports.listDrinkCategoryMasterByParams = async (req, res) => {
       ].concat(query);
     }
 
-    const list = await DrinkCategoryMaster.aggregate(query);
+    const list = await DrinkCategory.aggregate(query);
 
     res.json(list);
   } catch (error) {
@@ -110,9 +141,9 @@ exports.listDrinkCategoryMasterByParams = async (req, res) => {
   }
 };
 
-exports.updateDrinkCategoryMaster = async (req, res) => {
+exports.updateDrinkCategory = async (req, res) => {
   try {
-    const update = await DrinkCategoryMaster.findOneAndUpdate(
+    const update = await DrinkCategory.findOneAndUpdate(
       { _id: req.params._id },
       req.body,
       { new: true }
@@ -123,9 +154,9 @@ exports.updateDrinkCategoryMaster = async (req, res) => {
   }
 };
 
-exports.removeDrinkCategoryMaster = async (req, res) => {
+exports.removeDrinkCategory = async (req, res) => {
   try {
-    const delTL = await DrinkCategoryMaster.findOneAndRemove({
+    const delTL = await DrinkCategory.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(delTL);

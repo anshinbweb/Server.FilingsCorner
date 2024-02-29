@@ -13,24 +13,32 @@ const ProductDetailsSchema = new mongoose.Schema(
   {
     category: {
       type: Schema.Types.ObjectId,
-      ref: "DrinkCategoryMaster",
+      ref: "CategoryMaster",
       required: true,
     },
     productName: {
       type: String,
+      required: true,
     },
     productImage: {
       type: String,
+      required: true,
     },
     productDescription: {
       type: String,
     },
-    price: {
-      type: Number,
-    },
-    weight: {
-      type: Number,
-    },
+    // price: {
+    //   type: Number,
+    //   required: true,
+    // },
+    // weight: {
+    //   type: Number,
+    //   required: true,
+    // },
+    // unit: {
+    //   type: String,
+    //   required: true,
+    // },
     IsActive: {
       type: Boolean,
       default: false,
@@ -43,6 +51,23 @@ const ProductDetailsSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    isSize: {
+      type: Boolean,
+      default: false,
+    },
+    isDrink: {
+      type: Boolean,
+      default: false,
+    },
+    isMilk: {
+      type: Boolean,
+      default: false,
+    },
+    // isOutOfStock: {
+    //   type: Boolean,
+    //   default: false,
+    // },
   },
   { timestamps: true }
 );

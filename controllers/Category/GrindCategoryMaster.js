@@ -2,7 +2,9 @@ const GrindCategoryMaster = require("../../models/Category/GrindCategoryMaster")
 
 exports.getGrindCategoryMaster = async (req, res) => {
   try {
-    const find = await GrindCategoryMaster.findOne({ _id: req.params._id }).exec();
+    const find = await GrindCategoryMaster.findOne({
+      _id: req.params._id,
+    }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
@@ -20,7 +22,9 @@ exports.createGrindCategoryMaster = async (req, res) => {
 
 exports.listGrindCategoryMaster = async (req, res) => {
   try {
-    const list = await GrindCategoryMaster.find().sort({ createdAt: -1 }).exec();
+    const list = await GrindCategoryMaster.find()
+      .sort({ createdAt: -1 })
+      .exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
@@ -37,8 +41,8 @@ exports.listGrindCategoryMasterByParams = async (req, res) => {
       },
       {
         $lookup: {
-          from: "drinkcategorymasters",
-          localField: "drinkCategory",
+          from: "categorymasters",
+          localField: "Category",
           foreignField: "_id",
           as: "category",
         },
@@ -49,7 +53,13 @@ exports.listGrindCategoryMasterByParams = async (req, res) => {
           preserveNullAndEmptyArrays: true,
         },
       },
-     
+
+      {
+        $set: {
+          category: "$category.categoryName",
+        },
+      },
+
       {
         $facet: {
           stage1: [

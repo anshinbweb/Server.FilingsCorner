@@ -10,9 +10,9 @@ const GrindCategoryMasterSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    drinkCategory: {
+    Category: {
       type: Schema.Types.ObjectId,
-      ref: "DrinkCategoryMaster",
+      ref: "CategoryMaster",
       required: true,
     },
     IsActive: {

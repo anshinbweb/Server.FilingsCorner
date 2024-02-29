@@ -2,6 +2,7 @@ const { log } = require("console");
 const ProductsDetails = require("../../models/Products/ProductsDetails");
 const fs = require("fs");
 const SubscriptionMaster = require("../../models/Subscription/SubscriptionMaster");
+const { mongoose } = require("mongoose");
 exports.getProductsDetails = async (req, res) => {
   try {
     const find = await ProductsDetails.findOne({ _id: req.params._id }).exec();
@@ -27,9 +28,14 @@ exports.createProductsDetails = async (req, res) => {
       productDescription,
       price,
       weight,
+      unit,
       IsGiftHamper,
       IsSubscriptionProduct,
       IsActive,
+      isSize,
+      isDrink,
+      isMilk,
+      isOutOfStock,
     } = req.body;
 
     const add = await new ProductsDetails({
@@ -39,9 +45,14 @@ exports.createProductsDetails = async (req, res) => {
       productDescription,
       price,
       weight,
+      unit,
       IsGiftHamper,
       IsSubscriptionProduct,
       IsActive,
+      isSize,
+      isDrink,
+      isMilk,
+      isOutOfStock,
     }).save();
     res.status(200).json({ isOk: true, data: add, message: "" });
   } catch (err) {
@@ -52,7 +63,7 @@ exports.createProductsDetails = async (req, res) => {
 
 exports.listProductsDetails = async (req, res) => {
   try {
-    const list = await ProductsDetails.find().sort({ createdAt: -1 }).exec();
+    const list = await ProductsDetails.find().sort({ productName: 1 }).exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
@@ -61,11 +72,17 @@ exports.listProductsDetails = async (req, res) => {
 
 exports.listProductByCategory = async (req, res) => {
   try {
-    const list = await ProductsDetails.find({ category: req.params.categoryId })
+    const list = await ProductsDetails.find({
+      category: req.params.categoryId,
+      IsActive: true,
+    })
       .sort({ createdAt: -1 })
       .exec();
-    console.log("lis", list);
-    res.json(list);
+    if (list) {
+      res.status(200).json({ isOk: true, data: list, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
   } catch (error) {
     return res.status(400).send(error);
   }
@@ -75,17 +92,30 @@ exports.getProductByID = async (req, res) => {
   try {
     const find = await ProductsDetails.findOne({
       _id: req.params.productId,
+      IsActive: true,
     }).exec();
     // res.json(find);
-    console.log("find", find);
     let subData = [];
-    if (find.IsSubscriptionProduct) {
-      subData = await SubscriptionMaster.find().exec();
-      console.log("subData", subData);
+    if (find) {
+      if (find.IsSubscriptionProduct) {
+        subData = await SubscriptionMaster.find().exec();
+        res.status(200).json({
+          isOk: true,
+          data: find,
+          subcriptionData: subData,
+          message: "",
+        });
+      } else {
+        res.status(200).json({
+          isOk: true,
+          data: find,
+          subcriptionData: "No Subscription Details",
+          message: "",
+        });
+      }
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
     }
-    res
-      .status(200)
-      .json({ isOk: true, data: find, subcriptionData: subData, message: "" });
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -101,7 +131,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
       },
       {
         $lookup: {
-          from: "drinkcategorymasters",
+          from: "categorymasters",
           localField: "category",
           foreignField: "_id",
           as: "category",
@@ -218,5 +248,307 @@ exports.removeProductsDetails = async (req, res) => {
     res.json(del);
   } catch (err) {
     res.status(400).send(err);
+  }
+};
+
+exports.CategoryProductList = async (req, res) => {
+  try {
+    const { option, categoryid } = req.params;
+
+    const list = await ProductsDetails.find({
+      category: categoryid,
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    let sortedList;
+
+    switch (option) {
+      case "1": // Newest
+        sortedList = list;
+        break;
+      case "2": // Price low to high
+        sortedList = list.sort((a, b) => a.price - b.price);
+        break;
+      case "3": // Price high to low
+        sortedList = list.sort((a, b) => b.price - a.price);
+
+        break;
+      case "4": // A to Z
+        sortedList = list.sort((a, b) =>
+          a.productName.localeCompare(b.productName)
+        );
+        break;
+      case "5": // Z to A
+        sortedList = list.sort((a, b) =>
+          b.productName.localeCompare(a.productName)
+        );
+        break;
+      default:
+        // Default sorting, perhaps by createdAt descending
+        sortedList = list;
+    }
+
+    if (sortedList) {
+      res.status(200).json({ isOk: true, data: sortedList, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send(error);
+  }
+};
+
+exports.listProductByCoffee = async (req, res) => {
+  try {
+    const { option } = req.params;
+
+    // console.log("req.params", typeof parseInt(option));
+    console.log("option", option);
+    const list = await ProductsDetails.find({
+      category: "65b8cbd1aa85ec2cb2bf9f5e",
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    let sortedList;
+
+    switch (option) {
+      case "1": // Newest
+        sortedList = list;
+        break;
+      case "2": // Price low to high
+        sortedList = list.sort((a, b) => a.price - b.price);
+        break;
+      case "3": // Price high to low
+        sortedList = list.sort((a, b) => b.price - a.price);
+
+        break;
+      case "4": // A to Z
+        sortedList = list.sort((a, b) =>
+          a.productName.localeCompare(b.productName)
+        );
+        break;
+      case "5": // Z to A
+        sortedList = list.sort((a, b) =>
+          b.productName.localeCompare(a.productName)
+        );
+        break;
+      default:
+        // Default sorting, perhaps by createdAt descending
+        sortedList = list;
+    }
+
+    if (sortedList) {
+      res.status(200).json({ isOk: true, data: sortedList, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send(error);
+  }
+};
+
+exports.listProductByTeaSort = async (req, res) => {
+  try {
+    const list = await ProductsDetails.find({
+      category: "65b8cbd9aa85ec2cb2bf9f60",
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    switch (option) {
+      case 1: // Newest
+        sortedList = list;
+        break;
+      case 2: // Price low to high
+        sortedList = list.sort((a, b) => a.price - b.price);
+        break;
+      case 3: // Price high to low
+        sortedList = list.sort((a, b) => b.price - a.price);
+        break;
+      case 4: // A to Z
+        sortedList = list.sort((a, b) =>
+          a.productName.localeCompare(b.productName)
+        );
+        break;
+      case 5: // Z to A
+        sortedList = list.sort((a, b) =>
+          b.productName.localeCompare(a.productName)
+        );
+        break;
+      default:
+        // Default sorting, perhaps by createdAt descending
+        sortedList = list;
+    }
+
+    if (sortedList) {
+      res.status(200).json({ isOk: true, data: sortedList, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+};
+
+exports.listProductByTea = async (req, res) => {
+  try {
+    const list = await ProductsDetails.find({
+      category: "65b8cbd9aa85ec2cb2bf9f60",
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    console.log("list", list);
+
+    if (list) {
+      res.status(200).json({ isOk: true, data: list, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    return res.status(400).send("err", error);
+  }
+};
+exports.listProductByDrink = async (req, res) => {
+  try {
+    const { option } = req.params;
+
+    const list = await ProductsDetails.find({
+      category: "65b8e91127d8fef240f3059f",
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    switch (option) {
+      case 1: // Newest
+        sortedList = list;
+        break;
+      case 2: // Price low to high
+        sortedList = list.sort((a, b) => a.price - b.price);
+        break;
+      case 3: // Price high to low
+        sortedList = list.sort((a, b) => b.price - a.price);
+        break;
+      case 4: // A to Z
+        sortedList = list.sort((a, b) =>
+          a.productName.localeCompare(b.productName)
+        );
+        break;
+      case 5: // Z to A
+        sortedList = list.sort((a, b) =>
+          b.productName.localeCompare(a.productName)
+        );
+        break;
+      default:
+        // Default sorting, perhaps by createdAt descending
+        sortedList = list;
+    }
+
+    if (sortedList) {
+      res.status(200).json({ isOk: true, data: sortedList, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+};
+
+exports.listProductByShop = async (req, res) => {
+  //accessories
+  try {
+    const list = await ProductsDetails.find({
+      category: "65c343ea11dfa763253e353f",
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    switch (option) {
+      case 1: // Newest
+        sortedList = list;
+        break;
+      case 2: // Price low to high
+        sortedList = list.sort((a, b) => a.price - b.price);
+        break;
+      case 3: // Price high to low
+        sortedList = list.sort((a, b) => b.price - a.price);
+        break;
+      case 4: // A to Z
+        sortedList = list.sort((a, b) =>
+          a.productName.localeCompare(b.productName)
+        );
+        break;
+      case 5: // Z to A
+        sortedList = list.sort((a, b) =>
+          b.productName.localeCompare(a.productName)
+        );
+        break;
+      default:
+        // Default sorting, perhaps by createdAt descending
+        sortedList = list;
+    }
+
+    if (sortedList) {
+      res.status(200).json({ isOk: true, data: sortedList, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+};
+
+exports.listProductByFlight = async (req, res) => {
+  //gift hampers
+  try {
+    const list = await ProductsDetails.find({
+      category: "65c90fd0da80f9834d4744ca",
+      IsActive: true,
+    })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    switch (option) {
+      case 1: // Newest
+        sortedList = list;
+        break;
+      case 2: // Price low to high
+        sortedList = list.sort((a, b) => a.price - b.price);
+        break;
+      case 3: // Price high to low
+        sortedList = list.sort((a, b) => b.price - a.price);
+        break;
+      case 4: // A to Z
+        sortedList = list.sort((a, b) =>
+          a.productName.localeCompare(b.productName)
+        );
+        break;
+      case 5: // Z to A
+        sortedList = list.sort((a, b) =>
+          b.productName.localeCompare(a.productName)
+        );
+        break;
+      default:
+        // Default sorting, perhaps by createdAt descending
+        sortedList = list;
+    }
+
+    if (sortedList) {
+      res.status(200).json({ isOk: true, data: sortedList, message: "" });
+    } else {
+      res.status(200).json({ isOk: false, message: "No data Found" });
+    }
+  } catch (error) {
+    return res.status(400).send(error);
   }
 };

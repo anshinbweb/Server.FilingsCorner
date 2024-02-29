@@ -6,11 +6,15 @@ const BannerImagesSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    Description: {
+    keyWord: {
       type: String,
       required: true,
     },
-    bannerimage: {
+    Description: {
+      type: String,
+      // required: true,
+    },
+    bannerImage: {
       type: String,
       required: true,
     },

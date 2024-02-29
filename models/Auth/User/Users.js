@@ -15,22 +15,23 @@ const UsersSchema = new mongoose.Schema(
     lastName: {
       type: String,
     },
-    IsPublic: {
-      type: Boolean,
-    },
-    Email: {
+    userImage: {
       type: String,
     },
-    Password: {
+    contactNo: {
+      type: Number,
+    },
+    email: {
       type: String,
     },
-
+    password: {
+      type: String,
+    },
     IsActive: {
       type: Boolean,
     },
-    UserType: {
-      type: String, //admin, user
-      default: "user"
+    IsPublic: {
+      type: Boolean,
     },
     followers: [
       {
@@ -48,6 +49,24 @@ const UsersSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "UserCart",
+      },
+    ],
+    defaultShippingAddress: {
+      type: Number,
+    },
+    defaultBillingAddress: {
+      type: Number,
+    },
+    shippingAddress: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserShippingAddressMaster",
+      },
+    ],
+    billingAddress: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserShippingAddressMaster",
       },
     ],
   },

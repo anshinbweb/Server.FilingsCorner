@@ -9,6 +9,12 @@ const PromocodeMasterSchema = new mongoose.Schema(
     savePercentage: {
       type: Number,
     },
+    startDate: {
+      type: Date,
+    },
+    endDate: {
+      type: Date,
+    },
     IsActive: {
       type: Boolean,
     },

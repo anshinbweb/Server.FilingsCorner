@@ -15,13 +15,31 @@ const OrdersDetailsSchema = new mongoose.Schema(
     subsId: {
       type: Schema.Types.ObjectId,
       ref: "SubscriptionMaster",
-      required: true,
+      // required: true,
     },
-    quntity: {
+    quantity: {
       type: Number,
     },
-    totalAmount: {
+    amount: {
       type: Number,
+    },
+    sizeId: {
+      // if product is drink: small, medium, large
+      type: Schema.Types.ObjectId,
+      ref: "SizeMaster",
+      // required: true,
+    },
+    drinkId: {
+      // if product is drink: hot, iced, blend
+      type: Schema.Types.ObjectId,
+      ref: "DrinkCategoryMaster",
+      // required: true,
+    },
+    milkCategory: {
+      // if product is drink: whole milk, oat, soya...
+      type: Schema.Types.ObjectId,
+      ref: "MilkCategoryMaster",
+      // required: true,
     },
   },
   { timestamps: true }

@@ -1,34 +1,44 @@
-const Users = require("../../models/Auth/Users");
+const ParameterMaster = require("../../../models/Products/ProductParameters/ParameterMaster");
 
-exports.getUsers = async (req, res) => {
+exports.getParameterMaster = async (req, res) => {
   try {
-    const find = await Users.findOne({ _id: req.params._id }).exec();
+    const find = await ParameterMaster.findOne({ _id: req.params._id }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
   }
 };
 
-exports.createUsers = async (req, res) => {
+exports.createParameterMaster = async (req, res) => {
   try {
-    const add = await new Users(req.body).save();
+    const add = await new ParameterMaster(req.body).save();
     res.json(add);
   } catch (err) {
-    console.log(err);
-    return res.status(500).send(err);
+    return res.status(400).send(err);
   }
 };
 
-exports.listUsers = async (req, res) => {
+exports.listParameterMaster = async (req, res) => {
   try {
-    const list = await Users.find().sort({ createdAt: -1 }).exec();
+    const list = await ParameterMaster.find().sort({ createdAt: -1 }).exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
   }
 };
 
-exports.listUsersByParams = async (req, res) => {
+exports.listActiveParameter = async (req, res) => {
+  try {
+    const list = await ParameterMaster.find({ IsActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(list);
+  } catch (error) {
+    return res.status(400).send(error);
+  }
+};
+
+exports.listParameterMasterByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
@@ -77,7 +87,7 @@ exports.listUsersByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                Users: { $regex: match, $options: "i" },
+                ParameterMaster: { $regex: match, $options: "i" },
               },
             ],
           },
@@ -103,7 +113,7 @@ exports.listUsersByParams = async (req, res) => {
       ].concat(query);
     }
 
-    const list = await Users.aggregate(query);
+    const list = await ParameterMaster.aggregate(query);
 
     res.json(list);
   } catch (error) {
@@ -111,9 +121,9 @@ exports.listUsersByParams = async (req, res) => {
   }
 };
 
-exports.updateUsers = async (req, res) => {
+exports.updateParameterMaster = async (req, res) => {
   try {
-    const update = await Users.findOneAndUpdate(
+    const update = await ParameterMaster.findOneAndUpdate(
       { _id: req.params._id },
       req.body,
       { new: true }
@@ -124,36 +134,13 @@ exports.updateUsers = async (req, res) => {
   }
 };
 
-exports.removeUsers = async (req, res) => {
+exports.removeParameterMaster = async (req, res) => {
   try {
-    const del = await Users.findOneAndRemove({
+    const delTL = await ParameterMaster.findOneAndRemove({
       _id: req.params._id,
     });
-    res.json(del);
+    res.json(delTL);
   } catch (err) {
     res.status(400).send(err);
-  }
-};
-
-exports.userLogin = async (req, res) => {
-  try {
-    const { Email, Password } = req.body;
-    const findData = await Users.findOne({
-      Email,
-      Password,
-      UserType: "admin"
-    }).exec();
-    if (findData) {
-      return res.status(200).json({
-        isOk: true,
-        data: findData,
-        message: "Authentication Successfull",
-      });
-    } else {
-      res.status(500).send("Authentication Failed!");
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(err);
   }
 };
