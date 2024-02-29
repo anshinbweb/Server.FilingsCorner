@@ -324,11 +324,14 @@ exports.listProductOptionsByProductId = async (req, res) => {
   }
 };
 
-exports.removeProductOptionsForvariants = async (req, res) => {
+exports.updateProductOptionsForvariants = async (req, res) => {
   try {
     const productId = req.body.productId;
-    const optionId = req.body.optionId;
-    let valuesId = req.body.valuesId;
+    const optionId = req.body.parameterId;
+    let valuesId = req.body.parameterValueId;
+
+    // const optionId = req.body.optionId;
+    // let valuesId = req.body.valuesId;
 
     valuesId = valuesId.map((id) => {
       return new mongoose.Types.ObjectId(id);
