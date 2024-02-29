@@ -38,14 +38,15 @@ exports.createProductsDetails = async (req, res) => {
     } = req.body;
 
     const add = await new ProductsDetails({
-      categories,
+      categories: categories ? categories.split(",") : [],
       productName,
       productDescription,
+      productImage,
       basePrice,
       weight,
       unit,
-      productOptionId,
-      productVariantsId,
+      productOptionId: productOptionId ? [productOptionId] : [],
+      productVariantsId: productVariantsId ? [productVariantsId] : [],
       isOutOfStock,
       isSubscription,
       IsActive,
@@ -181,9 +182,12 @@ exports.listProductsDetailsByParams = async (req, res) => {
         $match: { IsActive: IsActive },
       },
       {
+        $unwind: "$categories"
+      },
+      {
         $lookup: {
           from: "categorymasters",
-          localField: "category",
+          localField: "categories",
           foreignField: "_id",
           as: "category",
         },
@@ -194,6 +198,18 @@ exports.listProductsDetailsByParams = async (req, res) => {
           preserveNullAndEmptyArrays: true,
         },
       },
+      // {
+      //   $set: {
+      //     categoryName: {
+      //       $map: {
+      //         input: "$category",
+      //         as: "category2",
+      //         in: "$$category2.categoryName",
+      //       },
+      //     },
+      //     // categoryName: "$$category.categoryName",
+      //   },
+      // },
 
       {
         $facet: {
@@ -222,10 +238,32 @@ exports.listProductsDetailsByParams = async (req, res) => {
           path: "$stage1",
         },
       },
+      // {
+      //   $group: {
+      //     _id: "$_id",
+      //     count:{$first: "$stage1.count"},
+      //     data:{ $first:"$stage2"},
+      //     categoryName: {$push:{
+      //       $map: {
+      //         input: "$category",
+      //         as: "category2",
+      //         in: "$$category2.categoryName",
+      //       },
+      //     },}
+      //   }
+      // },
+
       {
         $project: {
           count: "$stage1.count",
           data: "$stage2",
+          categoryName: {
+            $map: {
+              input: "$category",
+              as: "category2",
+              in: "$$category2.categoryName",
+            },
+          },
         },
       },
     ];
@@ -265,6 +303,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
 
     res.json(list);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 };
@@ -275,6 +314,15 @@ exports.updateProductsDetails = async (req, res) => {
       ? `uploads/Products/${req.file.filename}`
       : null;
     let fieldvalues = { ...req.body };
+    fieldvalues.categories = fieldvalues.categories
+      ? fieldvalues.categories.split(",")
+      : [];
+    fieldvalues.productOptionId = fieldvalues.productOptionId
+      ? [fieldvalues.productOptionId]
+      : [];
+    fieldvalues.productVariantsId = fieldvalues.productVariantsId
+      ? [fieldvalues.productVariantsId]
+      : [];
     if (productImage != null) {
       fieldvalues.productImage = productImage;
     }
@@ -287,7 +335,8 @@ exports.updateProductsDetails = async (req, res) => {
     );
     res.json(update);
   } catch (err) {
-    res.status(400).send(err);
+    console.log(err);
+    res.status(500).send(err);
   }
 };
 
