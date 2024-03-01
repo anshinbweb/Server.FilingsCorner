@@ -1,8 +1,8 @@
-const OrderDetails = require("../../models/Products/OrderDetailsNew");
-const Orders = require("../../models/Products/OrderNew");
-const ProductDetails = require("../../models/Products/Products/ProductDetails");
-const ProductVariants = require("../../models/Products/Products/ProductVariants");
-const SubscriptionMaster = require("../../models/Subscription/SubscriptionMaster");
+const OrderDetails = require("../../../models/Products/Orders/OrderDetailsNew");
+const Orders = require("../../../models/Products/Orders/OrderNew");
+const ProductDetails = require("../../../models/Products/Products/ProductDetails");
+const ProductVariants = require("../../../models/Products/Products/ProductVariants");
+const SubscriptionMaster = require("../../../models/Subscription/SubscriptionMaster");
 
 exports.createOrderDetails = async (req, res) => {
   try {
@@ -59,7 +59,7 @@ exports.getOrderDetails = async (req, res) => {
   }
 };
 
-exports.getOrderDetailsByParams = async (req, res) => {
+exports.listOrderDetailsByParams = async (req, res) => {
   try {
     let { skip, per_page, sorton, sortdir, match, IsActive } = req.body;
 
