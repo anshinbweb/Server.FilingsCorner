@@ -1,6 +1,6 @@
 const { Long } = require("mongodb");
-const Orders = require("../../models/Products/OrderNew");
-const OrderDetails = require("../../models/Products/OrderDetailsNew");
+const Orders = require("../../../models/Products/Orders/OrderNew");
+const OrderDetails = require("../../../models/Products/Orders/OrderDetailsNew");
 
 exports.getOrders = async (req, res) => {
   try {
