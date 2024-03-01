@@ -21,15 +21,15 @@ exports.createUserCart = async (req, res) => {
       discount = subs.savePercentage;
     }
 
+    const productAmount = await ProductDetails.findOne({ _id: productId });
+    if (amount.isOutOfStock) {
+      return res.status(200).json({
+        isOk: false,
+        message: "Product is out of stock",
+      });
+    }
     if (productVariantsId == null) {
-      amount = await ProductDetails.findOne({ _id: productId });
-      if (amount.isOutOfStock) {
-        return res.status(200).json({
-          isOk: false,
-          message: "Product is out of stock",
-        });
-      }
-      amount = amount.basePrice * quantity;
+      amount = productAmount.basePrice * quantity;
       console.log("amount", amount);
     } else {
       amount = await ProductVariants.findOne({ _id: productVariantsId });
@@ -39,7 +39,7 @@ exports.createUserCart = async (req, res) => {
           message: "Product is out of stock",
         });
       }
-      amount = amount.priceVariant * quantity;
+      amount = (amount.priceVariant + productAmount.basePrice) * quantity;
       console.log("amount", amount);
     }
 
@@ -60,11 +60,13 @@ exports.createUserCart = async (req, res) => {
       { new: true }
     );
     console.log("user add", user);
+    let ans = add.toObject();
+    ans["amount"] = amount;
 
     res.status(200).json({
       isOk: true,
       message: "UserCart created successfully",
-      data: { amount: amount },
+      data: ans,
     });
   } catch (err) {
     console.log(err);
@@ -138,14 +140,18 @@ exports.getUserCartByUserId = async (req, res) => {
         discount = subs.savePercentage;
       }
 
+      const productAmount = await ProductDetails.findOne({
+        _id: userCart[i].productId,
+      });
       if (userCart[i].productVariantsId == null) {
-        amount = await ProductDetails.findOne({ _id: userCart[i].productId });
-        amount = amount.basePrice * userCart[i].quantity;
+        amount = productAmount.basePrice * userCart[i].quantity;
       } else {
         amount = await ProductVariants.findOne({
           _id: userCart[i].productVariantsId,
         });
-        amount = amount.priceVariant * userCart[i].quantity;
+        amount =
+          (amount.priceVariant + productAmount.basePrice) *
+          userCart[i].quantity;
       }
       amount = amount - (amount * discount) / 100;
       let cartItem = userCart[i];
@@ -231,7 +237,7 @@ exports.getUserCartByUserId = async (req, res) => {
 
 exports.updateQuantity = async (req, res) => {
   try {
-    const { userId, productId, productVariantsId, count } = req.body;
+    const { userId, productId, productVariantsId, quantity } = req.body;
     console.log("req.params", req.params);
 
     const findData = await UserCart.findOne({
@@ -246,7 +252,7 @@ exports.updateQuantity = async (req, res) => {
     // const amt = findData.amount * Qt;
     const updatedCart = await UserCart.findByIdAndUpdate(
       { _id: ID },
-      { quantity: count },
+      { quantity: quantity },
       { new: true }
     );
     console.log("updatedCart", updatedCart);
@@ -261,20 +267,22 @@ exports.updateQuantity = async (req, res) => {
       discount = subs.savePercentage;
     }
 
+    const productAmount = await ProductDetails.findOne({
+      _id: updatedCart.productId,
+    });
     if (updatedCart.productVariantsId == null) {
-      amount = await ProductDetails.findOne({ _id: updatedCart.productId });
-      amount = amount.basePrice * count;
+      amount = productAmount.basePrice * quantity;
     } else {
       amount = await ProductVariants.findOne({
         _id: updatedCart.productVariantsId,
       });
-      amount = amount.priceVariant * count;
+      amount = (amount.priceVariant + productAmount.basePrice) * quantity;
     }
     amount = amount - (amount * discount) / 100;
 
     res.status(200).json({
       isOk: true,
-      quantity: count,
+      quantity: quantity,
       amount: amount,
       message: "UserCart updated successfully",
     });

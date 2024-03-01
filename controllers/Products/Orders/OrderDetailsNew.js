@@ -18,12 +18,20 @@ exports.createOrderDetails = async (req, res) => {
       }
 
       if (body[i].productVariantsId) {
-        const product = await ProductVariants.findOne({
+        const productVariant = await ProductVariants.findOne({
           _id: body[i].productVariantsId,
         }).exec();
+        const productDetail = await ProductDetails.findOne({
+          _id: body[i].productId,
+        }).exec();
+
         body[i].amount =
-          product.priceVariant * body[i].quantity -
-          (product.priceVariant * body[i].quantity * discount) / 100;
+          (productVariant.priceVariant + productDetail.basePrice) *
+            body[i].quantity -
+          ((productVariant.priceVariant + productDetail.basePrice) *
+            body[i].quantity *
+            discount) /
+            100;
       } else {
         const product = await ProductDetails.findOne({
           _id: body[i].productId,
