@@ -21,7 +21,7 @@ exports.updateDefaultBillingAddress = async (req, res) => {
     const { userId, addressId } = req.params;
     const find = await User.findOne({ _id: userId }).exec();
     if (find) {
-      const sa = find.shippingAddress;
+      const sa = find.billingAddress;
       const index = sa.indexOf(addressId);
       console.log("Index of addressId:", index);
 
@@ -284,20 +284,54 @@ exports.removeUserBillingAddress = async (req, res) => {
     });
 
     if (BillingAdd) {
-      const updatedUserBA = await User.findOneAndUpdate(
-        { _id: BillingAdd.userId },
-        { $pull: { billingAddress: req.params._id } },
+      const updatedUserBA = await User.findOne({ _id: BillingAdd.userId });
+
+      const defaultBillingAddress =
+        updatedUserBA.billingAddress[updatedUserBA.defaultBillingAddress];
+      if (defaultBillingAddress == req.params._id) {
+        const updatedUserBA = await User.findOneAndUpdate(
+          { _id: BillingAdd.userId },
+          {
+            $pull: { billingAddress: req.params._id },
+            $set: { defaultBillingAddress: -1 },
+          },
+          { new: true }
+        );
+      } else {
+        const updatedUserBA = await User.findOneAndUpdate(
+          { _id: BillingAdd.userId },
+          { $pull: { billingAddress: req.params._id } },
+          { new: true }
+        );
+        console.log("updatedUserBA", updatedUserBA);
+
+        const sa = updatedUserBA.billingAddress;
+        const index = sa.indexOf(defaultBillingAddress);
+        console.log("Index of addressId:", index);
+
+        updatedUserBA.defaultBillingAddress = index;
+        updatedUserBA.save();
+      }
+
+      const deletedBA = await UserBillingAddress.findOneAndUpdate(
+        { _id: req.params._id },
+        { $set: { IsActive: false } },
         { new: true }
       );
-      const deletedBA = await UserBillingAddress.findOneAndRemove({
-        _id: req.params._id,
-      });
       console.log("delted", deletedBA);
-      res.json(deletedBA);
+      res.status(200).json({
+        isOk: true,
+        message: "Billing address removed successfully",
+        data: {},
+      });
     } else {
       console.log("Billing address not found");
+      res
+        .status(200)
+        .json({ isOk: false, message: "Billing address not found", data: {} });
     }
   } catch (error) {
-    res.status(500).json("error in remove", error);
+    console.log("error in remove", error);
+    res.status(500).json({ "error in remove": error });
   }
 };

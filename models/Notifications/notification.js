@@ -7,8 +7,11 @@ const UserNotificationSchema = mongoose.Schema(
       ref: "users",
       required: true,
     },
-
     Type: {
+      type: String,
+      required: true,
+    },
+    Title: {
       type: String,
       required: true,
     },
@@ -16,14 +19,14 @@ const UserNotificationSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    // URL: {
-    //   type: String,
-    //   required: true,
-    // },
+    URL: {
+      type: String,
+      required: false,
+    },
     isActive: {
       type: Boolean,
-      default: false,
-      // required: true,
+      default: true,
+      required: true,
     },
     // IsRead: {
     //   type: Boolean,

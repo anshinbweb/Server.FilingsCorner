@@ -38,14 +38,15 @@ exports.createProductsDetails = async (req, res) => {
     } = req.body;
 
     const add = await new ProductsDetails({
-      categories,
+      categories: categories ? categories.split(",") : [],
       productName,
       productDescription,
+      productImage,
       basePrice,
       weight,
       unit,
-      productOptionId,
-      productVariantsId,
+      productOptionId: productOptionId ? [productOptionId] : [],
+      productVariantsId: productVariantsId ? [productVariantsId] : [],
       isOutOfStock,
       isSubscription,
       IsActive,
@@ -181,9 +182,12 @@ exports.listProductsDetailsByParams = async (req, res) => {
         $match: { IsActive: IsActive },
       },
       {
+        $unwind: "$categories",
+      },
+      {
         $lookup: {
           from: "categorymasters",
-          localField: "category",
+          localField: "categories",
           foreignField: "_id",
           as: "category",
         },
@@ -194,6 +198,18 @@ exports.listProductsDetailsByParams = async (req, res) => {
           preserveNullAndEmptyArrays: true,
         },
       },
+      // {
+      //   $set: {
+      //     categoryName: {
+      //       $map: {
+      //         input: "$category",
+      //         as: "category2",
+      //         in: "$$category2.categoryName",
+      //       },
+      //     },
+      //     // categoryName: "$$category.categoryName",
+      //   },
+      // },
 
       {
         $facet: {
@@ -222,10 +238,32 @@ exports.listProductsDetailsByParams = async (req, res) => {
           path: "$stage1",
         },
       },
+      // {
+      //   $group: {
+      //     _id: "$_id",
+      //     count:{$first: "$stage1.count"},
+      //     data:{ $first:"$stage2"},
+      //     categoryName: {$push:{
+      //       $map: {
+      //         input: "$category",
+      //         as: "category2",
+      //         in: "$$category2.categoryName",
+      //       },
+      //     },}
+      //   }
+      // },
+
       {
         $project: {
           count: "$stage1.count",
           data: "$stage2",
+          categoryName: {
+            $map: {
+              input: "$category",
+              as: "category2",
+              in: "$$category2.categoryName",
+            },
+          },
         },
       },
     ];
@@ -261,10 +299,55 @@ exports.listProductsDetailsByParams = async (req, res) => {
       ].concat(query);
     }
 
-    const list = await ProductsDetails.aggregate(query);
+    const list1 = await ProductsDetails.aggregate(query);
 
-    res.json(list);
+    let list = [];
+    for (let i = 0; i < list1[0].data.length; i++) {
+      let obj = {
+        _id: list1[0].data[i]._id,
+        categories: list1[0].data[i].category.categoryName,
+        productName: list1[0].data[i].productName,
+        productDescription: list1[0].data[i].productDescription,
+        productImage: list1[0].data[i].productImage,
+        basePrice: list1[0].data[i].basePrice,
+        weight: list1[0].data[i].weight,
+        unit: list1[0].data[i].unit,
+        isOutOfStock: list1[0].data[i].isOutOfStock,
+        isSubscription: list1[0].data[i].isSubscription,
+        IsActive: list1[0].data[i].IsActive,
+      };
+      list.push(obj);
+    }
+
+    console.log("list", list[0]);
+    let list2 = [];
+    for (let i = 0; i < list.length; i++) {
+      let obj = {
+        _id: list[i]._id,
+        categories: [list[i].categories],
+        productName: list[i].productName,
+        productDescription: list[i].productDescription,
+        productImage: list[i].productImage,
+        basePrice: list[i].basePrice,
+        weight: list[i].weight,
+        unit: list[i].unit,
+        isOutOfStock: list[i].isOutOfStock,
+        isSubscription: list[i].isSubscription,
+        IsActive: list[i].IsActive,
+      };
+      for (let j = i + 1; j < list.length; j++) {
+        if (String(list[i]._id) == String(list[j]._id)) {
+          obj.categories.push(list[j].categories);
+          list.splice(j, 1);
+        }
+      }
+      list2.push(obj);
+    }
+    let ans = [{ count: list2[0].length, data: list2 }];
+
+    res.json(ans);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 };
@@ -275,6 +358,15 @@ exports.updateProductsDetails = async (req, res) => {
       ? `uploads/Products/${req.file.filename}`
       : null;
     let fieldvalues = { ...req.body };
+    fieldvalues.categories = fieldvalues.categories
+      ? fieldvalues.categories.split(",")
+      : [];
+    fieldvalues.productOptionId = fieldvalues.productOptionId
+      ? [fieldvalues.productOptionId]
+      : [];
+    fieldvalues.productVariantsId = fieldvalues.productVariantsId
+      ? [fieldvalues.productVariantsId]
+      : [];
     if (productImage != null) {
       fieldvalues.productImage = productImage;
     }
@@ -287,7 +379,8 @@ exports.updateProductsDetails = async (req, res) => {
     );
     res.json(update);
   } catch (err) {
-    res.status(400).send(err);
+    console.log(err);
+    res.status(500).send(err);
   }
 };
 
