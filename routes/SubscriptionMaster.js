@@ -10,21 +10,39 @@ const {
   getSubscriptionMaster,
   updateSubscriptionMaster,
   removeSubscriptionMaster,
+  listActiveSubscriptionMaster,
 } = require("../controllers/Subscription/SubscriptionMaster");
 
-router.post("/auth/create/SubscriptionMaster", catchAsync(createSubscriptionMaster));
+router.post(
+  "/auth/create/SubscriptionMaster",
+  catchAsync(createSubscriptionMaster)
+);
 
 router.get("/auth/list/SubscriptionMaster", catchAsync(listSubscriptionMaster));
+
+router.get(
+  "/auth/listActive/SubscriptionMaster",
+  catchAsync(listActiveSubscriptionMaster)
+);
 
 router.post(
   "/auth/list-by-params/SubscriptionMaster",
   catchAsync(listSubscriptionMasterByParams)
 );
 
-router.get("/auth/get/SubscriptionMaster/:_id", catchAsync(getSubscriptionMaster));
+router.get(
+  "/auth/get/SubscriptionMaster/:_id",
+  catchAsync(getSubscriptionMaster)
+);
 
-router.put("/auth/update/SubscriptionMaster/:_id", catchAsync(updateSubscriptionMaster));
+router.put(
+  "/auth/update/SubscriptionMaster/:_id",
+  catchAsync(updateSubscriptionMaster)
+);
 
-router.delete("/auth/remove/SubscriptionMaster/:_id", catchAsync(removeSubscriptionMaster));
+router.delete(
+  "/auth/remove/SubscriptionMaster/:_id",
+  catchAsync(removeSubscriptionMaster)
+);
 
 module.exports = router;
