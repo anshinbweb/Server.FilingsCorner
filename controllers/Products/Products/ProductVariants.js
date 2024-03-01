@@ -137,7 +137,13 @@ exports.removeProductVariants = async (req, res) => {
 exports.getProductVariantsInfo = async (req, res) => {
   try {
     const productId = req.body.productId;
-    const productVariant = req.body.productVariants;
+    const productVariantObject = req.body.productVariants;
+
+    let productVariant = [];
+    for (let key in productVariantObject) {
+      productVariant.push(productVariantObject[key]);
+    }
+
     const find = await ProductVariants.findOne({
       productId: productId,
       productVariants: { $all: productVariant },
