@@ -60,11 +60,13 @@ exports.createUserCart = async (req, res) => {
       { new: true }
     );
     console.log("user add", user);
+    let ans = add.toObject();
+    ans["amount"] = amount;
 
     res.status(200).json({
       isOk: true,
       message: "UserCart created successfully",
-      data: { amount: amount },
+      data: ans,
     });
   } catch (err) {
     console.log(err);
