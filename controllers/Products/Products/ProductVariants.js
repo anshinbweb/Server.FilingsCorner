@@ -152,7 +152,9 @@ exports.listProductVariantsByProductId = async (req, res) => {
   try {
     const find = await ProductVariants.find({
       productId: req.params._id,
-    }).populate('productVariants').exec();
+    })
+      .populate("productVariants")
+      .exec();
     res.json(find);
   } catch (err) {
     res.status(400).send(err);
@@ -164,7 +166,7 @@ exports.updateProductVariantPrice = async (req, res) => {
     const { value } = req.body;
     const update = await ProductVariants.findOneAndUpdate(
       { _id: req.params._id },
-      { priceVariant:  value },
+      { priceVariant: value },
       { new: true }
     );
     res.json(update);
@@ -178,7 +180,7 @@ exports.updateProductVariantSubs = async (req, res) => {
     const { value } = req.body;
     const update = await ProductVariants.findOneAndUpdate(
       { _id: req.params._id },
-      { isSubscription:  value },
+      { isSubscription: value },
       { new: true }
     );
     res.json(update);
@@ -192,7 +194,7 @@ exports.updateProductVariantStock = async (req, res) => {
     const { value } = req.body;
     const update = await ProductVariants.findOneAndUpdate(
       { _id: req.params._id },
-      { isOutOfStock:  value },
+      { isOutOfStock: value },
       { new: true }
     );
     res.json(update);
@@ -206,7 +208,7 @@ exports.updateProductVariantActive = async (req, res) => {
     const { value } = req.body;
     const update = await ProductVariants.findOneAndUpdate(
       { _id: req.params._id },
-      { IsActive:  value },
+      { IsActive: value },
       { new: true }
     );
     res.json(update);

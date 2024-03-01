@@ -1,17 +1,19 @@
 const userNotifcation = require("../../models/Notifications/notification");
 const mongoose = require("mongoose");
+
 exports.createuserNotifcation = async (req, res) => {
   try {
-    const { UserId, Type, Description, isActive } = req.body;
-    console.log(UserId, Type, Description, isActive);
+    const { UserId, Type, Title, Description, URL } = req.body;
     const addNotification = await new userNotifcation({
       UserId,
       Type,
+      Title,
       Description,
-      isActive,
+      URL,
     }).save();
     res.json(addNotification);
   } catch (err) {
+    console.log(err);
     return res.status(500).json("error in create user notification", err);
   }
 };
@@ -32,7 +34,7 @@ exports.updateUserNotification = async (req, res) => {
 
 exports.removeUserNotification = async (req, res) => {
   try {
-    const delUserNotifiy = await Prospect.findOneAndRemove({
+    const delUserNotifiy = await userNotifcation.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(delUserNotifiy);
@@ -64,11 +66,15 @@ exports.getNotification = async (req, res) => {
 };
 
 exports.getuserAllNotification = async (req, res) => {
-  const notificationAll = await userNotifcation
-    .find({ UserId: req.params._id })
-    .sort({ createdAt: -1 })
-    .exec();
-  res.json(notificationAll);
+  try {
+    const notificationAll = await userNotifcation
+      .find({ UserId: req.params._id })
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(notificationAll);
+  } catch (err) {
+    res.status(500).json("get user notification failed", err);
+  }
 };
 
 // exports.listuserNotifcations = async (req, res) => {
