@@ -29,6 +29,24 @@ exports.createUserCart = async (req, res) => {
         }).exec();
         discount = subs.savePercentage;
       }
+    const checkCart = await UserCart.findOne({
+      userId: userId,
+      productId: productId,
+      productVariantsId: productVariantsId,
+    });
+    if (checkCart) {
+      req.body.quantity = checkCart.quantity + quantity;
+      this.updateQuantity(req, res);
+    } else {
+      // CHECK STOCK
+      let amount = 0;
+      let discount = 0;
+      if (subsId) {
+        const subs = await SubscriptionMaster.findOne({
+          _id: subsId,
+        }).exec();
+        discount = subs.savePercentage;
+      }
 
       const productAmount = await ProductDetails.findOne({ _id: productId });
       if (amount.isOutOfStock) {
