@@ -29,72 +29,73 @@ exports.createUserCart = async (req, res) => {
         }).exec();
         discount = subs.savePercentage;
       }
-    const checkCart = await UserCart.findOne({
-      userId: userId,
-      productId: productId,
-      productVariantsId: productVariantsId,
-    });
-    if (checkCart) {
-      req.body.quantity = checkCart.quantity + quantity;
-      this.updateQuantity(req, res);
-    } else {
-      // CHECK STOCK
-      let amount = 0;
-      let discount = 0;
-      if (subsId) {
-        const subs = await SubscriptionMaster.findOne({
-          _id: subsId,
-        }).exec();
-        discount = subs.savePercentage;
-      }
-
-      const productAmount = await ProductDetails.findOne({ _id: productId });
-      if (amount.isOutOfStock) {
-        return res.status(200).json({
-          isOk: false,
-          message: "Product is out of stock",
-        });
-      }
-      if (productVariantsId == null) {
-        amount = productAmount.basePrice * quantity;
-        console.log("amount", amount);
+      const checkCart = await UserCart.findOne({
+        userId: userId,
+        productId: productId,
+        productVariantsId: productVariantsId,
+      });
+      if (checkCart) {
+        req.body.quantity = checkCart.quantity + quantity;
+        this.updateQuantity(req, res);
       } else {
-        amount = await ProductVariants.findOne({ _id: productVariantsId });
+        // CHECK STOCK
+        let amount = 0;
+        let discount = 0;
+        if (subsId) {
+          const subs = await SubscriptionMaster.findOne({
+            _id: subsId,
+          }).exec();
+          discount = subs.savePercentage;
+        }
+
+        const productAmount = await ProductDetails.findOne({ _id: productId });
         if (amount.isOutOfStock) {
           return res.status(200).json({
             isOk: false,
             message: "Product is out of stock",
           });
         }
-        amount = (amount.priceVariant + productAmount.basePrice) * quantity;
-        console.log("amount", amount);
+        if (productVariantsId == null) {
+          amount = productAmount.basePrice * quantity;
+          console.log("amount", amount);
+        } else {
+          amount = await ProductVariants.findOne({ _id: productVariantsId });
+          if (amount.isOutOfStock) {
+            return res.status(200).json({
+              isOk: false,
+              message: "Product is out of stock",
+            });
+          }
+          amount = (amount.priceVariant + productAmount.basePrice) * quantity;
+          console.log("amount", amount);
+        }
+
+        amount = amount - (amount * discount) / 100;
+
+        const add = await new UserCart({
+          userId,
+          productId,
+          subsId,
+          productVariantsId,
+          quantity,
+        }).save();
+        console.log("data id", add._id);
+        const usercartID = add._id;
+        const user = await User.findOneAndUpdate(
+          { _id: userId },
+          { $addToSet: { cart: usercartID } },
+          { new: true }
+        );
+        console.log("user add", user);
+        let ans = add.toObject();
+        ans["amount"] = amount;
+
+        res.status(200).json({
+          isOk: true,
+          message: "UserCart created successfully",
+          data: ans,
+        });
       }
-
-      amount = amount - (amount * discount) / 100;
-
-      const add = await new UserCart({
-        userId,
-        productId,
-        subsId,
-        productVariantsId,
-        quantity,
-      }).save();
-      console.log("data id", add._id);
-      const usercartID = add._id;
-      const user = await User.findOneAndUpdate(
-        { _id: userId },
-        { $addToSet: { cart: usercartID } },
-        { new: true }
-      );
-      console.log("user add", user);
-      let ans = add.toObject();
-      ans["amount"] = amount;
-
-      res.status(200).json({
-        isOk: true,
-        message: "UserCart created successfully",
-        data: ans,
-      });
     }
   } catch (err) {
     console.log(err);
