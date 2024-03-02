@@ -11,63 +11,73 @@ exports.createUserCart = async (req, res) => {
     console.log("req.body", req.body);
     console.log("subsId", subsId);
 
-    // CHECK STOCK
-    let amount = 0;
-    let discount = 0;
-    if (subsId) {
-      const subs = await SubscriptionMaster.findOne({
-        _id: subsId,
-      }).exec();
-      discount = subs.savePercentage;
-    }
-
-    const productAmount = await ProductDetails.findOne({ _id: productId });
-    if (amount.isOutOfStock) {
-      return res.status(200).json({
-        isOk: false,
-        message: "Product is out of stock",
-      });
-    }
-    if (productVariantsId == null) {
-      amount = productAmount.basePrice * quantity;
-      console.log("amount", amount);
+    const checkCart = await UserCart.findOne({
+      userId: userId,
+      productId: productId,
+      productVariantsId: productVariantsId,
+    });
+    if (checkCart) {
+      req.body.quantity = checkCart.quantity + quantity;
+      this.updateQuantity(req, res);
     } else {
-      amount = await ProductVariants.findOne({ _id: productVariantsId });
+      // CHECK STOCK
+      let amount = 0;
+      let discount = 0;
+      if (subsId) {
+        const subs = await SubscriptionMaster.findOne({
+          _id: subsId,
+        }).exec();
+        discount = subs.savePercentage;
+      }
+
+      const productAmount = await ProductDetails.findOne({ _id: productId });
       if (amount.isOutOfStock) {
         return res.status(200).json({
           isOk: false,
           message: "Product is out of stock",
         });
       }
-      amount = (amount.priceVariant + productAmount.basePrice) * quantity;
-      console.log("amount", amount);
+      if (productVariantsId == null) {
+        amount = productAmount.basePrice * quantity;
+        console.log("amount", amount);
+      } else {
+        amount = await ProductVariants.findOne({ _id: productVariantsId });
+        if (amount.isOutOfStock) {
+          return res.status(200).json({
+            isOk: false,
+            message: "Product is out of stock",
+          });
+        }
+        amount = (amount.priceVariant + productAmount.basePrice) * quantity;
+        console.log("amount", amount);
+      }
+
+      amount = amount - (amount * discount) / 100;
+
+      const add = await new UserCart({
+        userId,
+        productId,
+        subsId,
+        productVariantsId,
+        quantity,
+      }).save();
+      console.log("data id", add._id);
+      const usercartID = add._id;
+      const user = await User.findOneAndUpdate(
+        { _id: userId },
+        { $addToSet: { cart: usercartID } },
+        { new: true }
+      );
+      console.log("user add", user);
+      let ans = add.toObject();
+      ans["amount"] = amount;
+
+      res.status(200).json({
+        isOk: true,
+        message: "UserCart created successfully",
+        data: ans,
+      });
     }
-
-    amount = amount - (amount * discount) / 100;
-
-    const add = await new UserCart({
-      userId,
-      productId,
-      subsId,
-      productVariantsId,
-      quantity,
-    }).save();
-    console.log("data id", add._id);
-    const usercartID = add._id;
-    const user = await User.findOneAndUpdate(
-      { _id: userId },
-      { $addToSet: { cart: usercartID } },
-      { new: true }
-    );
-    console.log("user add", user);
-    let ans = add.toObject();
-    ans["amount"] = amount;
-
-    res.status(200).json({
-      isOk: true,
-      message: "UserCart created successfully",
-      data: ans,
-    });
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
@@ -120,6 +130,7 @@ exports.getUserCartByUserId = async (req, res) => {
           subsId: 1,
           productVariantsId: 1,
           quantity: 1,
+          productImage: "$productDetailsData.productImage",
           productName: "$productDetailsData.productName",
           subsName: "$subscriptionData.title",
         },
@@ -130,6 +141,7 @@ exports.getUserCartByUserId = async (req, res) => {
     const userCart = await UserCart.aggregate(query).exec();
 
     let list = [];
+    let subTotal = 0;
     for (let i = 0; i < userCart.length; i++) {
       let amount = 0;
       let discount = 0;
@@ -155,11 +167,12 @@ exports.getUserCartByUserId = async (req, res) => {
       }
       amount = amount - (amount * discount) / 100;
       let cartItem = userCart[i];
-      cartItem["amount"] = amount;
+      subTotal += amount;
+      cartItem["amount"] = amount / cartItem.quantity;
       list.push(cartItem);
 
       // list.push(userCart[i]);
-      list[i]["amount"] = amount;
+      // list[i]["amount"] = amount;
     }
 
     // let query = [
@@ -228,7 +241,9 @@ exports.getUserCartByUserId = async (req, res) => {
 
     // const list = await UserCart.aggregate(query).exec();
 
-    res.status(200).json(list);
+    res
+      .status(200)
+      .json({ data: list, subTotal: subTotal, shippingCharge: 20 });
   } catch (error) {
     console.log("error in getUserCartByUserId", error);
     return res.status(500).json("error in getUserCartByUserId", error);
@@ -294,8 +309,8 @@ exports.updateQuantity = async (req, res) => {
 
 exports.RemoveFromCart = async (req, res) => {
   try {
-    const { userId, productId, productVariantsId } = req.params;
-    console.log("req.params", req.params);
+    const { userId, productId, productVariantsId } = req.body;
+
     const findData = await UserCart.findOneAndRemove({
       userId: userId,
       productId: productId,

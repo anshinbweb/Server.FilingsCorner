@@ -681,3 +681,68 @@ exports.getProductsOptionsParameters = async (req, res) => {
     return res.status(400).send(error);
   }
 };
+
+exports.getRelatedProducts = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const product = await ProductsDetails.findOne({
+      _id: productId,
+    }).exec();
+
+    const query = [
+      {
+        $match: {
+          categories: { $in: product.categories },
+          IsActive: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "categorymasters",
+          localField: "categories",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $project: {
+          productName: 1,
+          productDescription: 1,
+          productImage: 1,
+          basePrice: 1,
+          weight: 1,
+          unit: 1,
+          isOutOfStock: 1,
+          isSubscription: 1,
+          category: {
+            $map: {
+              input: "$category",
+              as: "cat",
+              in: {
+                _id: "$$cat._id",
+                categoryName: "$$cat.categoryName",
+              },
+            },
+          },
+        },
+      },
+    ];
+
+    const relatedProducts = await ProductsDetails.find(query).exec();
+
+    // random shuffle array in relatedProducts
+    for (let i = relatedProducts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [relatedProducts[i], relatedProducts[j]] = [
+        relatedProducts[j],
+        relatedProducts[i],
+      ];
+    }
+
+    res.json(relatedProducts);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+};
