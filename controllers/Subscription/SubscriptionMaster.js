@@ -2,7 +2,9 @@ const SubscriptionMaster = require("../../models/Subscription/SubscriptionMaster
 
 exports.getSubscriptionMaster = async (req, res) => {
   try {
-    const find = await SubscriptionMaster.findOne({ _id: req.params._id }).exec();
+    const find = await SubscriptionMaster.findOne({
+      _id: req.params._id,
+    }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
@@ -24,6 +26,17 @@ exports.listSubscriptionMaster = async (req, res) => {
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
+  }
+};
+
+exports.listActiveSubscriptionMaster = async (req, res) => {
+  try {
+    const list = await SubscriptionMaster.find({ IsActive: true })
+      .sort({ createdAt: -1 })
+      .exec();
+    res.json(list);
+  } catch (error) {
+    return res.status(500).json("error in active subscription", error);
   }
 };
 
@@ -125,7 +138,7 @@ exports.updateSubscriptionMaster = async (req, res) => {
 
 exports.removeSubscriptionMaster = async (req, res) => {
   try {
-    const del= await SubscriptionMaster.findOneAndRemove({
+    const del = await SubscriptionMaster.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);

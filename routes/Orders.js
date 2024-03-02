@@ -9,9 +9,12 @@ const {
   listOrders,
   listOrdersByParams,
   getOrders,
-  updateOrders,
+  updateOrders, // is this possible?
   removeOrders,
-} = require("../controllers/Products/Orders");
+  getOrdersByUserId,
+  updateOrderStatus,
+  updateDeliveryDate,
+} = require("../controllers/Products/Orders/OrderNew");
 
 router.post("/auth/create/orders", catchAsync(createOrders));
 
@@ -24,5 +27,11 @@ router.get("/auth/get/orders/:_id", catchAsync(getOrders));
 router.put("/auth/update/orders/:_id", catchAsync(updateOrders));
 
 router.delete("/auth/remove/orders/:_id", catchAsync(removeOrders));
+
+router.get("/auth/get/orders-by-user-id/:_id", catchAsync(getOrdersByUserId));
+
+router.put("/auth/update/order-status/:_id", catchAsync(updateOrderStatus));
+
+router.put("/auth/update/delivery-date/:_id", catchAsync(updateDeliveryDate));
 
 module.exports = router;

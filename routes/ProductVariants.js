@@ -39,7 +39,10 @@ router.delete(
   catchAsync(removeProductVariants)
 );
 
-router.get("/auth/get/productVariantsInfo", catchAsync(getProductVariantsInfo));
+router.post(
+  "/auth/get/productVariantsInfo",
+  catchAsync(getProductVariantsInfo)
+);
 
 router.get(
   "/auth/get/productVariantsByProductId/:_id",
