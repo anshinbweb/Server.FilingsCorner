@@ -1,4 +1,6 @@
 const ProductVariants = require("../../../models/Products/Products/ProductVariants");
+const mongoose = require("mongoose");
+const { param } = require("../../../routes/UserCart");
 
 exports.getProductVariants = async (req, res) => {
   try {
@@ -219,6 +221,101 @@ exports.updateProductVariantActive = async (req, res) => {
     );
     res.json(update);
   } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
+exports.getProductVariantsInfoInCart = async (req, res) => {
+  try {
+    const productVariantsId = req.params.productVariantsId;
+
+    let query = [
+      {
+        $match: { _id: new mongoose.Types.ObjectId(productVariantsId) },
+      },
+      {
+        $lookup: {
+          from: "parametervalues",
+          localField: "productVariants",
+          foreignField: "_id",
+          as: "parametervalues",
+        },
+      },
+      {
+        $unwind: {
+          path: "$parametervalues",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $set: {
+          parametervalues: "$parametervalues.parameterValue",
+          parametervaluesId: "$parametervalues.parameterId",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "parametermasters",
+          localField: "parametervaluesId",
+          foreignField: "_id",
+          as: "parametermaster",
+        },
+      },
+      {
+        $unwind: {
+          path: "$parametermaster",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          parameterName: "$parametermaster.parameterName",
+        },
+      },
+
+      {
+        $set: {
+          parameter: {
+            parameterName: "$parameterName",
+            parameterValue: "$parametervalues",
+          },
+        },
+      },
+
+      {
+        $group: {
+          _id: "$_id",
+          productVariants: { $first: "$productVariants" },
+          parameters: { $push: "$parameter" },
+          priceVariant: { $first: "$priceVariant" },
+          isSubscription: { $first: "$isSubscription" },
+          isOutOfStock: { $first: "$isOutOfStock" },
+          IsActive: { $first: "$IsActive" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+        },
+      },
+
+      {
+        $project: {
+          _id: 1,
+          productVariants: 1,
+          parameters: 1,
+          priceVariant: 1,
+          isSubscription: 1,
+          isOutOfStock: 1,
+          IsActive: 1,
+        },
+      },
+    ];
+
+    const find = await ProductVariants.aggregate(query).exec();
+
+    res.json(find);
+  } catch (err) {
+    console.log(err);
     res.status(400).send(err);
   }
 };
