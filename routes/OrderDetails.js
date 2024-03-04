@@ -18,12 +18,12 @@ router.post("/auth/create/order-details", catchAsync(createOrderDetails)); // in
 
 router.get("/auth/get/order-details/:_id", catchAsync(getOrderDetails));
 
-router.post("/auth/list-by-params/order-details", catchAsync(listOrderDetailsByParams));
-
-router.put(
-  "/auth/update/order-details/:_id",
-  catchAsync(updateOrderDetails)
+router.post(
+  "/auth/list-by-params/order-details",
+  catchAsync(listOrderDetailsByParams)
 );
+
+router.put("/auth/update/order-details/:_id", catchAsync(updateOrderDetails));
 
 router.delete(
   "/auth/remove/order-details/:_id",

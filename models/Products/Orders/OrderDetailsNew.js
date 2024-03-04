@@ -7,6 +7,11 @@ const OrdersDetailsSchema = new mongoose.Schema(
       ref: "Users",
       required: true,
     },
+    orderId: {
+      type: Schema.Types.ObjectId,
+      ref: "OrderNew",
+      required: false,
+    },
     productId: {
       type: Schema.Types.ObjectId,
       ref: "ProductDetails",

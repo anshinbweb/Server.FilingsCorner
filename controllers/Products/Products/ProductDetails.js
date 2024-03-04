@@ -3,6 +3,7 @@ const fs = require("fs");
 const SubscriptionMaster = require("../../../models/Subscription/SubscriptionMaster");
 const { mongoose } = require("mongoose");
 const ProductOptions = require("../../../models/Products/Products/ProductOptions");
+const ProductVariants = require("../../../models/Products/Products/ProductVariants");
 
 exports.getProductsDetails = async (req, res) => {
   try {
@@ -273,7 +274,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                ProductsDetails: { $regex: match, $options: "i" },
+                productName: { $regex: match, $options: "i" },
               },
             ],
           },
@@ -301,51 +302,58 @@ exports.listProductsDetailsByParams = async (req, res) => {
 
     const list1 = await ProductsDetails.aggregate(query);
 
-    let list = [];
-    for (let i = 0; i < list1[0].data.length; i++) {
-      let obj = {
-        _id: list1[0].data[i]._id,
-        categories: list1[0].data[i].category.categoryName,
-        productName: list1[0].data[i].productName,
-        productDescription: list1[0].data[i].productDescription,
-        productImage: list1[0].data[i].productImage,
-        basePrice: list1[0].data[i].basePrice,
-        weight: list1[0].data[i].weight,
-        unit: list1[0].data[i].unit,
-        isOutOfStock: list1[0].data[i].isOutOfStock,
-        isSubscription: list1[0].data[i].isSubscription,
-        IsActive: list1[0].data[i].IsActive,
-      };
-      list.push(obj);
-    }
+    if (list1.length === 0) {
+      let ans = [{ count: 0, data: [] }];
 
-    console.log("list", list[0]);
-    let list2 = [];
-    for (let i = 0; i < list.length; i++) {
-      let obj = {
-        _id: list[i]._id,
-        categories: [list[i].categories],
-        productName: list[i].productName,
-        productDescription: list[i].productDescription,
-        productImage: list[i].productImage,
-        basePrice: list[i].basePrice,
-        weight: list[i].weight,
-        unit: list[i].unit,
-        isOutOfStock: list[i].isOutOfStock,
-        isSubscription: list[i].isSubscription,
-        IsActive: list[i].IsActive,
-      };
-      for (let j = i + 1; j < list.length; j++) {
-        if (String(list[i]._id) == String(list[j]._id)) {
-          obj.categories.push(list[j].categories);
-          list.splice(j, 1);
-        }
+      res.json(ans);
+    } else {
+      let list = [];
+      for (let i = 0; i < list1[0].data.length; i++) {
+        let obj = {
+          _id: list1[0].data[i]._id,
+          categories: list1[0].data[i].category.categoryName,
+          productName: list1[0].data[i].productName,
+          productDescription: list1[0].data[i].productDescription,
+          productImage: list1[0].data[i].productImage,
+          basePrice: list1[0].data[i].basePrice,
+          weight: list1[0].data[i].weight,
+          unit: list1[0].data[i].unit,
+          isOutOfStock: list1[0].data[i].isOutOfStock,
+          isSubscription: list1[0].data[i].isSubscription,
+          IsActive: list1[0].data[i].IsActive,
+        };
+        list.push(obj);
       }
-      list2.push(obj);
-    }
-    let ans = [{ count: list2[0].length, data: list2 }];
 
-    res.json(ans);
+      console.log("list", list[0]);
+      let list2 = [];
+      for (let i = 0; i < list.length; i++) {
+        let obj = {
+          _id: list[i]._id,
+          categories: [list[i].categories],
+          productName: list[i].productName,
+          productDescription: list[i].productDescription,
+          productImage: list[i].productImage,
+          basePrice: list[i].basePrice,
+          weight: list[i].weight,
+          unit: list[i].unit,
+          isOutOfStock: list[i].isOutOfStock,
+          isSubscription: list[i].isSubscription,
+          IsActive: list[i].IsActive,
+        };
+        for (let j = i + 1; j < list.length; j++) {
+          if (String(list[i]._id) == String(list[j]._id)) {
+            obj.categories.push(list[j].categories);
+            list.splice(j, 1);
+          }
+        }
+        list2.push(obj);
+      }
+
+      let ans = [{ count: list1[0].count, data: list2 }];
+
+      res.json(ans);
+    }
   } catch (error) {
     console.log(error);
     res.status(500).send(error);
@@ -386,9 +394,18 @@ exports.updateProductsDetails = async (req, res) => {
 
 exports.removeProductsDetails = async (req, res) => {
   try {
+    const delOptions = await ProductOptions.deleteMany({
+      productId: req.params._id,
+    });
+
+    const delVariants = await ProductVariants.deleteMany({
+      productId: req.params._id,
+    });
+
     const del = await ProductsDetails.findOneAndRemove({
       _id: req.params._id,
     });
+
     res.json(del);
   } catch (err) {
     res.status(400).send(err);

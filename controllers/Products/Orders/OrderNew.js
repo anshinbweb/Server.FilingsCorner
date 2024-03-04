@@ -25,6 +25,14 @@ exports.createOrders = async (req, res) => {
     }
     body.totalAmount = amount;
 
+    if (body.isShippingType) {
+      body.shippingCharge = 20;
+      body.subTotal = body.totalAmount + body.shippingCharge;
+    } else {
+      body.shippingCharge = 0;
+      body.subTotal = body.totalAmount;
+    }
+
     const add = await new Orders(body).save();
     res.json(add);
   } catch (err) {
@@ -86,7 +94,23 @@ exports.createOrderInOneGo = async (req, res) => {
     }
     body.totalAmount = amount;
 
+    if (body.isShippingType) {
+      body.shippingCharge = 20;
+      body.subTotal = body.totalAmount + body.shippingCharge;
+    } else {
+      body.shippingCharge = 0;
+      body.subTotal = body.totalAmount;
+    }
+
     const add = await new Orders(body).save();
+    for (let i = 0; i < added.length; i++) {
+      const update = await OrderDetails.findOneAndUpdate(
+        { _id: added[i]._id },
+        { orderId: add._id },
+        { new: true }
+      );
+    }
+
     res.json(add);
   } catch (err) {
     console.log(err);

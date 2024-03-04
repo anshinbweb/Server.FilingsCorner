@@ -18,6 +18,14 @@ const OrdersSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    subTotal: {
+      type: Number,
+      required: true,
+    },
+    shippingCharge: {
+      type: Number,
+      required: true,
+    },
     remark: {
       type: String,
       required: false,
@@ -61,6 +69,10 @@ const OrdersSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
       required: true,
+    },
+    isShippingType: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }
