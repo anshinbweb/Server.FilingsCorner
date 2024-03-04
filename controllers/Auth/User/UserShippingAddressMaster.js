@@ -292,6 +292,19 @@ exports.updateUserShippingAddress = async (req, res) => {
   }
 };
 
+exports.updateBillingValueSA = async (req, res) => {
+  try {
+    const update = await UserShippingAddress.findOneAndUpdate(
+      { _id: req.params._id },
+      { isBillingSame: true },
+      { new: true }
+    );
+    res.json(update);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
 exports.removeUserShippingAddress = async (req, res) => {
   try {
     const ShippingAdd = await UserShippingAddress.findOne({
@@ -347,5 +360,18 @@ exports.removeUserShippingAddress = async (req, res) => {
   } catch (error) {
     console.log("error in remove", error);
     res.status(500).json({ "error in remove": error });
+  }
+};
+
+exports.getDefaultShippingAddressByUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findOne({ _id: userId }).exec();
+    const shippingId = user.shippingAddress[user.defaultShippingAddress];
+    const find = await UserShippingAddress.findOne({ _id: shippingId }).exec();
+    res.json(find);
+  } catch (error) {
+    console.log("error in get", error);
+    return res.status(500).send(error);
   }
 };

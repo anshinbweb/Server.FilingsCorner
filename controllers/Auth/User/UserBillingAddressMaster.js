@@ -109,24 +109,40 @@ exports.getAllBillingAddressofUser = async (req, res) => {
 
 exports.createUserBillingAddress = async (req, res) => {
   try {
-    const add = await new UserBillingAddress(req.body).save();
+    console.log("req.body", req.body);
+    const add = await new UserBillingAddress({
+      firstName: req.body.firstNameBA,
+      lastName: req.body.lastNameBA,
+      contactNo: req.body.contactNoBA,
+      companyName: req.body.companyNameBA,
+      addressLine1: req.body.addressLine1BA,
+      addressLine2: req.body.addressLine2BA,
+      city: req.body.cityBA,
+      stateId: req.body.stateIdBA,
+      countryId: req.body.countryIdBA,
+      zipCode: req.body.zipCodeBA,
+      userId: req.body.userIdBA,
+      isBillingSame: req.body.isBillingSameBA,
+      IsActive: req.body.IsActiveBA,
+    }).save();
+    console.log("add", add._id);
     const billingID = add._id;
     const user = await User.findOneAndUpdate(
-      { _id: req.body.userId },
+      { _id: req.body.userIdBA },
       { $addToSet: { billingAddress: billingID } },
       { new: true }
     );
 
-    if (req.body.isBillingSame) {
-      req.body.isBillingSame = true;
-      const add = await new UserShippingAddress(req.body).save();
-      const billingID = add._id;
-      const user = await User.findOneAndUpdate(
-        { _id: req.body.userId },
-        { $addToSet: { shippingAddress: billingID } },
-        { new: true }
-      );
-    }
+    // if (req.body.isBillingSameBA) {
+    //   req.body.isBillingSameBA = true;
+    //   const add = await new UserShippingAddress(req.body).save();
+    //   const billingID = add._id;
+    //   const user = await User.findOneAndUpdate(
+    //     { _id: req.body.userId },
+    //     { $addToSet: { shippingAddress: billingID } },
+    //     { new: true }
+    //   );
+    // }
 
     res.json(add);
   } catch (err) {
@@ -333,5 +349,18 @@ exports.removeUserBillingAddress = async (req, res) => {
   } catch (error) {
     console.log("error in remove", error);
     res.status(500).json({ "error in remove": error });
+  }
+};
+
+exports.getDefaultBillingAddressByUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findOne({ _id: userId }).exec();
+    const billingId = user.billingAddress[user.defaultBillingAddress];
+    const find = await UserBillingAddress.findOne({ _id: billingId }).exec();
+    res.json(find);
+  } catch (error) {
+    console.log("error in get default billing address", error);
+    return res.status(500).send(error);
   }
 };

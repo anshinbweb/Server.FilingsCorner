@@ -1,6 +1,9 @@
 const { Long } = require("mongodb");
 const Orders = require("../../../models/Products/Orders/OrderNew");
 const OrderDetails = require("../../../models/Products/Orders/OrderDetailsNew");
+const ProductDetails = require("../../../models/Products/Products/ProductDetails");
+const ProductVariants = require("../../../models/Products/Products/ProductVariants");
+const SubscriptionMaster = require("../../../models/Subscription/SubscriptionMaster");
 
 exports.getOrders = async (req, res) => {
   try {
@@ -25,6 +28,68 @@ exports.createOrders = async (req, res) => {
     const add = await new Orders(body).save();
     res.json(add);
   } catch (err) {
+    return res.status(400).send(err);
+  }
+};
+
+exports.createOrderInOneGo = async (req, res) => {
+  try {
+    let body = req.body;
+    body.orderId = [];
+
+    let product = req.body.products;
+
+    for (let i = 0; i < product.length; i++) {
+      let discount = 0;
+      if (product[i].subsId) {
+        const subs = await SubscriptionMaster.findOne({
+          _id: product[i].subsId,
+        }).exec();
+        discount = subs.savePercentage;
+      }
+
+      if (product[i].productVariantsId) {
+        const productVariant = await ProductVariants.findOne({
+          _id: product[i].productVariantsId,
+        }).exec();
+        const productDetail = await ProductDetails.findOne({
+          _id: product[i].productId,
+        }).exec();
+
+        product[i].amount =
+          (productVariant.priceVariant + productDetail.basePrice) *
+            product[i].quantity -
+          ((productVariant.priceVariant + productDetail.basePrice) *
+            product[i].quantity *
+            discount) /
+            100;
+      } else {
+        const product = await ProductDetails.findOne({
+          _id: product[i].productId,
+        }).exec();
+        product[i].amount =
+          product.basePrice * product[i].quantity -
+          (product.basePrice * product[i].quantity * discount) / 100;
+      }
+    }
+
+    const added = await OrderDetails.insertMany(product);
+
+    for (let i = 0; i < added.length; i++) {
+      body.orderId.push(added[i]._id);
+    }
+
+    let amount = 0;
+    for (let i = 0; i < body.orderId.length; i++) {
+      const order = await OrderDetails.findOne({ _id: body.orderId[i] }).exec();
+      amount += order.amount;
+    }
+    body.totalAmount = amount;
+
+    const add = await new Orders(body).save();
+    res.json(add);
+  } catch (err) {
+    console.log(err);
     return res.status(400).send(err);
   }
 };
