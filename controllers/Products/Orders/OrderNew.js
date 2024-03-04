@@ -113,23 +113,37 @@ exports.listOrdersByParams = async (req, res) => {
       // },
       {
         $lookup: {
-          from: "users",
-          localField: "userId",
+          from: "usershippingaddressmasters",
+          localField: "shippingAddress",
           foreignField: "_id",
-          as: "username",
+          as: "address",
         },
       },
       {
         $unwind: {
-          path: "$username",
+          path: "$address",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
-        $set: {
-          username: "$username.firstName",
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
         },
       },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      // {
+      //   $set: {
+      //     username: "$username.firstName",
+      //   },
+      // },
 
       {
         $facet: {
