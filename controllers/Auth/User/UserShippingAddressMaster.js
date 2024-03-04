@@ -362,3 +362,16 @@ exports.removeUserShippingAddress = async (req, res) => {
     res.status(500).json({ "error in remove": error });
   }
 };
+
+exports.getDefaultShippingAddressByUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findOne({ _id: userId }).exec();
+    const shippingId = user.shippingAddress[user.defaultShippingAddress];
+    const find = await UserShippingAddress.findOne({ _id: shippingId }).exec();
+    res.json(find);
+  } catch (error) {
+    console.log("error in get", error);
+    return res.status(500).send(error);
+  }
+};

@@ -14,9 +14,12 @@ const {
   getOrdersByUserId,
   updateOrderStatus,
   updateDeliveryDate,
+  createOrderInOneGo,
 } = require("../controllers/Products/Orders/OrderNew");
 
 router.post("/auth/create/orders", catchAsync(createOrders));
+
+router.post("/auth/create/orders-in-one-go", catchAsync(createOrderInOneGo));
 
 router.get("/auth/list/orders", catchAsync(listOrders));
 
