@@ -292,6 +292,19 @@ exports.updateUserShippingAddress = async (req, res) => {
   }
 };
 
+exports.updateBillingValueSA = async (req, res) => {
+  try {
+    const update = await UserShippingAddress.findOneAndUpdate(
+      { _id: req.params._id },
+      { isBillingSame: true },
+      { new: true }
+    );
+    res.json(update);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
 exports.removeUserShippingAddress = async (req, res) => {
   try {
     const ShippingAdd = await UserShippingAddress.findOne({

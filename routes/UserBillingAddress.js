@@ -14,6 +14,7 @@ const {
   listActiveBillingAddress,
   getAllBillingAddressofUser,
   updateDefaultBillingAddress,
+  getDefaultBillingAddressByUser,
 } = require("../controllers/Auth/User/UserBillingAddressMaster");
 
 router.post(
@@ -64,4 +65,10 @@ router.post(
   "/auth/addUpdate/userBillingAddress",
   catchAsync(AddUpdateBillingAddress)
 );
+
+router.get(
+  "/auth/getDefaultBillingAddress/:userId",
+  catchAsync(getDefaultBillingAddressByUser)
+);
+
 module.exports = router;
