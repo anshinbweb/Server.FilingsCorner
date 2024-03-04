@@ -54,7 +54,7 @@ const OrdersSchema = new mongoose.Schema(
         "Processing",
         "Dispatched",
         "Cancelled",
-        "Completed",
+        "Delivered",
       ],
     },
     isPaid: {
