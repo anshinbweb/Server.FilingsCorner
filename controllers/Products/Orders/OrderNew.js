@@ -3,6 +3,7 @@ const Orders = require("../../../models/Products/Orders/OrderNew");
 const OrderDetails = require("../../../models/Products/Orders/OrderDetailsNew");
 const ProductDetails = require("../../../models/Products/Products/ProductDetails");
 const ProductVariants = require("../../../models/Products/Products/ProductVariants");
+const SubscriptionMaster = require("../../../models/Subscription/SubscriptionMaster");
 
 exports.getOrders = async (req, res) => {
   try {
@@ -88,6 +89,7 @@ exports.createOrderInOneGo = async (req, res) => {
     const add = await new Orders(body).save();
     res.json(add);
   } catch (err) {
+    console.log(err);
     return res.status(400).send(err);
   }
 };
