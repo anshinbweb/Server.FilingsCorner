@@ -273,7 +273,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
           $match: {
             $or: [
               {
-                ProductsDetails: { $regex: match, $options: "i" },
+                productName: { $regex: match, $options: "i" },
               },
             ],
           },
@@ -314,12 +314,12 @@ exports.listProductsDetailsByParams = async (req, res) => {
         unit: list1[0].data[i].unit,
         isOutOfStock: list1[0].data[i].isOutOfStock,
         isSubscription: list1[0].data[i].isSubscription,
+        productVariantsId: list1[0].data[i].productVariantsId.length,
         IsActive: list1[0].data[i].IsActive,
       };
       list.push(obj);
     }
 
-    console.log("list", list[0]);
     let list2 = [];
     for (let i = 0; i < list.length; i++) {
       let obj = {
@@ -333,6 +333,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
         unit: list[i].unit,
         isOutOfStock: list[i].isOutOfStock,
         isSubscription: list[i].isSubscription,
+        productVariantsId: list1[0].data[i].productVariantsId.length,
         IsActive: list[i].IsActive,
       };
       for (let j = i + 1; j < list.length; j++) {
