@@ -14,6 +14,7 @@ const {
   AddUpdateShippingAddress,
   getAllShippingAddressofUser,
   updateDefaultAddress,
+  getDefaultShippingAddressByUser,
 } = require("../controllers/Auth/User/UserShippingAddressMaster");
 
 router.post(
@@ -65,6 +66,11 @@ router.delete(
 router.post(
   "/auth/addUpdate/userShippingAddress",
   catchAsync(AddUpdateShippingAddress)
+);
+
+router.get(
+  "/auth/getDefaultShippingAddress/:userId",
+  catchAsync(getDefaultShippingAddressByUser)
 );
 
 module.exports = router;
