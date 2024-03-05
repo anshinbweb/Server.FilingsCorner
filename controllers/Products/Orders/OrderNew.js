@@ -4,6 +4,8 @@ const OrderDetails = require("../../../models/Products/Orders/OrderDetailsNew");
 const ProductDetails = require("../../../models/Products/Products/ProductDetails");
 const ProductVariants = require("../../../models/Products/Products/ProductVariants");
 const SubscriptionMaster = require("../../../models/Subscription/SubscriptionMaster");
+const User = require("../../../models/Auth/User/Users");
+const UserCart = require("../../../models/Auth/User/UserCart");
 
 exports.getOrders = async (req, res) => {
   try {
@@ -110,6 +112,13 @@ exports.createOrderInOneGo = async (req, res) => {
         { new: true }
       );
     }
+
+    const remove = await UserCart.deleteMany({ userId: body.userId });
+    const user = await User.updateOne(
+      { _id: body.userId },
+      { $set: { cart: [] } },
+      { new: true }
+    );
 
     res.json(add);
   } catch (err) {
