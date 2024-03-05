@@ -1,4 +1,6 @@
 const Users = require("../../../models/Auth/User/Users");
+const nodemailer = require('nodemailer');
+const resetTokens = {};
 const fs = require("fs");
 
 exports.getUsers = async (req, res) => {
@@ -9,13 +11,68 @@ exports.getUsers = async (req, res) => {
     return res.status(500).send(error);
   }
 };
+exports.ResendOTP=async(req,res)=>{
+  try {
+    let {
+      firstName,
+      lastName,
+      contactNo,
+      email,
+      password,
+      IsActive,
+      IsPublic,
+      followers,
+      following,
+      cart,
+      defaultShippingAddress,
+      defaultBillingAddress,
+      shippingAddress,
+      billingAddress
+    } = req.body;
+    console.log('email!', email);
 
+    // Generate OTP
+    const otp = generateOTP(6);
+
+    // Save OTP and timestamp in resetTokens object
+    resetTokens[email] = {
+      otp: otp,
+      timestamp: Date.now(),
+    };
+
+    // Create a nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'dhruvshah232002@gmail.com',
+        pass: 'paum zfsl wuxc asul',
+      },
+    });
+
+    // Compose email options
+    const mailOptions = {
+      from: 'dhruvshah232002@gmail.com',
+      to: email,
+      subject: 'Resend OTP',
+      text: `Your new OTP is: ${otp}`,
+    };
+
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log('Email sent:', info.response);
+    return res.status(200).json({ isOk: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Failed to send reset email' });
+  }
+};
 exports.createUsers = async (req, res) => {
   try {
     if (!fs.existsSync(`${__basedir}/uploads/userImages`)) {
       fs.mkdirSync(`${__basedir}/uploads/userImages`);
     }
-
+    
     let userImage = req.file ? `uploads/userImages/${req.file.filename}` : null;
     let {
       firstName,
@@ -32,8 +89,8 @@ exports.createUsers = async (req, res) => {
       defaultBillingAddress,
       shippingAddress,
       billingAddress,
+      otp
     } = req.body;
-
     let Cart;
     let sa;
     let Followers;
@@ -64,7 +121,7 @@ exports.createUsers = async (req, res) => {
     }
 
     const emailExists = await Users.findOne({
-      email: req.body.email,
+      email: email,
     }).exec();
     if (emailExists) {
       return res.status(200).json({
@@ -72,7 +129,16 @@ exports.createUsers = async (req, res) => {
         message: "Email already exists",
       });
     } else {
-      // const add = await new Users(req.body).save();
+      const otpNumber = parseInt(resetTokens[email].otp , 10);
+      const userotp = parseInt(otp , 10);
+      console.log("email",email);
+      console.log("user entered otp isss",otp);
+      console.log('resetTokens data are:', resetTokens);
+      console.log("otptpttp isss",otpNumber);
+      console.log("otptpttp user isss",userotp);
+
+      if (userotp===otpNumber && !isExpired(resetTokens[email].timestamp)) {
+      try{
       const add = await new Users({
         firstName: firstName,
         lastName: lastName,
@@ -89,19 +155,148 @@ exports.createUsers = async (req, res) => {
         shippingAddress: sa,
         billingAddress: ba,
         userImage: userImage,
+        
       }).save();
 
-      // res.json(add)
-      return res.status(200).json({
+      res.status(200).json({
         isOk: true,
         data: add,
+        isVerified: true,
+        email: email,
       });
+      
+      delete resetTokens[email];
     }
-  } catch (err) {
-    console.log(err);
-    return res.status(500).send(err);
+    catch(err){
+      console.log("error creating account",err);
+    }
+    
+    }
+     else {
+          // If OTP does not match or resetToken not found, consider it not verified
+          res.status(200).json({
+            isOk: false,
+            isVerified: false,
+            email: email
+          });
+        }
+  }} catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err });
   }
 };
+
+const isExpired = (timestamp) => {
+  const expirationTime = 90000; // 2 minutes
+  return Date.now() - timestamp > expirationTime;
+};
+
+
+
+
+
+
+exports.SendOTP = async (req, res) => {
+  const otp = generateOTP(6);
+  console.log("otp is",otp);
+  let {
+    firstName,
+    lastName,
+    contactNo,
+    email,
+    password,
+    IsActive,
+    IsPublic,
+    followers,
+    following,
+    cart,
+    defaultShippingAddress,
+    defaultBillingAddress,
+    shippingAddress,
+    billingAddress,
+  } = req.body;
+  console.log("email!",email);
+  const emailExists = await Users.findOne({
+    email: email,
+  }).exec();
+  if (emailExists) {
+    return res.status(200).json({
+      isOk: false,
+      message: "Email already exists",
+    });
+  }
+  else{
+    resetTokens[email] = {
+      otp: otp,
+      timestamp: Date.now(),
+     };
+     console.log("reste tokens issss",resetTokens);
+
+  const savedOTPData = resetTokens[email];
+  const currentTime = Date.now();
+  const otpTimestamp = savedOTPData.timestamp;
+  const timeDifference = currentTime - otpTimestamp;
+  const validityTime = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+  if (timeDifference > validityTime) {
+    
+    return res.status(400).json({ message: 'OTP has expired' });
+  }
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'dhruvshah232002@gmail.com',
+      pass: 'paum zfsl wuxc asul',
+    },
+  });
+  
+  // Check if the email exists in the dummy database
+
+  const user=Users.findOne({ email: req.body.email}).exec()
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  // Generate OTP
+ 
+  
+  
+  // Send the password reset email
+  const mailOptions = {
+    from: 'dhruvshah232002@gmail.com',
+    to: email,
+    subject: 'OTP Verification',
+    text: ` Your OTP is: ${otp}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Failed to send reset email' });
+    }
+
+    console.log('Email sent: ' + info.response);
+    return res.status(200).json({
+      isOk: true,
+    });
+  });
+}}
+
+function generateOTP(length) {
+  const digits = '123456789';
+  let OTP = '';
+
+  for (let i = 0; i < length; i++) {
+    const index = Math.floor(Math.random() * digits.length);
+    OTP += digits[index];
+  }
+
+  return OTP;
+}
+
+
+
+
 
 exports.listUsers = async (req, res) => {
   try {
