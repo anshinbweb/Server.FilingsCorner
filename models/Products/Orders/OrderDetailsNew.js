@@ -33,6 +33,11 @@ const OrdersDetailsSchema = new mongoose.Schema(
       default: false,
       required: true,
     },
+    isLatestOrder: {
+      type: Boolean, 
+      default: true,
+      required: true,
+    },
     quantity: {
       type: Number,
       required: true,
