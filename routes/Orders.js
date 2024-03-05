@@ -15,6 +15,7 @@ const {
   updateOrderStatus,
   updateDeliveryDate,
   createOrderInOneGo,
+  getLetestOrderByUser,
 } = require("../controllers/Products/Orders/OrderNew");
 
 router.post("/auth/create/orders", catchAsync(createOrders));
@@ -36,5 +37,10 @@ router.get("/auth/get/orders-by-user-id/:_id", catchAsync(getOrdersByUserId));
 router.put("/auth/update/order-status/:_id", catchAsync(updateOrderStatus));
 
 router.put("/auth/update/delivery-date/:_id", catchAsync(updateDeliveryDate));
+
+router.get(
+  "/auth/get/latest-order-by-user/:userId",
+  catchAsync(getLetestOrderByUser)
+);
 
 module.exports = router;
