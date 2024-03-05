@@ -68,6 +68,19 @@ exports.listProductsDetails = async (req, res) => {
   }
 };
 
+exports.listSubscriptionProducts = async (req, res) => {
+  try {
+    const listSubsProduct = await ProductsDetails.find({ isSubscription: true })
+      .sort({})
+      .exec();
+    console.log("list in subscription", listSubsProduct);
+
+    res.json(listSubsProduct);
+  } catch (error) {
+    return res.status(400).json("error in list subscription products", error);
+  }
+};
+
 exports.listProductByCategory = async (req, res) => {
   try {
     const list = await ProductsDetails.find({

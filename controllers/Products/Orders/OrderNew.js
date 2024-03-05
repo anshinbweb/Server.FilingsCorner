@@ -295,10 +295,11 @@ exports.removeOrders = async (req, res) => {
 
 exports.getOrdersByUserId = async (req, res) => {
   try {
-    const find = await Orders.find({ userId: req.params._id }).exec();
-    res.json(find);
+    const findOrders = await Orders.find({ userId: req.params.userId }).exec();
+    console.log("get order by userid", findOrders);
+    res.json(findOrders);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).json("error in get order by userid", error);
   }
 };
 
@@ -328,7 +329,7 @@ exports.updateDeliveryDate = async (req, res) => {
   }
 };
 
-exports.getLetestOrderByUser = async (req, res) => {
+exports.getLatestOrderByUser = async (req, res) => {
   try {
     let query = [
       {
@@ -419,10 +420,15 @@ exports.getLetestOrderByUser = async (req, res) => {
           orderStatus: { $first: "$orderStatus" },
           orderDetails: { $push: "$orderDetails" },
           shippingDetails: { $first: "$shippingDetails" },
+          billingAddress: { $first: "$billingAddress" },
           userDetails: { $first: "$userDetails" },
           productDetails: { $push: "$productDetails" },
           subsDetails: { $push: "$subsDetails" },
           deliveryDate: { $first: "$deliveryDate" },
+          isShippingType: { $first: "$isShippingType" },
+          shippingCharge: { $first: "$shippingCharge" },
+          totalAmount: { $first: "$totalAmount" },
+          subTotal: { $first: "$subTotal" },
           createdAt: { $first: "$createdAt" },
           updatedAt: { $first: "$updatedAt" },
         },
@@ -436,6 +442,7 @@ exports.getLetestOrderByUser = async (req, res) => {
           orderStatus: 1,
           orderDetails: 1,
           shippingDetails: 1,
+          billingAddress: 1,
           // userDetails: 1,
           userFirstName: "$userDetails.firstName",
           userLastName: "$userDetails.lastName",
@@ -443,6 +450,10 @@ exports.getLetestOrderByUser = async (req, res) => {
           productVariants: 1,
           subsDetails: 1,
           deliveryDate: 1,
+          isShippingType: 1,
+          shippingCharge: 1,
+          totalAmount: 1,
+          subTotal: 1,
           createdAt: 1,
           updatedAt: 1,
         },
