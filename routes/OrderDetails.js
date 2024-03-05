@@ -12,7 +12,9 @@ const {
   listOrderDetails,
   listOrderDetailsByParams,
   getOrderDetailsByOrderId,
+  createSubscriptionOrder,
 } = require("../controllers/Products/Orders/OrderDetailsNew");
+
 
 router.post("/auth/create/order-details", catchAsync(createOrderDetails)); // input must be an array
 
@@ -35,6 +37,11 @@ router.get("/auth/list/order-details", catchAsync(listOrderDetails));
 router.get(
   "/auth/get/order-details-by-order-id/:_id",
   catchAsync(getOrderDetailsByOrderId)
+);
+
+router.get(
+  "/auth/create/order-by-subscription",
+  catchAsync(createSubscriptionOrder)
 );
 
 module.exports = router;
