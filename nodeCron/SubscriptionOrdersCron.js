@@ -10,7 +10,7 @@ const SubscriptionMaster = require("../models/Subscription/SubscriptionMaster");
 const moment = require("moment");
 
 exports.SubscriptionOrdersCron = () => {
-  cron.schedule("40 15 * * *", async () => {
+  cron.schedule("00 00 * * *", async () => {
     try {
       // Fetch all orders
       const orders = await OrderDetails.find({
@@ -81,12 +81,28 @@ exports.SubscriptionOrdersCron = () => {
             oldOrder.shippingCharge
           );
 
+          let randomOrderId = Math.random()
+            .toString(36)
+            .slice(2, 10)
+            .padEnd(8, "0");
+
+          let existingOrder = await Orders.findOne({ randomOrderId });
+
+          while (existingOrder) {
+            randomOrderId = Math.random()
+              .toString(36)
+              .slice(2, 10)
+              .padEnd(8, "0");
+            existingOrder = await Orders.findOne({ randomOrderId });
+          }
+
           const newOrder = new Orders({
             ...oldOrder.toObject(),
             _id: new mongoose.Types.ObjectId(),
             subTotal: newOrderDetail.amount,
             totalAmount: totalAmount,
             orderId: [newOrderDetail._id],
+            randomOrderId: randomOrderId,
             OrderStatus: "Not Processed",
             isLatestOrder: true,
             createdAt: new Date(),
