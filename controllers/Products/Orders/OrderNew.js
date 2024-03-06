@@ -26,14 +26,14 @@ exports.createOrders = async (req, res) => {
       const order = await OrderDetails.findOne({ _id: body.orderId[i] }).exec();
       amount += order.amount;
     }
-    body.totalAmount = amount;
+    body.subTotal = amount;
 
     if (body.isShippingType) {
       body.shippingCharge = 20;
-      body.subTotal = body.totalAmount + body.shippingCharge;
+      body.totalAmount = body.subTotal + body.shippingCharge;
     } else {
       body.shippingCharge = 0;
-      body.subTotal = body.totalAmount;
+      body.totalAmount = body.subTotal;
     }
 
     const add = await new Orders(body).save();
@@ -95,14 +95,14 @@ exports.createOrderInOneGo = async (req, res) => {
       const order = await OrderDetails.findOne({ _id: body.orderId[i] }).exec();
       amount += order.amount;
     }
-    body.totalAmount = amount;
+    body.subTotal = amount;
 
     if (body.isShippingType) {
       body.shippingCharge = 20;
-      body.subTotal = body.totalAmount + body.shippingCharge;
+      body.totalAmount = body.subTotal + body.shippingCharge;
     } else {
       body.shippingCharge = 0;
-      body.subTotal = body.totalAmount;
+      body.totalAmount = body.subTotal;
     }
 
     let randomOrderId = Math.random().toString(36).slice(2, 10).padEnd(8, "0");
