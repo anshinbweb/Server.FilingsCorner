@@ -401,7 +401,6 @@ exports.getLatestOrderByUser = async (req, res) => {
       {
         $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true },
       },
-
       {
         $lookup: {
           from: "subscriptionmasters",
@@ -424,13 +423,13 @@ exports.getLatestOrderByUser = async (req, res) => {
       {
         $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true },
       },
-
       {
         $group: {
           _id: "$_id",
           userId: { $first: "$userId" },
           orderId: { $push: "$orderId" },
-          orderStatus: { $first: "$orderStatus" },
+          randomOrderId: { $push: "$randomOrderId" },
+          orderStatus: { $first: "$OrderStatus" },
           orderDetails: { $push: "$orderDetails" },
           shippingDetails: { $first: "$shippingDetails" },
           billingAddress: { $first: "$billingAddress" },
@@ -446,12 +445,12 @@ exports.getLatestOrderByUser = async (req, res) => {
           updatedAt: { $first: "$updatedAt" },
         },
       },
-
       {
         $project: {
           _id: 1,
           userId: 1,
           orderId: 1,
+          randomOrderId: 1,
           orderStatus: 1,
           orderDetails: 1,
           shippingDetails: 1,
