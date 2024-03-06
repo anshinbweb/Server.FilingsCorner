@@ -17,6 +17,7 @@ const {
   getProductsOptions,
   getProductsOptionsParameters,
   getRelatedProducts,
+  listSubscriptionProducts,
 } = require("../controllers/Products/Products/ProductDetails");
 const multer = require("multer");
 
@@ -42,6 +43,11 @@ router.post(
 router.get(
   "/auth/list/product/product-details",
   catchAsync(listProductsDetails)
+);
+
+router.get(
+  "/auth/list/subscription-product/product-details",
+  catchAsync(listSubscriptionProducts)
 );
 
 router.post(

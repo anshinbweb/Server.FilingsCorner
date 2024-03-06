@@ -357,8 +357,21 @@ exports.getDefaultBillingAddressByUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findOne({ _id: userId }).exec();
     const billingId = user.billingAddress[user.defaultBillingAddress];
-    const find = await UserBillingAddress.findOne({ _id: billingId }).exec();
-    res.json(find);
+    if (billingId) {
+      const find = await UserBillingAddress.findOne({ _id: billingId }).exec();
+      res
+        .status(200)
+        .json({
+          isOk: true,
+          data: find,
+          message: "got the default billing address",
+        });
+    } else {
+      res
+        .status(200)
+        .json({ isOk: false, message: "no billing address found" });
+    }
+    // res.json(find);
   } catch (error) {
     console.log("error in get default billing address", error);
     return res.status(500).send(error);

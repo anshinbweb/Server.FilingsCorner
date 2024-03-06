@@ -6,6 +6,7 @@ const ProductVariants = require("../../../models/Products/Products/ProductVarian
 const SubscriptionMaster = require("../../../models/Subscription/SubscriptionMaster");
 const User = require("../../../models/Auth/User/Users");
 const UserCart = require("../../../models/Auth/User/UserCart");
+const { mongoose } = require("mongoose");
 
 exports.getOrders = async (req, res) => {
   try {
@@ -103,6 +104,19 @@ exports.createOrderInOneGo = async (req, res) => {
       body.shippingCharge = 0;
       body.totalAmount = body.subTotal;
     }
+
+    let randomOrderId = Math.random().toString(36).slice(2, 10).padEnd(8, "0");
+
+    let existingOrder = await Orders.findOne({ randomOrderId });
+
+    while (existingOrder) {
+      randomOrderId = Math.random().toString(36).slice(2, 10).padEnd(8, "0");
+      existingOrder = await Orders.findOne({ randomOrderId });
+    }
+    console.log("existingRandomId", randomOrderId);
+
+    // Assign the unique random order ID to the body object
+    body.randomOrderId = randomOrderId;
 
     const add = await new Orders(body).save();
     for (let i = 0; i < added.length; i++) {
@@ -294,10 +308,11 @@ exports.removeOrders = async (req, res) => {
 
 exports.getOrdersByUserId = async (req, res) => {
   try {
-    const find = await Orders.find({ userId: req.params._id }).exec();
-    res.json(find);
+    const findOrders = await Orders.find({ userId: req.params.userId }).exec();
+    console.log("get order by userid", findOrders);
+    res.json(findOrders);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).json("error in get order by userid", error);
   }
 };
 
@@ -324,5 +339,296 @@ exports.updateDeliveryDate = async (req, res) => {
     res.json(update);
   } catch (error) {
     return res.status(400).send(error);
+  }
+};
+
+exports.getLatestOrderByUser = async (req, res) => {
+  try {
+    let query = [
+      {
+        $match: { userId: new mongoose.Types.ObjectId(req.params.userId) },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $limit: 1,
+      },
+      {
+        $unwind: { path: "$orderId", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "userbillingaddressmasters",
+          localField: "billingAddress",
+          foreignField: "_id",
+          as: "billingAddress",
+        },
+      },
+      {
+        $unwind: { path: "$billingAddress", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "usershippingaddressmasters",
+          localField: "shippingAddress",
+          foreignField: "_id",
+          as: "shippingDetails",
+        },
+      },
+      {
+        $unwind: { path: "$shippingDetails", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "ordersdetilsnews",
+          localField: "orderId",
+          foreignField: "_id",
+          as: "orderDetails",
+        },
+      },
+      {
+        $unwind: { path: "$orderDetails", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "productdetailsnews",
+          localField: "orderDetails.productId",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      {
+        $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true },
+      },
+
+      {
+        $lookup: {
+          from: "subscriptionmasters",
+          localField: "orderDetails.subsId",
+          foreignField: "_id",
+          as: "subsDetails",
+        },
+      },
+      {
+        $unwind: { path: "$subsDetails", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      {
+        $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true },
+      },
+
+      {
+        $group: {
+          _id: "$_id",
+          userId: { $first: "$userId" },
+          orderId: { $push: "$orderId" },
+          orderStatus: { $first: "$orderStatus" },
+          orderDetails: { $push: "$orderDetails" },
+          shippingDetails: { $first: "$shippingDetails" },
+          billingAddress: { $first: "$billingAddress" },
+          userDetails: { $first: "$userDetails" },
+          productDetails: { $push: "$productDetails" },
+          subsDetails: { $push: "$subsDetails" },
+          deliveryDate: { $first: "$deliveryDate" },
+          isShippingType: { $first: "$isShippingType" },
+          shippingCharge: { $first: "$shippingCharge" },
+          totalAmount: { $first: "$totalAmount" },
+          subTotal: { $first: "$subTotal" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+        },
+      },
+
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          orderId: 1,
+          orderStatus: 1,
+          orderDetails: 1,
+          shippingDetails: 1,
+          billingAddress: 1,
+          // userDetails: 1,
+          userFirstName: "$userDetails.firstName",
+          userLastName: "$userDetails.lastName",
+          productDetails: 1,
+          productVariants: 1,
+          subsDetails: 1,
+          deliveryDate: 1,
+          isShippingType: 1,
+          shippingCharge: 1,
+          totalAmount: 1,
+          subTotal: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      },
+    ];
+
+    const find = await Orders.aggregate(query).exec();
+
+    // const find = await Orders.find({ userId: req.params._id })
+    //   .sort({ createdAt: -1 })
+    //   .limit(1)
+    //   .exec();
+    res.json(find);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+};
+
+exports.getSubscriptionProductofUser = async (req, res) => {
+  try {
+    let query = [
+      {
+        $match: { userId: new mongoose.Types.ObjectId(req.params.userId) },
+      },
+      // {
+      //   $sort: { createdAt: -1 },
+      // },
+      // {
+      //   $limit: 1,
+      // },
+      {
+        $unwind: { path: "$orderId", preserveNullAndEmptyArrays: true },
+      },
+      // {
+      //   $lookup: {
+      //     from: "userbillingaddressmasters",
+      //     localField: "billingAddress",
+      //     foreignField: "_id",
+      //     as: "billingAddress",
+      //   },
+      // },
+      // {
+      //   $unwind: { path: "$billingAddress", preserveNullAndEmptyArrays: true },
+      // },
+      // {
+      //   $lookup: {
+      //     from: "usershippingaddressmasters",
+      //     localField: "shippingAddress",
+      //     foreignField: "_id",
+      //     as: "shippingDetails",
+      //   },
+      // },
+      // {
+      //   $unwind: { path: "$shippingDetails", preserveNullAndEmptyArrays: true },
+      // },
+      {
+        $lookup: {
+          from: "ordersdetilsnews",
+          localField: "orderId",
+          foreignField: "_id",
+          as: "orderDetails",
+        },
+      },
+      {
+        $unwind: { path: "$orderDetails", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $match: { "orderDetails.isSubs": true }, // Filter to include only order details where isSubs is true
+      },
+      {
+        $lookup: {
+          from: "productdetailsnews",
+          localField: "orderDetails.productId",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      {
+        $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true },
+      },
+
+      {
+        $lookup: {
+          from: "subscriptionmasters",
+          localField: "orderDetails.subsId",
+          foreignField: "_id",
+          as: "subsDetails",
+        },
+      },
+      {
+        $unwind: { path: "$subsDetails", preserveNullAndEmptyArrays: true },
+      },
+      // {
+      //   $lookup: {
+      //     from: "users",
+      //     localField: "userId",
+      //     foreignField: "_id",
+      //     as: "userDetails",
+      //   },
+      // },
+      // {
+      //   $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true },
+      // },
+
+      {
+        $group: {
+          _id: "$_id",
+          userId: { $first: "$userId" },
+          orderId: { $push: "$orderId" },
+          orderStatus: { $first: "$orderStatus" },
+          orderDetails: { $push: "$orderDetails" },
+          // shippingDetails: { $first: "$shippingDetails" },
+          // billingAddress: { $first: "$billingAddress" },
+          // userDetails: { $first: "$userDetails" },
+          productDetails: { $push: "$productDetails" },
+          subsDetails: { $push: "$subsDetails" },
+          deliveryDate: { $first: "$deliveryDate" },
+          isShippingType: { $first: "$isShippingType" },
+          shippingCharge: { $first: "$shippingCharge" },
+          totalAmount: { $first: "$totalAmount" },
+          subTotal: { $first: "$subTotal" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+        },
+      },
+
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          orderId: 1,
+          orderStatus: 1,
+          orderDetails: 1,
+          // shippingDetails: 1,
+          // billingAddress: 1,
+          // userDetails: 1,
+          // userFirstName: "$userDetails.firstName",
+          // userLastName: "$userDetails.lastName",
+          productDetails: 1,
+          productVariants: 1,
+          subsDetails: 1,
+          deliveryDate: 1,
+          isShippingType: 1,
+          shippingCharge: 1,
+          totalAmount: 1,
+          subTotal: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      },
+    ];
+
+    const find = await Orders.aggregate(query).exec();
+
+    // const find = await Orders.find({ userId: req.params._id })
+    //   .sort({ createdAt: -1 })
+    //   .limit(1)
+    //   .exec();
+    res.json(find);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
   }
 };

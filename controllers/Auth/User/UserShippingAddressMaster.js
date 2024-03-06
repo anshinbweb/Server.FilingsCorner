@@ -368,8 +368,22 @@ exports.getDefaultShippingAddressByUser = async (req, res) => {
     const userId = req.params.userId;
     const user = await User.findOne({ _id: userId }).exec();
     const shippingId = user.shippingAddress[user.defaultShippingAddress];
-    const find = await UserShippingAddress.findOne({ _id: shippingId }).exec();
-    res.json(find);
+    if (shippingId) {
+      const find = await UserShippingAddress.findOne({
+        _id: shippingId,
+      }).exec();
+      res.status(200).json({
+        isOk: true,
+        data: find,
+        message: "got the default billing address",
+      });
+    } else {
+      res.status(200).json({
+        isOk: false,
+        message: "No default shipping address found",
+      });
+    }
+    // res.json(find);
   } catch (error) {
     console.log("error in get", error);
     return res.status(500).send(error);
