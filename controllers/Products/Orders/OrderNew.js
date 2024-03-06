@@ -49,6 +49,7 @@ exports.createOrderInOneGo = async (req, res) => {
     body.orderId = [];
 
     let product = req.body.products;
+    console.log("pp", product);
 
     for (let i = 0; i < product.length; i++) {
       let discount = 0;
@@ -57,12 +58,15 @@ exports.createOrderInOneGo = async (req, res) => {
           _id: product[i].subsId,
         }).exec();
         discount = subs.savePercentage;
+
+        product[i].isSubs = true;
       }
 
       if (product[i].productVariantsId) {
         const productVariant = await ProductVariants.findOne({
           _id: product[i].productVariantsId,
         }).exec();
+
         const productDetail = await ProductDetails.findOne({
           _id: product[i].productId,
         }).exec();
@@ -75,16 +79,20 @@ exports.createOrderInOneGo = async (req, res) => {
             discount) /
             100;
       } else {
-        const product = await ProductDetails.findOne({
+        console.log("product[i].productId", product);
+        const products = await ProductDetails.findOne({
           _id: product[i].productId,
         }).exec();
+        console.log("product[i]", products);
         product[i].amount =
-          product.basePrice * product[i].quantity -
-          (product.basePrice * product[i].quantity * discount) / 100;
+          products.basePrice * product[i].quantity -
+          (products.basePrice * product[i].quantity * discount) / 100;
       }
     }
 
+    console.log("last", product);
     const added = await OrderDetails.insertMany(product);
+    console.log("added", added);
 
     for (let i = 0; i < added.length; i++) {
       body.orderId.push(added[i]._id);

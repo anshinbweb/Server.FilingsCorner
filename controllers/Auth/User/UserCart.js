@@ -10,12 +10,16 @@ exports.createUserCart = async (req, res) => {
     const { userId, productId, subsId, productVariantsId, quantity } = req.body;
     console.log("req.body", req.body);
     console.log("subsId", subsId);
+    console.log("initial productVariantsId", productVariantsId);
 
+    let productVariantsIds = productVariantsId == "" ? null : productVariantsId;
     const checkCart = await UserCart.findOne({
       userId: userId,
       productId: productId,
-      productVariantsId: productVariantsId,
+      productVariantsId: productVariantsIds,
     });
+    console.log("checkCart", checkCart);
+    console.log("productVariantsId", productVariantsIds);
     if (checkCart) {
       req.body.quantity = checkCart.quantity + quantity;
       this.updateQuantity(req, res);
@@ -32,7 +36,7 @@ exports.createUserCart = async (req, res) => {
       const checkCart = await UserCart.findOne({
         userId: userId,
         productId: productId,
-        productVariantsId: productVariantsId,
+        productVariantsId: productVariantsIds,
       });
       if (checkCart) {
         req.body.quantity = checkCart.quantity + quantity;
@@ -55,11 +59,11 @@ exports.createUserCart = async (req, res) => {
             message: "Product is out of stock",
           });
         }
-        if (productVariantsId == null) {
+        if (productVariantsIds == null) {
           amount = productAmount.basePrice * quantity;
           console.log("amount", amount);
         } else {
-          amount = await ProductVariants.findOne({ _id: productVariantsId });
+          amount = await ProductVariants.findOne({ _id: productVariantsIds });
           if (amount.isOutOfStock) {
             return res.status(200).json({
               isOk: false,
@@ -73,11 +77,11 @@ exports.createUserCart = async (req, res) => {
         amount = amount - (amount * discount) / 100;
 
         const add = await new UserCart({
-          userId,
-          productId,
-          subsId,
-          productVariantsId,
-          quantity,
+          userId: userId,
+          productId: productId,
+          subsId: subsId,
+          productVariantsId: productVariantsIds,
+          quantity: quantity,
         }).save();
         console.log("data id", add._id);
         const usercartID = add._id;
