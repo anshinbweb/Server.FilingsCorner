@@ -14,6 +14,10 @@ const OrdersSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    randomOrderId: {
+      type: String,
+      required: true,
+    },
     totalAmount: {
       type: Number,
       required: true,
