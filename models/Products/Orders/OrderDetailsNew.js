@@ -7,6 +7,11 @@ const OrdersDetailsSchema = new mongoose.Schema(
       ref: "Users",
       required: true,
     },
+    orderId: {
+      type: Schema.Types.ObjectId,
+      ref: "OrderNew",
+      required: false,
+    },
     productId: {
       type: Schema.Types.ObjectId,
       ref: "ProductDetails",
@@ -26,6 +31,11 @@ const OrdersDetailsSchema = new mongoose.Schema(
       // to check if product is ordered automatically as subscription
       type: Boolean, // false for first time order
       default: false,
+      required: true,
+    },
+    isLatestOrder: {
+      type: Boolean, 
+      default: true,
       required: true,
     },
     quantity: {

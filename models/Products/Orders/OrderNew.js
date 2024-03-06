@@ -14,7 +14,19 @@ const OrdersSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    randomOrderId: {
+      type: String,
+      required: true,
+    },
     totalAmount: {
+      type: Number,
+      required: true,
+    },
+    subTotal: {
+      type: Number,
+      required: true,
+    },
+    shippingCharge: {
       type: Number,
       required: true,
     },
@@ -54,13 +66,17 @@ const OrdersSchema = new mongoose.Schema(
         "Processing",
         "Dispatched",
         "Cancelled",
-        "Completed",
+        "Delivered",
       ],
     },
     isPaid: {
       type: Boolean,
       default: false,
       required: true,
+    },
+    isShippingType: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

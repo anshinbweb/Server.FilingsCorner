@@ -16,6 +16,7 @@ const {
   updateProductVariantStock,
   updateProductVariantActive,
   updateProductVariantPrice,
+  getProductVariantsInfoInCart,
 } = require("../controllers/Products/Products/ProductVariants");
 
 router.post("/auth/create/productVariants", catchAsync(createProductVariants));
@@ -39,7 +40,10 @@ router.delete(
   catchAsync(removeProductVariants)
 );
 
-router.get("/auth/get/productVariantsInfo", catchAsync(getProductVariantsInfo));
+router.post(
+  "/auth/get/productVariantsInfo",
+  catchAsync(getProductVariantsInfo)
+);
 
 router.get(
   "/auth/get/productVariantsByProductId/:_id",
@@ -64,6 +68,11 @@ router.put(
 router.put(
   "/auth/update/productVariantActive/:_id",
   catchAsync(updateProductVariantActive)
+);
+
+router.get(
+  "/auth/get/productVariantsInfoInCart/:productVariantsId",
+  catchAsync(getProductVariantsInfoInCart)
 );
 
 module.exports = router;

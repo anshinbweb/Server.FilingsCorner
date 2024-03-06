@@ -292,6 +292,19 @@ exports.updateUserShippingAddress = async (req, res) => {
   }
 };
 
+exports.updateBillingValueSA = async (req, res) => {
+  try {
+    const update = await UserShippingAddress.findOneAndUpdate(
+      { _id: req.params._id },
+      { isBillingSame: true },
+      { new: true }
+    );
+    res.json(update);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
 exports.removeUserShippingAddress = async (req, res) => {
   try {
     const ShippingAdd = await UserShippingAddress.findOne({
@@ -299,20 +312,80 @@ exports.removeUserShippingAddress = async (req, res) => {
     });
 
     if (ShippingAdd) {
-      const updatedUserSA = await User.findOneAndUpdate(
-        { _id: ShippingAdd.userId },
-        { $pull: { shippingAddress: req.params._id } },
+      const updatedUserSA = await User.findOne({ _id: ShippingAdd.userId });
+
+      const defaultShippingAddress =
+        updatedUserSA.shippingAddress[updatedUserSA.defaultShippingAddress];
+      if (defaultShippingAddress == req.params._id) {
+        const updatedUserSA = await User.findOneAndUpdate(
+          { _id: ShippingAdd.userId },
+          {
+            $pull: { shippingAddress: req.params._id },
+            $set: { defaultShippingAddress: -1 },
+          },
+          { new: true }
+        );
+      } else {
+        const updatedUserSA = await User.findOneAndUpdate(
+          { _id: ShippingAdd.userId },
+          { $pull: { shippingAddress: req.params._id } },
+          { new: true }
+        );
+
+        const sa = updatedUserSA.shippingAddress;
+        const index = sa.indexOf(defaultShippingAddress);
+        console.log("Index of addressId:", index);
+
+        updatedUserSA.defaultShippingAddress = index;
+        updatedUserSA.save();
+      }
+
+      const deletedBA = await UserShippingAddress.findOneAndUpdate(
+        { _id: req.params._id },
+        { $set: { IsActive: false } },
         { new: true }
       );
-      const deletedsA = await UserShippingAddress.findOneAndRemove({
-        _id: req.params._id,
+      console.log("delted", deletedBA);
+      res.status(200).json({
+        isOk: true,
+        message: "Shipping address removed successfully",
+        data: {},
       });
-      console.log("delted", deletedsA);
-      res.json(deletedsA);
     } else {
-      console.log("Billing address not found");
+      console.log("Shipping address not found");
+      res
+        .status(200)
+        .json({ isOk: false, message: "Shipping address not found", data: {} });
     }
   } catch (error) {
-    res.status(500).json("error in remove", error);
+    console.log("error in remove", error);
+    res.status(500).json({ "error in remove": error });
+  }
+};
+
+exports.getDefaultShippingAddressByUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findOne({ _id: userId }).exec();
+    const shippingId = user.shippingAddress[user.defaultShippingAddress];
+    if (shippingId) {
+      const find = await UserShippingAddress.findOne({
+        _id: shippingId,
+      }).exec();
+      res.status(200).json({
+        isOk: true,
+        data: find,
+        message: "got the default billing address",
+      });
+    } else {
+      res.status(200).json({
+        isOk: false,
+        message: "No default shipping address found",
+      });
+    }
+    // res.json(find);
+  } catch (error) {
+    console.log("error in get", error);
+    return res.status(500).send(error);
   }
 };
