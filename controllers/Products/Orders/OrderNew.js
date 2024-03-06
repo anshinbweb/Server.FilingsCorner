@@ -537,18 +537,52 @@ exports.getSubscriptionProductofUser = async (req, res) => {
       {
         $match: { "orderDetails.isSubs": true }, // Filter to include only order details where isSubs is true
       },
+      // {
+      //   $lookup: {
+      //     from: "productdetailsnews",
+      //     localField: "orderDetails.productId",
+      //     foreignField: "_id",
+      //     as: "productDetails",
+      //   },
+      // },
+      // {
+      //   $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true },
+      // },
+
       {
         $lookup: {
           from: "productdetailsnews",
           localField: "orderDetails.productId",
           foreignField: "_id",
-          as: "productDetails",
+          as: "productDetailsTemp", // Temporary field to hold the product details
         },
       },
       {
-        $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true },
+        $addFields: {
+          "orderDetails.productDetails": {
+            $arrayElemAt: ["$productDetailsTemp", 0], // Retrieve the first element from the productDetailsTemp array
+          },
+        },
       },
-
+      {
+        $project: {
+          productDetailsTemp: 0, // Exclude the temporary field from the output
+          "orderDetails.productDetails.productDescription": 0, // Exclude unwanted fields from productDetails
+          "orderDetails.productDetails.basePrice": 0,
+          "orderDetails.productDetails.weight": 0,
+          "orderDetails.productDetails.unit": 0,
+          "orderDetails.productDetails.productOptionId": 0,
+          "orderDetails.productDetails.productVariantsId": 0,
+          "orderDetails.productDetails.isOutOfStock": 0,
+          "orderDetails.productDetails.isSubscription": 0,
+          "orderDetails.productDetails.IsActive": 0,
+          "orderDetails.productDetails.createdAt": 0,
+          "orderDetails.productDetails.updatedAt": 0,
+          "orderDetails.productDetails.categories": 0,
+          "orderDetails.productDetails._id": 0,
+          "orderDetails.productDetails.__v": 0,
+        },
+      },
       {
         $lookup: {
           from: "subscriptionmasters",
@@ -560,6 +594,20 @@ exports.getSubscriptionProductofUser = async (req, res) => {
       {
         $unwind: { path: "$subsDetails", preserveNullAndEmptyArrays: true },
       },
+      {
+        $addFields: {
+          "orderDetails.subscriptionStartDate": {
+            $toDate: {
+              $add: [
+                // new Date(0), // Epoch date (1970-01-01)
+                { $multiply: ["$subsDetails.days", 24, 60, 60, 1000] }, // Subscription duration in milliseconds
+                "$createdAt", // Add the createdAt date
+              ],
+            },
+          },
+        },
+      },
+
       // {
       //   $lookup: {
       //     from: "users",
@@ -582,7 +630,7 @@ exports.getSubscriptionProductofUser = async (req, res) => {
           // shippingDetails: { $first: "$shippingDetails" },
           // billingAddress: { $first: "$billingAddress" },
           // userDetails: { $first: "$userDetails" },
-          productDetails: { $push: "$productDetails" },
+          // productDetails: { $push: "$productDetails" },
           subsDetails: { $push: "$subsDetails" },
           deliveryDate: { $first: "$deliveryDate" },
           isShippingType: { $first: "$isShippingType" },
@@ -606,7 +654,7 @@ exports.getSubscriptionProductofUser = async (req, res) => {
           // userDetails: 1,
           // userFirstName: "$userDetails.firstName",
           // userLastName: "$userDetails.lastName",
-          productDetails: 1,
+          // productDetails: 1,
           productVariants: 1,
           subsDetails: 1,
           deliveryDate: 1,
