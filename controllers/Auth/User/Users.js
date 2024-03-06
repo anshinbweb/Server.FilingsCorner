@@ -44,14 +44,14 @@ exports.ResendOTP=async(req,res)=>{
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'dhruvshah232002@gmail.com',
-        pass: 'paum zfsl wuxc asul',
+        user: 'marwiz.tech@gmail.com',
+        pass: 'abuoxineboamaqkm',
       },
     });
 
     // Compose email options
     const mailOptions = {
-      from: 'dhruvshah232002@gmail.com',
+      from: 'marwiz.tech@gmail.com',
       to: email,
       subject: 'Resend OTP',
       text: `Your new OTP is: ${otp}`,
@@ -245,8 +245,8 @@ exports.SendOTP = async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'dhruvshah232002@gmail.com',
-      pass: 'paum zfsl wuxc asul',
+      user: 'marwiz.tech@gmail.com',
+      pass: 'abuoxineboamaqkm',
     },
   });
   
@@ -263,7 +263,7 @@ exports.SendOTP = async (req, res) => {
   
   // Send the password reset email
   const mailOptions = {
-    from: 'dhruvshah232002@gmail.com',
+    from: 'marwiz.tech@gmail.com',
     to: email,
     subject: 'OTP Verification',
     text: ` Your OTP is: ${otp}`,
