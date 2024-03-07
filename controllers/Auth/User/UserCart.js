@@ -13,10 +13,12 @@ exports.createUserCart = async (req, res) => {
     console.log("initial productVariantsId", productVariantsId);
 
     let productVariantsIds = productVariantsId == "" ? null : productVariantsId;
+    let subsIds = subsId == "" ? null : subsId;
     const checkCart = await UserCart.findOne({
       userId: userId,
       productId: productId,
       productVariantsId: productVariantsIds,
+      subsId: subsIds,
     });
     console.log("checkCart", checkCart);
     console.log("productVariantsId", productVariantsIds);
@@ -49,9 +51,9 @@ exports.createUserCart = async (req, res) => {
       // CHECK STOCK
       let amount = 0;
       let discount = 0;
-      if (subsId) {
+      if (subsIds) {
         const subs = await SubscriptionMaster.findOne({
-          _id: subsId,
+          _id: subsIds,
         }).exec();
         discount = subs.savePercentage;
       }
@@ -83,7 +85,7 @@ exports.createUserCart = async (req, res) => {
       const add = await new UserCart({
         userId: userId,
         productId: productId,
-        subsId: subsId,
+        subsId: subsIds,
         productVariantsId: productVariantsIds,
         quantity: quantity,
       }).save();
@@ -280,12 +282,13 @@ exports.getUserCartByUserId = async (req, res) => {
 
 exports.updateQuantity = async (req, res) => {
   try {
-    const { userId, productId, productVariantsId, quantity } = req.body;
+    const { userId, productId, productVariantsId, subsId, quantity } = req.body;
 
     const findData = await UserCart.findOne({
       userId: userId,
       productId: productId,
       productVariantsId: productVariantsId,
+      subsId: subsId,
     });
     console.log("findData", findData);
 
@@ -336,12 +339,14 @@ exports.updateQuantity = async (req, res) => {
 
 exports.increaseQuantityOne = async (req, res) => {
   try {
-    const { userId, productId, productVariantsId } = req.body;
+    const { userId, productId, productVariantsId, subsId } = req.body;
 
+    console.log("req.body", req.body);
     const findData = await UserCart.findOne({
       userId: userId,
       productId: productId,
       productVariantsId: productVariantsId,
+      subsId: subsId,
     });
     console.log("findData", findData);
 
@@ -393,12 +398,13 @@ exports.increaseQuantityOne = async (req, res) => {
 
 exports.decreaseQuantityOne = async (req, res) => {
   try {
-    const { userId, productId, productVariantsId } = req.body;
+    const { userId, productId, productVariantsId, subsId } = req.body;
 
     const findData = await UserCart.findOne({
       userId: userId,
       productId: productId,
       productVariantsId: productVariantsId,
+      subsId: subsId,
     });
     console.log("findData", findData);
 
