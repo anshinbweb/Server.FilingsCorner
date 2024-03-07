@@ -435,8 +435,8 @@ exports.getLatestOrderByUser = async (req, res) => {
         $group: {
           _id: "$_id",
           userId: { $first: "$userId" },
-          orderId: { $push: "$orderId" },
-          randomOrderId: { $push: "$randomOrderId" },
+          orderId: { $push: "$orderId" },  
+          randomOrderId: { $first: "$randomOrderId" },
           orderStatus: { $first: "$OrderStatus" },
           orderDetails: { $push: "$orderDetails" },
           shippingDetails: { $first: "$shippingDetails" },
