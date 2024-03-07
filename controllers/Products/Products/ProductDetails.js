@@ -598,6 +598,71 @@ exports.getProductsOptions = async (req, res) => {
       _id: req.params.productId,
     }).exec();
 
+    // const query = [
+    //   {
+    //     $match: {
+    //       _id: { $in: product.productOptionId },
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       // $in: ProductOptions.parameterId,
+    //       from: "parametermasters",
+    //       localField: "parameterId",
+    //       foreignField: "_id",
+    //       as: "parameter1",
+    //     },
+    //   },
+    //   { $unwind: { path: "$parameter1", preserveNullAndEmptyArrays: true } },
+
+    //   {
+    //     $lookup: {
+    //       from: "parametervalues",
+    //       localField: "parameterValueId",
+    //       foreignField: "_id",
+    //       as: "parameter",
+    //     },
+    //   },
+    //   // { $unwind: { path: "$parameter", preserveNullAndEmptyArrays: true } },
+
+    //   {
+    //     $project: {
+    //       parameterName: "$parameter1.parameterName",
+    //       paramterid: "$parameter1._id",
+    //       // parameterValue: "$parameterValue.parameterValue",
+    //       parameterValueId: 1,
+    //       parameterValueNames: {
+    //         $map: {
+    //           input: "$parameter",
+    //           as: "parameter2",
+    //           in: "$$parameter2._id",
+    //         },
+    //       },
+    //     },
+    //   },
+    // ];
+
+    // const options = await ProductOptions.aggregate(query).exec();
+    // // console.log(options);
+
+    // let newOptions = [];
+    // options.forEach((element) => {
+    //   let newOption = {
+    //     id: element.paramterid,
+    //     name: element.parameterName,
+    //     // make a object of parameterValueId and parameterValueNames
+    //     parameterValues: element.parameterValueNames.map((value, index) => {
+    //       console.log("value in backend", value);
+    //       console.log("value in backend ", element.parameterValueId);
+    //       return {
+    //         id: element.parameterValueId[index],
+    //         name: value,
+    //       };
+    //     }),
+    //   };
+    //   newOptions.push(newOption);
+    // });
+
     const query = [
       {
         $match: {
@@ -606,35 +671,33 @@ exports.getProductsOptions = async (req, res) => {
       },
       {
         $lookup: {
-          // $in: ProductOptions.parameterId,
           from: "parametermasters",
           localField: "parameterId",
           foreignField: "_id",
-          as: "parameter1",
+          as: "parameter",
         },
       },
-      { $unwind: { path: "$parameter1", preserveNullAndEmptyArrays: true } },
-
+      { $unwind: "$parameter" },
       {
         $lookup: {
           from: "parametervalues",
           localField: "parameterValueId",
           foreignField: "_id",
-          as: "parameter",
+          as: "parameterValues",
         },
       },
-      // { $unwind: { path: "$parameter", preserveNullAndEmptyArrays: true } },
-
       {
         $project: {
-          parameterName: "$parameter1.parameterName",
-          // parameterValue: "$parameterValue.parameterValue",
-          parameterValueId: 1,
-          parameterValueNames: {
+          id: "$parameter._id",
+          name: "$parameter.parameterName",
+          parameterValues: {
             $map: {
-              input: "$parameter",
-              as: "parameter2",
-              in: "$$parameter2.parameterValue",
+              input: "$parameterValues",
+              as: "value",
+              in: {
+                id: "$$value._id",
+                name: "$$value.parameterValue",
+              },
             },
           },
         },
@@ -642,25 +705,8 @@ exports.getProductsOptions = async (req, res) => {
     ];
 
     const options = await ProductOptions.aggregate(query).exec();
-    // console.log(options);
 
-    let newOptions = [];
-    options.forEach((element) => {
-      let newOption = {
-        id: element._id,
-        name: element.parameterName,
-        // make a object of parameterValueId and parameterValueNames
-        parameterValues: element.parameterValueNames.map((value, index) => {
-          return {
-            id: element.parameterValueId[index],
-            name: value,
-          };
-        }),
-      };
-      newOptions.push(newOption);
-    });
-
-    res.json(newOptions);
+    res.json(options);
   } catch (error) {
     console.log(error);
     return res.status(400).send(error);
