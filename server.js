@@ -8,6 +8,7 @@ const path = require("path");
 const { throws } = require("assert");
 require("dotenv").config();
 const axios = require("axios");
+var NodeCronJob = require("./nodeCron/NodeIndex");
 
 global.__basedir = __dirname;
 
@@ -27,6 +28,7 @@ mongoose
   .connect(process.env.DATABASE, { useNewUrlParser: true })
   .then(() => {
     databasestatus = "DB connected";
+    NodeCronJob.LoadCronJobs();
     console.log("DB connected");
   })
   .catch((err) => {
