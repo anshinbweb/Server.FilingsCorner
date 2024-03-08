@@ -17,6 +17,8 @@ const {
   userLogin,
   ChangePasswordUser,
   updateDefaultAddress,
+  forgotPassword,
+  NewPassword,
   ResendOTP
 } = require("../controllers/Auth/User/Users");
 const multer = require("multer");
@@ -147,11 +149,46 @@ cleanupExpiredOTPs();
 //     });
 //   }})
 router.post(
+  "/auth/forgot/password/users",
+    catchAsync(forgotPassword));
+router.post(
   "/auth/create/users",
      upload.single("myFile"),
     catchAsync(createUsers));
 router.post("/auth/otp/users",upload.single("myFile"),catchAsync(SendOTP));
-  // router.post("/auth/otp/users",upload.single("myFile"),async(req, res) => {
+
+router.post("/auth/user-change-password", catchAsync(ChangePasswordUser));
+
+router.get("/auth/list/users", catchAsync(listUsers));
+
+router.post("/auth/list-by-params/users", catchAsync(listUsersByParams));
+
+router.get("/auth/get/users/:_id", catchAsync(getUsers));
+
+router.put(
+  "/auth/update/users/:_id",
+  upload.single("myFile"),
+  catchAsync(updateUsers)
+);
+
+router.post(
+  "/auth/update-defualt-address/:userId/:addressId",
+  catchAsync(updateDefaultAddress)
+);
+router.post('/auth/resend-otp/users',upload.single("myFile"), catchAsync(ResendOTP));
+
+
+
+router.delete("/auth/remove/users/:_id", catchAsync(removeUsers));
+
+router.post("/login", catchAsync(userLogin));
+
+router.post("/auth/new/password/users", catchAsync(NewPassword));
+
+module.exports = router;
+
+
+ // router.post("/auth/otp/users",upload.single("myFile"),async(req, res) => {
   //     try {
   //       // Access resetTokens data in the verification route
   //       let userImage = req.file ? `uploads/userImages/${req.file.filename}` : null;
@@ -224,36 +261,4 @@ router.post("/auth/otp/users",upload.single("myFile"),catchAsync(SendOTP));
 
   
   // Function to check if a timestamp is expired (2 minutes = 120,000 milliseconds)
-  const isExpired = (timestamp) => {
-    const expirationTime = 90000; // 2 minutes
-    return Date.now() - timestamp > expirationTime;
-  };
- console.log(resetTokens);
-
-router.post("/auth/user-change-password", catchAsync(ChangePasswordUser));
-
-router.get("/auth/list/users", catchAsync(listUsers));
-
-router.post("/auth/list-by-params/users", catchAsync(listUsersByParams));
-
-router.get("/auth/get/users/:_id", catchAsync(getUsers));
-
-router.put(
-  "/auth/update/users/:_id",
-  upload.single("myFile"),
-  catchAsync(updateUsers)
-);
-
-router.post(
-  "/auth/update-defualt-address/:userId/:addressId",
-  catchAsync(updateDefaultAddress)
-);
-router.post('/auth/resend-otp/users',upload.single("myFile"), catchAsync(ResendOTP));
-
-
-
-router.delete("/auth/remove/users/:_id", catchAsync(removeUsers));
-
-router.post("/login", catchAsync(userLogin));
-
-module.exports = router;
+  
