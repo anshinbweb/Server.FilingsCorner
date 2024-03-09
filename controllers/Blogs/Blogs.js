@@ -11,6 +11,34 @@ exports.getBlogs = async (req, res) => {
   }
 };
 
+exports.AddLikes = async (req, res) => {
+  try {
+    const { blogId, userId } = req.params;
+    const blogsData = await Blogs.findOneAndUpdate(
+      { _id: blogId },
+      { $addToSet: { likes: userId } },
+      { new: true }
+    );
+    res.json(blogsData);
+  } catch (error) {
+    return res.status(500).json("error in add likes ", error);
+  }
+};
+
+exports.RemoveLikes = async (req, res) => {
+  try {
+    const { blogId, userId } = req.params;
+    const blogsData = await Blogs.findOneAndUpdate(
+      { _id: blogId },
+      { $pull: { likes: userId } },
+      { new: true }
+    );
+    res.json(blogsData);
+  } catch (error) {
+    return res.status(500).json("error in remove likes ", error);
+  }
+};
+
 // exports.SerachBlog = async (req, res) => {
 //   try {
 //     const searchTerm = req.query.search; // Assuming you're passing the search term in the query string
