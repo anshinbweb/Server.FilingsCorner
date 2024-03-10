@@ -1,8 +1,8 @@
-const AdminUser = require("../../models/Auth/AdminUser");
+const User = require("../../../models/Auth/User/AdminUsers");
 
 exports.getAdminUser = async (req, res) => {
   try {
-    const find = await AdminUser.findOne({ _id: req.params._id }).exec();
+    const find = await User.findOne({ _id: req.params._id }).exec();
     res.json(find);
   } catch (error) {
     return res.status(500).send(error);
@@ -11,17 +11,17 @@ exports.getAdminUser = async (req, res) => {
 
 exports.createAdminUser = async (req, res) => {
   try {
-    const emailExists = await AdminUser.findOne({
+    const emailExists = await User.findOne({
       email: req.body.email,
     }).exec();
+
     if (emailExists) {
       return res.status(200).json({
         isOk: false,
         message: "Email already exists",
       });
     } else {
-      const add = await new AdminUser(req.body).save();
-      // res.json(add)
+      const add = await new User(req.body).save();
       return res.status(200).json({
         isOk: true,
         data: add,
@@ -35,7 +35,7 @@ exports.createAdminUser = async (req, res) => {
 
 exports.listAdminUser = async (req, res) => {
   try {
-    const list = await AdminUser.find().sort({ createdAt: -1 }).exec();
+    const list = await User.find().sort({ createdAt: -1 }).exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
@@ -126,17 +126,18 @@ exports.listAdminUserByParams = async (req, res) => {
       ].concat(query);
     }
 
-    const list = await AdminUser.aggregate(query);
+    const list = await User.aggregate(query);
 
     res.json(list);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 };
 
 exports.updateAdminUser = async (req, res) => {
   try {
-    const update = await AdminUser.findOneAndUpdate(
+    const update = await User.findOneAndUpdate(
       { _id: req.params._id },
       req.body,
       { new: true }
@@ -149,7 +150,7 @@ exports.updateAdminUser = async (req, res) => {
 
 exports.removeAdminUser = async (req, res) => {
   try {
-    const del = await AdminUser.findOneAndRemove({
+    const del = await User.findOneAndRemove({
       _id: req.params._id,
     });
     res.json(del);
@@ -158,41 +159,12 @@ exports.removeAdminUser = async (req, res) => {
   }
 };
 
-// exports.userLoginAdmin = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const findData = await AdminUser.findOne({
-//       email,
-//       password,
-//     }).exec();
-//     // console.log("find", findData);
-//     if (findData) {
-//       return res.status(200).json({
-//         isOk: true,
-//         data: findData,
-//         message: "Authentication Successfull",
-//       });
-//     } else {
-//       return res.status(200).json({
-//         isOk: false,
-//         message: "Authentication Failed",
-//       });
-//       // res.status(200).send("Authentication Failed!");
-//     }
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).send(err);
-//   }
-// };
-
 exports.userLoginAdmin = async (req, res) => {
   const { email, password } = req.body;
-  console.log("email", req.body);
   try {
-    const usermp = await AdminUser.findOne({ email: email }).exec();
+    const usermp = await User.findOne({ email: email }).exec();
     if (usermp) {
       if (usermp.password !== password) {
-        console.log("Password didn't match");
         return res.status(200).json({
           isOk: false,
           filed: 1,

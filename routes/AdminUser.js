@@ -11,7 +11,7 @@ const {
   updateAdminUser,
   removeAdminUser,
   userLoginAdmin,
-} = require("../controllers/Auth/AdminUser");
+} = require("../controllers/Auth/User/AdminUsers");
 
 router.post("/auth/create/adminUser", catchAsync(createAdminUser));
 

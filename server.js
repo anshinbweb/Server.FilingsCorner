@@ -8,7 +8,6 @@ const path = require("path");
 const { throws } = require("assert");
 require("dotenv").config();
 const axios = require("axios");
-var NodeCronJob = require("./nodeCron/NodeIndex");
 
 global.__basedir = __dirname;
 
@@ -28,7 +27,6 @@ mongoose
   .connect(process.env.DATABASE, { useNewUrlParser: true })
   .then(() => {
     databasestatus = "DB connected";
-    NodeCronJob.LoadCronJobs();
     console.log("DB connected");
   })
   .catch((err) => {
@@ -95,7 +93,7 @@ app.use(async (err, req, res, next) => {
   });
 });
 
-const port = process.env.PORT || 8005;
+const port = process.env.PORT || 8000;
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);

@@ -1,10 +1,3 @@
-//title
-//desc
-//likes: type array of userId
-//comments: type of array userId and comment
-//userId   (created blog by which user)
-//created at
-
 const mongoose = require("mongoose");
 const { Schema, model, Types } = require("mongoose");
 const BlogsSchema = new mongoose.Schema(

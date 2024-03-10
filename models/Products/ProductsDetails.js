@@ -27,18 +27,10 @@ const ProductDetailsSchema = new mongoose.Schema(
     productDescription: {
       type: String,
     },
-    // price: {
-    //   type: Number,
-    //   required: true,
-    // },
-    // weight: {
-    //   type: Number,
-    //   required: true,
-    // },
-    // unit: {
-    //   type: String,
-    //   required: true,
-    // },
+    price: {
+      type: Number,
+      required: true,
+    },
     IsActive: {
       type: Boolean,
       default: false,
@@ -47,27 +39,10 @@ const ProductDetailsSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    IsGiftHamper: {
+    isOutOfStock: {
       type: Boolean,
       default: false,
     },
-
-    isSize: {
-      type: Boolean,
-      default: false,
-    },
-    isDrink: {
-      type: Boolean,
-      default: false,
-    },
-    isMilk: {
-      type: Boolean,
-      default: false,
-    },
-    // isOutOfStock: {
-    //   type: Boolean,
-    //   default: false,
-    // },
   },
   { timestamps: true }
 );

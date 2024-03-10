@@ -1,4 +1,3 @@
-const { Long } = require("mongodb");
 const CategoryMaster = require("../../models/Category/CategoryMaster");
 
 exports.getCategoryMaster = async (req, res) => {
