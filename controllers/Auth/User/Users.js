@@ -2,6 +2,7 @@ const Users = require("../../../models/Auth/User/Users");
 const nodemailer = require('nodemailer');
 const resetTokens = {};
 const fs = require("fs");
+const NewsLetterSubs = require("../../../models/PolicyAndInquiry/NewsLetterSubs");
 
 exports.getUsers = async (req, res) => {
   try {
@@ -131,11 +132,6 @@ exports.createUsers = async (req, res) => {
     } else {
       const otpNumber = parseInt(resetTokens[email].otp , 10);
       const userotp = parseInt(otp , 10);
-      console.log("email",email);
-      console.log("user entered otp isss",otp);
-      console.log('resetTokens data are:', resetTokens);
-      console.log("otptpttp isss",otpNumber);
-      console.log("otptpttp user isss",userotp);
 
       if (userotp===otpNumber && !isExpired(resetTokens[email].timestamp)) {
       try{

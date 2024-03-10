@@ -54,7 +54,7 @@ exports.createProductsDetails = async (req, res) => {
     }).save();
     res.status(200).json({ isOk: true, data: add, message: "" });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return res.status(500).send(err);
   }
 };
@@ -73,7 +73,6 @@ exports.listSubscriptionProducts = async (req, res) => {
     const listSubsProduct = await ProductsDetails.find({ isSubscription: true })
       .sort({})
       .exec();
-    console.log("list in subscription", listSubsProduct);
 
     res.json(listSubsProduct);
   } catch (error) {
@@ -212,18 +211,6 @@ exports.listProductsDetailsByParams = async (req, res) => {
           preserveNullAndEmptyArrays: true,
         },
       },
-      // {
-      //   $set: {
-      //     categoryName: {
-      //       $map: {
-      //         input: "$category",
-      //         as: "category2",
-      //         in: "$$category2.categoryName",
-      //       },
-      //     },
-      //     // categoryName: "$$category.categoryName",
-      //   },
-      // },
 
       {
         $facet: {
@@ -252,21 +239,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
           path: "$stage1",
         },
       },
-      // {
-      //   $group: {
-      //     _id: "$_id",
-      //     count:{$first: "$stage1.count"},
-      //     data:{ $first:"$stage2"},
-      //     categoryName: {$push:{
-      //       $map: {
-      //         input: "$category",
-      //         as: "category2",
-      //         in: "$$category2.categoryName",
-      //       },
-      //     },}
-      //   }
-      // },
-
+     
       {
         $project: {
           count: "$stage1.count",
@@ -328,6 +301,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
           productName: list1[0].data[i].productName,
           productDescription: list1[0].data[i].productDescription,
           productImage: list1[0].data[i].productImage,
+          productVariantsId: list1[0].data[i].productVariantsId,
           basePrice: list1[0].data[i].basePrice,
           weight: list1[0].data[i].weight,
           unit: list1[0].data[i].unit,
@@ -338,7 +312,6 @@ exports.listProductsDetailsByParams = async (req, res) => {
         list.push(obj);
       }
 
-      console.log("list", list[0]);
       let list2 = [];
       for (let i = 0; i < list.length; i++) {
         let obj = {
@@ -347,6 +320,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
           productName: list[i].productName,
           productDescription: list[i].productDescription,
           productImage: list[i].productImage,
+          productVariantsId: list[i].productVariantsId,
           basePrice: list[i].basePrice,
           weight: list[i].weight,
           unit: list[i].unit,
@@ -368,7 +342,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
       res.json(ans);
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send(error);
   }
 };
@@ -379,15 +353,17 @@ exports.updateProductsDetails = async (req, res) => {
       ? `uploads/Products/${req.file.filename}`
       : null;
     let fieldvalues = { ...req.body };
+
     fieldvalues.categories = fieldvalues.categories
       ? fieldvalues.categories.split(",")
       : [];
     fieldvalues.productOptionId = fieldvalues.productOptionId
-      ? [fieldvalues.productOptionId]
+      ? fieldvalues.productOptionId.split(",")
       : [];
     fieldvalues.productVariantsId = fieldvalues.productVariantsId
-      ? [fieldvalues.productVariantsId]
+      ? fieldvalues.productVariantsId.split(",")
       : [];
+
     if (productImage != null) {
       fieldvalues.productImage = productImage;
     }
@@ -400,7 +376,6 @@ exports.updateProductsDetails = async (req, res) => {
     );
     res.json(update);
   } catch (err) {
-    console.log(err);
     res.status(500).send(err);
   }
 };
@@ -587,7 +562,7 @@ exports.CategoryProductListData = async (req, res) => {
       res.status(200).json({ isOk: false, message: "No data Found" });
     }
   } catch (error) {
-    console.log(error);
+    e.log(error);
     return res.status(400).send(error);
   }
 };
@@ -708,7 +683,7 @@ exports.getProductsOptions = async (req, res) => {
 
     res.json(options);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(400).send(error);
   }
 };
@@ -753,7 +728,7 @@ exports.getProductsOptionsParameters = async (req, res) => {
 
     res.json(options);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(400).send(error);
   }
 };
@@ -818,7 +793,7 @@ exports.getRelatedProducts = async (req, res) => {
 
     res.json(relatedProducts);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).send(error);
   }
 };
