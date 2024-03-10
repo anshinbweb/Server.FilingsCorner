@@ -1,8 +1,10 @@
 const Users = require("../../../models/Auth/User/Users");
 const nodemailer = require('nodemailer');
 const resetTokens = {};
+const resetTokens1 = {};
 const fs = require("fs");
 const NewsLetterSubs = require("../../../models/PolicyAndInquiry/NewsLetterSubs");
+const uuid = require('uuid');
 
 exports.getUsers = async (req, res) => {
   try {
@@ -525,3 +527,127 @@ exports.ChangePasswordUser = async (req, res) => {
     return res.status(500).json("change password user login failed");
   }
 };
+exports.forgotPassword=async(req,res)=>{
+  try{
+  const resetTokens = {};
+
+  const {email} = req.body;
+  console.log("email from frontend isss",email);
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: "marwiz.tech@gmail.com",
+      pass: "abuoxineboamaqkm"
+    },
+  });
+  
+  // Check if the email exists in the dummy database
+  const user=await Users.findOne({
+    email:email
+  }).exec()
+  .then((docs) => {
+  console.log("userrrrr issss",docs.email);
+  const token = uuid.v4();
+  const timestamp=Date.now();
+  resetTokens1[email]= {
+    token: token,
+    email:email,
+    timestamp: timestamp,
+  };
+  // resetTokens3[token]= {
+  //   email:email,
+  //   timestamp: timestamp,
+  // };
+  // Send the password reset email
+  const resetLink = `${process.env.REACT_APP_API_URL_COFFEE}/change-password?timestamp=${timestamp}`;
+  const mailOptions = {
+    from: 'marwiz.tech@gmail.com',
+    to: docs.email,
+    subject: 'Password Reset',
+    text: `Click the following link to reset your password,it will be invalid after 15 minutes: ${resetLink}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Failed to send reset email' });
+    }
+
+    console.log('Email sent: ' + info.response);
+    // console.log("resettokens3",resetTokens3);
+    res.status(200).json({
+      isOk: true,
+      isSent: true,
+      email: email
+    });
+  });
+  // Generate a unique token
+})
+.catch((err) => {
+  res.status(200).json({
+    isOk: false,
+    msg:"User not found!",
+  });
+});
+  } catch(err)  {
+    res.status(500).json({
+      isOk: false,
+      msg:err,
+    });
+  }
+}
+
+
+exports.NewPassword=async(req,res)=>{
+  let{newpassword,confirmpassword,timestamp}=req.body;
+  
+  let currentTimestamp = Date.now();
+
+  const linkExpirationTime = 15 * 60 * 1000; // 15 minutes in milliseconds
+  const email=Object.keys(resetTokens1)[0];
+  // const timestamp=resetTokens1[email].timestamp;
+  console.log("timestamp isss",timestamp);
+  let diff=currentTimestamp-timestamp
+  if (diff<linkExpirationTime) {
+    // The link is valid, allow the user to change the password
+    if(newpassword!==confirmpassword){
+      res.status(200).json({
+        isOk: false,
+        isNoMatch: true,
+      });
+    }
+    else
+    {
+    console.log("resettokens1",resetTokens1);
+    console.log("new password iss",newpassword);
+    console.log("confirm password isss",confirmpassword);
+    const email=Object.keys(resetTokens1)[0];
+    console.log("current email isss",email);
+    const user = await Users.findOne({ email }).exec();
+  
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // Update the user's password or any other value based on your requirements
+    user.password = newpassword; // Replace 'password' with the actual field you want to update
+    await user.save();
+    resetTokens1[email].timestamp=0;
+    // delete resetTokens1[email];
+  
+    console.log("after updating password resettokens1",currentTimestamp-resetTokens1[email].timestamp);
+    res.status(200).json({
+      isOk: true,
+      isSent: true,
+    });
+
+  
+      
+    }
+  } else {
+    // The link has expired
+    res.status(200).json({
+      isOk: false,
+      msg: "link is not valid now!" ,
+    });
+  }
+}

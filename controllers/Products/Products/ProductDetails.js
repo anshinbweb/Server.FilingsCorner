@@ -4,6 +4,7 @@ const SubscriptionMaster = require("../../../models/Subscription/SubscriptionMas
 const { mongoose } = require("mongoose");
 const ProductOptions = require("../../../models/Products/Products/ProductOptions");
 const ProductVariants = require("../../../models/Products/Products/ProductVariants");
+const { log } = require("console");
 
 exports.getProductsDetails = async (req, res) => {
   try {
@@ -741,6 +742,8 @@ exports.getRelatedProducts = async (req, res) => {
       _id: productId,
     }).exec();
 
+    console.log("product", product);
+
     const query = [
       {
         $match: {
@@ -780,9 +783,8 @@ exports.getRelatedProducts = async (req, res) => {
       },
     ];
 
-    const relatedProducts = await ProductsDetails.find(query).exec();
+    const relatedProducts = await ProductsDetails.aggregate(query).exec();
 
-    // random shuffle array in relatedProducts
     for (let i = relatedProducts.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [relatedProducts[i], relatedProducts[j]] = [
@@ -790,8 +792,9 @@ exports.getRelatedProducts = async (req, res) => {
         relatedProducts[i],
       ];
     }
+    const limitedRelatedProducts = relatedProducts.slice(0, 5);
 
-    res.json(relatedProducts);
+    res.json(limitedRelatedProducts);
   } catch (error) {
     // console.log(error);
     return res.status(500).send(error);

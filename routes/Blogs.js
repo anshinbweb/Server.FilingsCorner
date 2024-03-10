@@ -15,6 +15,8 @@ const {
   topPopularPosts,
   SearchBlog,
   SerachBlogDetails,
+  AddLikes,
+  RemoveLikes,
 } = require("../controllers/Blogs/Blogs");
 
 const multer = require("multer");
@@ -46,6 +48,10 @@ router.get("/auth/serachblogDetails/blogs", catchAsync(SerachBlogDetails));
 router.post("/auth/topPopularPosts/blogs", catchAsync(topPopularPosts));
 
 router.put("/auth/updateViews/blogs/:bid/:views", catchAsync(updateViews));
+
+router.put("/auth/addLikes/blogs/:blogId/:userId", catchAsync(AddLikes));
+
+router.put("/auth/removeLikes/blogs/:blogId/:userId", catchAsync(RemoveLikes));
 
 router.post("/auth/list-by-params/blogs", catchAsync(listBlogsByParams));
 
