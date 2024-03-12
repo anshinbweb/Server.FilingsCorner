@@ -1,4 +1,5 @@
 const User = require("../../../models/Auth/User/AdminUsers");
+const fs = require("fs");
 
 exports.getAdminUser = async (req, res) => {
   try {
@@ -11,6 +12,17 @@ exports.getAdminUser = async (req, res) => {
 
 exports.createAdminUser = async (req, res) => {
   try {
+
+    if (!fs.existsSync(`${__basedir}/uploads/userImages`)) {
+      fs.mkdirSync(`${__basedir}/uploads/userImages`);
+    }
+
+    let bannerImage = req.file
+      ? `uploads/userImages/${req.file.filename}`
+      : null;
+
+
+      let { firstName, lastName, email,password, IsActive } = req.body;  
     const emailExists = await User.findOne({
       email: req.body.email,
     }).exec();
@@ -21,11 +33,15 @@ exports.createAdminUser = async (req, res) => {
         message: "Email already exists",
       });
     } else {
-      const add = await new User(req.body).save();
-      return res.status(200).json({
-        isOk: true,
-        data: add,
-      });
+      const add = await new User({
+        firstName,
+        lastName,
+        email,
+        password,
+        bannerImage,
+        IsActive,
+      }).save();
+      res.status(200).json({ isOk: true, data: add, message: "" });
     }
   } catch (err) {
     console.log(err);
@@ -137,9 +153,16 @@ exports.listAdminUserByParams = async (req, res) => {
 
 exports.updateAdminUser = async (req, res) => {
   try {
+    let bannerImage = req.file
+      ? `uploads/userImages/${req.file.filename}`
+      : null;
+    let fieldvalues = { ...req.body };
+    if (bannerImage != null) {
+      fieldvalues.bannerImage = bannerImage;
+    }
     const update = await User.findOneAndUpdate(
       { _id: req.params._id },
-      req.body,
+      fieldvalues,
       { new: true }
     );
     res.json(update);
