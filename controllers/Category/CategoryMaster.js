@@ -20,7 +20,7 @@ exports.createCategoryMaster = async (req, res) => {
 
 exports.listCategoryMaster = async (req, res) => {
   try {
-    const list = await CategoryMaster.find().sort({ createdAt: -1 }).exec();
+    const list = await CategoryMaster.find({ IsActive: true }).sort({ categoryName : 1 }).exec();
     res.json(list);
   } catch (error) {
     return res.status(400).send(error);
