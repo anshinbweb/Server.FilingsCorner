@@ -98,6 +98,19 @@ exports.listProductsDetailsByParams = async (req, res) => {
       },
 
       {
+        $match: {
+          $or: [
+            {
+              productName: { $regex: match, $options: "i" },
+            },
+            {
+              "category.categoryName": { $regex: match, $options: "i" },
+            },
+          ],
+        },
+      },
+
+      {
         $facet: {
           stage1: [
             {
@@ -131,19 +144,7 @@ exports.listProductsDetailsByParams = async (req, res) => {
         },
       },
     ];
-    if (match) {
-      query = [
-        {
-          $match: {
-            $or: [
-              {
-                ProductsDetails: { $regex: match, $options: "i" },
-              },
-            ],
-          },
-        },
-      ].concat(query);
-    }
+   
 
     if (sorton && sortdir) {
       let sort = {};
