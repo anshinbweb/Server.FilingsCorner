@@ -4,8 +4,6 @@ const Employee = require('../models/Master/Employee');
 exports.isAuthenticated = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
-    // console.log(">>",req.headers);
-
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ error: "Not logged in" });
     }
@@ -14,7 +12,6 @@ exports.isAuthenticated = async (req, res, next) => {
     if (!token) {
         return res.status(401).json({ error: "Not logged in" });
     }
-
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_TOKEN);

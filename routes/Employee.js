@@ -1,6 +1,5 @@
 const express = require('express');
 const { createEmployee, getEmployee, removeEmployee, updateEmployee, listEmployees, loginEmployee } = require('../controllers/Master/Employee');
-const { isAuthenticated } = require('../middlewares/auth');
 
 const router = express.Router();
 const multer = require("multer");
@@ -18,10 +17,10 @@ const upload = multer({ storage: multerStorage });
 
 router.post('/login', loginEmployee);
 
-router.post('/employees/create', upload.single("myFile"), isAuthenticated, createEmployee);
-router.get('/employees/:id', isAuthenticated, getEmployee);
-router.delete('/employees/:id', isAuthenticated, removeEmployee);
-router.put('/employees/:id', isAuthenticated, updateEmployee);
-router.get('/employees', isAuthenticated, listEmployees);
+router.post('/employees/create', upload.single("myFile"), createEmployee);
+router.get('/employees/:id', getEmployee);
+router.delete('/employees/:id', removeEmployee);
+router.put('/employees/:id', updateEmployee);
+router.get('/employees', listEmployees);
 
 module.exports = router;

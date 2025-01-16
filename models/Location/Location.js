@@ -3,7 +3,8 @@ const { Schema, model, Types } = require("mongoose");
 const CompanyLocationSchema = new mongoose.Schema(
   {
     CityID: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref:"City",
       required: true,
     },
     StateID: {
@@ -34,15 +35,6 @@ const CompanyLocationSchema = new mongoose.Schema(
     StoreLogo: {
       type: String,
     },
-    // UserName: {
-    //   type: String,
-    //   required: true,
-    // },
-    // Password: {
-    //   type: String,
-    //   required: true,
-    // },
-    
     IsActive: {
       type: Boolean,
       default: true,

@@ -10,6 +10,14 @@ const CompanyDetailsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    EmailID_Company: {
+      type: String,
+      required: true,
+    },
+    Password: {
+      type: String,
+      required: true,
+    },
     CountryID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Country",

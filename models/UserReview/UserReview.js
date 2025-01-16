@@ -13,9 +13,7 @@ const UserReviewSchema = new mongoose.Schema(
     },
     message: {
         type: String,
-    },
-   
-    
+    }, 
   },
   { timestamps: true }
 );
