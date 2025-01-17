@@ -29,7 +29,8 @@ const CompanyMasterSchema = new mongoose.Schema(
       required: true,
     },
     City: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "State",
       required: true,
     },
     Address: {

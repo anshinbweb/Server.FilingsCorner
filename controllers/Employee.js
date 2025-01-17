@@ -1,4 +1,4 @@
-const Employee = require("../../models/Master/Employee");
+const Employee = require("../models/EmployeeDetails");
 
 
 exports.loginEmployee = async (req, res) => {

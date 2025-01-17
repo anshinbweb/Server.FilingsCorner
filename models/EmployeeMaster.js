@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const employeeSchema = new mongoose.Schema(
+const employeeMasterSchema = new mongoose.Schema(
     {
         firstName: {
             type: String,
@@ -12,7 +12,6 @@ const employeeSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-        image: String,
         email: {
             type: String,
             required: true,
@@ -21,9 +20,7 @@ const employeeSchema = new mongoose.Schema(
         },
         password: { type: String, required: true },
         phone: {
-            type: String,
-            required: false,
-            trim: true,
+            type: Number,
         },
         department: {
             type: String,
@@ -37,27 +34,26 @@ const employeeSchema = new mongoose.Schema(
                 "Executive",
             ],
         },
-        role: {
-            type: String,
-            enum: ["admin", "employee"],
-        },
         dateOfJoining: {
             type: Date,
             required: true,
+        },
+        photo: {
+            type: String,
         },
         currentSalary: {
             type: Number,
             required: true,
             min: 0,
         },
+        companyDetailsId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "CompanyDetails",
+            required: true,
+        },
         isActive: {
             type: Boolean,
             default: true,
-        },
-        companyId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "CompanyMaster",
-            required: true,
         },
     },
     {
@@ -65,17 +61,17 @@ const employeeSchema = new mongoose.Schema(
     }
 );
 
-const Employee = mongoose.model("Employee", employeeSchema);
+const EmployeeMaster = mongoose.model("EmployeeMaster", employeeMasterSchema);
 
-employeeSchema.pre("save", async function (next) {
+employeeMasterSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
 });
 
-employeeSchema.methods.matchPassword = async function (enteredPassword) {
+employeeMasterSchema.methods.matchPassword = async function (enteredPassword) {
     return bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = Employee;
+module.exports = EmployeeMaster;

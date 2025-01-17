@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 
-const employeeMasterSchema = new mongoose.Schema(
+const employeeDetailsSchema = new mongoose.Schema(
     {
         firstName: {
             type: String,
@@ -13,21 +12,15 @@ const employeeMasterSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-        image: String,
         email: {
             type: String,
             required: true,
             unique: true,
             trim: true,
         },
-        password: {
-            type: String,
-            required: true,
-        },
+        password: { type: String, required: true },
         phone: {
-            type: String,
-            required: false,
-            trim: true,
+            type: Number,
         },
         department: {
             type: String,
@@ -45,19 +38,27 @@ const employeeMasterSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
+        photo: {
+            type: String,
+        },
         currentSalary: {
             type: Number,
             required: true,
             min: 0,
         },
+        companyDetailsId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "CompanyDetails",
+            required: true,
+        },
+        employeeMasterId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "EmployeeMaster",
+            required: true,
+        },
         isActive: {
             type: Boolean,
             default: true,
-        },
-        companyMasterId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "CompanyMaster",
-            required: true,
         },
     },
     {
@@ -65,17 +66,17 @@ const employeeMasterSchema = new mongoose.Schema(
     }
 );
 
-const EmployeeMaster = mongoose.model("EmployeeMaster", employeeMasterSchema);
+const EmployeeDetails = mongoose.model("EmployeeDetails", employeeDetailsSchema);
 
-employeeMasterSchema.pre("save", async function (next) {
+employeeDetailsSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
 });
 
-employeeMasterSchema.methods.matchPassword = async function (enteredPassword) {
+employeeDetailsSchema.methods.matchPassword = async function (enteredPassword) {
     return bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = EmployeeMaster;
+module.exports = EmployeeDetails;
