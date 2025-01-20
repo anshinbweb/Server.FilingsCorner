@@ -84,6 +84,7 @@ exports.updateCompanyDetails = async (req, res) => {
         Object.entries(existingFiles).forEach(([key, oldFilePath]) => {
             if (
                 oldFilePath &&
+                updatedFiles[key] !== null && 
                 oldFilePath !== updatedFiles[key] &&
                 fs.existsSync(`${__basedir}/${oldFilePath}`)
             ) {

@@ -16,6 +16,11 @@ const RateCardSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        currencyId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "CurrencyMaster",
+            required: true,
+        },
         companyDetailsId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "CompanyDetails",

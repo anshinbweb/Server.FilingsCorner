@@ -9,7 +9,7 @@ exports.createService = async (req, res) => {
             companyDetailsId,
             IsActive,
         } = req.body;
-        console.log(requiredDocuments)
+        console.log(requiredDocuments);
         const service = new Services({
             serviceName,
             serviceDescription,
@@ -138,12 +138,14 @@ exports.deleteService = async (req, res) => {
             });
         }
 
+        await RateCard.deleteMany({ serviceId: _id }).exec();
+
         return res.status(200).json({
             isOk: true,
-            message: "Service deleted successfully",
+            message: "Service and associated rate cards deleted successfully",
         });
     } catch (error) {
-        console.log(error);
+        console.error("Error deleting service:", error);
         return res.status(500).json({
             isOk: false,
             message: "Internal server error",
@@ -222,7 +224,7 @@ exports.updateService = async (req, res) => {
             error: error.message,
         });
     }
-}
+};
 
 exports.listServicesByCompanyId = async (req, res) => {
     try {
@@ -242,4 +244,4 @@ exports.listServicesByCompanyId = async (req, res) => {
             error: error.message,
         });
     }
-}
+};

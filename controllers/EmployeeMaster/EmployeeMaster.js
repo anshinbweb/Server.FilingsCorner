@@ -111,61 +111,93 @@ exports.listEmployeeMasterByCompany = async (req, res) => {
 exports.listEmployeesMasterByParams = async (req, res) => {
     try {
         let { skip, per_page, sorton, sortdir, match, isActive } = req.body;
-        const { companyDetailsId } = req.params;
 
-        skip = parseInt(skip) || 0;
-        per_page = parseInt(per_page) || 10;
-        sortdir = sortdir === "desc" ? -1 : 1;
-        isActive = isActive === "true" || isActive === true;
+        const companyDetailsId = req.params.companyDetailsId;
 
-        const sort = {};
-        sort[sorton || "createdAt"] = sortdir;
-
-        const query = [];
-
-        if (match) {
-            query.push({
-                $match: {
-                    $or: [
-                        { firstName: { $regex: match, $options: "i" } },
-                        { lastName: { $regex: match, $options: "i" } },
+        let query = [
+            {
+                $match: { isActive: isActive },
+            },
+            {
+                $facet: {
+                    stage1: [
                         {
-                            companyDetailsId: new mongoose.Types.ObjectId(
-                                companyDetailsId
-                            ),
+                            $group: {
+                                _id: null,
+                                count: {
+                                    $sum: 1,
+                                },
+                            },
+                        },
+                    ],
+                    stage2: [
+                        {
+                            $skip: skip,
+                        },
+                        {
+                            $limit: per_page,
                         },
                     ],
                 },
-            });
+            },
+            {
+                $unwind: {
+                    path: "$stage1",
+                },
+            },
+            {
+                $project: {
+                    count: "$stage1.count",
+                    data: "$stage2",
+                },
+            },
+        ];
+        if (match) {
+            query = [
+                {
+                    $match: {
+                        $or: [
+                            {
+                                firstName: { $regex: match, $options: "i" },
+                                lastName: { $regex: match, $options: "i" },
+                            },
+                            {
+                                companyDetailsId: companyDetailsId,
+                            },
+                        ],
+                    },
+                },
+            ].concat(query);
         }
 
-        query.push({
-            $sort: sort,
-        });
+        if (sorton && sortdir) {
+            let sort = {};
+            sort[sorton] = sortdir == "desc" ? -1 : 1;
+            query = [
+                {
+                    $sort: sort,
+                },
+            ].concat(query);
+        } else {
+            let sort = {};
+            sort["createdAt"] = -1;
+            query = [
+                {
+                    $sort: sort,
+                },
+            ].concat(query);
+        }
 
-        query.push({
-            $facet: {
-                metadata: [
-                    {
-                        $count: "total",
-                    },
-                ],
-                data: [{ $skip: skip }, { $limit: per_page }],
-            },
-        });
+        const ServicesList = await EmployeeMaster.aggregate(query);
 
-        const result = await EmployeeMaster.aggregate(query);
+        console.log(ServicesList);
 
-        const metadata = result[0]?.metadata[0] || { total: 0 };
-        const data = result[0]?.data || [];
-
-        res.json({
-            total: metadata.total,
-            data,
+        return res.status(200).json({
+            data: ServicesList,
         });
     } catch (error) {
-        console.error("Error in listEmployeesMasterByParams:", error);
-        res.status(500).send({ message: "Internal Server Error", error });
+        console.log(error);
+        return res.status(500).send(error);
     }
 };
 
